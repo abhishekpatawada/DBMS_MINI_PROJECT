@@ -7,6 +7,7 @@ from backend.routes.restaurant_routes import router as restaurant_router
 from backend.routes.grocery_routes import router as grocery_router
 from backend.routes.delivery_routes import router as delivery_router
 from backend.routes.order_routes import router as order_router
+from backend.routes.visualizer_routes import router as visualizer_router
 
 app = FastAPI(
     title="DBMS Project REST API",
@@ -30,6 +31,7 @@ app.include_router(restaurant_router)
 app.include_router(grocery_router)
 app.include_router(delivery_router)
 app.include_router(order_router)
+app.include_router(visualizer_router)
 
 
 @app.get("/")
