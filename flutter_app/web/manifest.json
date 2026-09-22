@@ -1,0 +1,11 @@
+{
+  "name": "DBMS Project",
+  "short_name": "DBMS Project",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0175C2",
+  "theme_color": "#0175C2",
+  "description": "Food & Grocery Delivery App",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false
+}

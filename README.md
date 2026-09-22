@@ -1,119 +1,121 @@
 # DBMS Project - Food & Grocery Delivery Platform
 
-A local database management system college project built with **Python**, **Streamlit**, and **MySQL**.
+A full-stack multi-vendor Food & Grocery delivery database management system built with **Flutter** (Frontend), **Python FastAPI** (Backend REST API), and **MySQL** (Database).
 
 ---
 
-## 🏗️ Project Architecture
+## 📱 User Interface Navigation Flow
+
+1. **Screen 1: Role Selection**
+   - Choose one of the 4 roles:
+     - 👤 **Customer (User)**
+     - 🛵 **Delivery Agent**
+     - 🏪 **Restaurant Partner**
+     - 🏬 **Dark Store Hub**
+2. **Screen 2: Sign In / Sign Up (with Phone Number)**
+   - **Sign In**: Login using registered phone number / identifier.
+   - **Sign Up**: Register new profile with dynamic form fields tailored to the chosen role.
+3. **Screen 3: Role-Specific Dashboards (Full CRUD)**
+   - **Customer**: Place orders from restaurants/dark stores, view live orders, cancel/delete orders.
+   - **Delivery Agent**: View assigned drop-offs, fast-action status updates (`Out for Delivery`, `Delivered`).
+   - **Restaurant Partner**: Full menu management (Add/Edit/Delete dishes), set discounts, update order progress.
+   - **Dark Store Hub**: Real-time grocery inventory (Add/Edit stock/Delete items), fulfill store dispatches.
+
+---
+
+## 🏗️ Project Structure
 
 ```text
 dbms_project/
 │
-├── app.py                      # Main Streamlit application entry point
-├── requirements.txt            # Python dependencies
-├── README.md                   # Project documentation
-├── .gitignore                  # Git ignore configuration
-├── .env.example                # Sample environment variables template
+├── flutter_app/                        # 📱 Flutter Cross-Platform Client
+│   ├── pubspec.yaml
+│   ├── lib/
+│   │   ├── main.dart                   # Flutter entry point & app theme
+│   │   ├── theme/
+│   │   │   └── app_theme.dart          # Material 3 design system
+│   │   ├── models/
+│   │   │   └── models.dart             # JSON-serializable Dart entities
+│   │   ├── services/
+│   │   │   └── api_service.dart        # Centralized HTTP client
+│   │   └── screens/
+│   │       ├── role_selection_screen.dart   # Screen 1: Role Selection
+│   │       ├── auth_screen.dart             # Screen 2: Sign In / Sign Up
+│   │       ├── user/                        # Screen 3: Customer Dashboard
+│   │       ├── delivery_agent/              # Screen 3: Agent Dashboard
+│   │       ├── restaurant/                  # Screen 3: Restaurant Dashboard
+│   │       └── dark_store/                  # Screen 3: Dark Store Hub
 │
-├── frontend/                   # Streamlit UI views & components
-│   ├── __init__.py
-│   ├── user/                   # Customer dashboard views
-│   │   ├── __init__.py
-│   │   └── dashboard.py
-│   ├── delivery_agent/         # Delivery personnel portal
-│   │   ├── __init__.py
-│   │   └── dashboard.py
-│   ├── restaurant/             # Restaurant management portal
-│   │   ├── __init__.py
-│   │   └── dashboard.py
-│   └── dark_store/             # Dark store inventory management
-│       ├── __init__.py
-│       └── dashboard.py
+├── backend/                            # ⚡ Python FastAPI REST API
+│   ├── main.py                         # FastAPI app & CORS configuration
+│   ├── config.py                       # Environment configuration loader
+│   ├── database.py                     # MySQL connection manager & query helpers
+│   ├── routes/
+│   │   ├── auth_routes.py              # Phone login & registration API
+│   │   ├── user_routes.py              # User CRUD endpoints
+│   │   ├── restaurant_routes.py        # Restaurant & Menu CRUD endpoints
+│   │   ├── grocery_routes.py           # Dark Store & Grocery CRUD endpoints
+│   │   ├── delivery_routes.py          # Delivery Agent CRUD endpoints
+│   │   └── order_routes.py             # Transactional Order & Status endpoints
+│   └── ... (service modules)
 │
-├── backend/                    # Business logic and database interface
-│   ├── __init__.py
-│   ├── config.py               # Environment configuration loader
-│   ├── database.py             # Reusable MySQL connection manager & query helpers
-│   ├── user_service.py         # Customer CRUD logic
-│   ├── order_service.py        # Order placement and tracking logic
-│   ├── restaurant_service.py   # Restaurant and menu management
-│   ├── grocery_service.py      # Dark store stock & inventory operations
-│   ├── delivery_service.py     # Agent dispatch and transit updates
-│   └── payment_service.py      # Payment transaction handler
+├── database/                           # 🗄️ MySQL Database
+│   ├── schema.sql                      # DDL for all ER tables & foreign keys
+│   ├── sample_data.sql                 # Starter mock data
+│   └── queries.sql                     # Analytical and operational queries
 │
-├── database/                   # SQL schemas and queries
-│   ├── schema.sql              # MySQL DDL table definitions & constraints
-│   ├── sample_data.sql         # Starter mock data
-│   └── queries.sql             # Useful analytical and operational queries
-│
-├── models/                     # Python data classes representing entities
-│   ├── __init__.py
-│   ├── user.py
-│   ├── order.py
-│   ├── restaurant.py
-│   ├── grocery.py
-│   ├── delivery_agent.py
-│   └── payment.py
-│
-└── utils/                      # Helper utilities
-    ├── __init__.py
-    └── helpers.py              # Formatting & helper functions
+├── requirements.txt                    # Python dependencies
+├── .env.example                        # MySQL configuration template
+└── README.md                           # Documentation
 ```
 
 ---
 
-## 📊 Database Entities & Schema
+## 🚀 How to Run Locally
 
-The relational schema is defined in [database/schema.sql](database/schema.sql):
-
-- **`users`**: Customer profiles with delivery addresses (`User_Id`, `User_Name`, `User_Phone`, `Street`, `Area`, `State`, `Pincode`).
-- **`delivery_agent`**: Delivery fleet information (`Agent_Id`, `Agent_Name`, `Agent_Phone`, `VehicleNO`, `V_Type`, `Has_license`, `Rating`).
-- **`restaurant`**: Restaurant listings (`Rest_Id`, `RName`, `RLocation`, `RPhone`, `RRating`).
-- **`rest_items`**: Menu items with dynamic final price calculation (`Rest_Id`, `Item_Name`, `Food_Name`, `Is_Veg`, `BasePrice`, `Discount`, `FinalPrice`).
-- **`dark_store`**: Local fulfillment centers (`Store_Id`, `DS_Street`, `DS_Area`, `DS_State`, `DS_Pincode`).
-- **`groceries`**: Inventory per dark store (`Store_Id`, `Item_Name`, `Price`, `Available_count`).
-- **`orders`**: Placed orders tracking user and assigned agent (`Order_Id`, `User_Id`, `Agent_Id`, `Order_Type`, `Order_Status`, `Total_Amount`, `Order_Date`).
-- **`order_items`**: Line items per order (`Item_Order_Id`, `Order_Id`, `Item_Name`, `Quantity`, `Item_Price`, `Subtotal`).
-- **`payments`**: Payment records (`Payment_Id`, `Order_Id`, `Payment_Method`, `Payment_Status`, `Transaction_Date`, `Amount`).
-
----
-
-## 🚀 Setup & Installation
-
-### 1. Prerequisites
-- Python 3.10+
-- MySQL Server (Local instance, XAMPP, or MySQL Workbench)
-
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env` and set your local MySQL credentials:
-
-```bash
-cp .env.example .env
+### 1. Database Setup (MySQL)
+Run the SQL scripts in MySQL CLI or MySQL Workbench:
+```sql
+SOURCE database/schema.sql;
+SOURCE database/sample_data.sql;
 ```
 
-Edit `.env`:
+Configure your `.env` file in the root directory:
 ```env
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=your_mysql_password
 DB_NAME=dbms_project
 ```
 
-### 3. Initialize MySQL Database
-Run the SQL scripts in MySQL CLI or MySQL Workbench:
+---
 
-```bash
-mysql -u root -p < database/schema.sql
-mysql -u root -p < database/sample_data.sql
-```
-
-### 4. Install Dependencies
+### 2. Start the Python FastAPI Backend
+Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-### 5. Launch the Streamlit App
+Run the backend server:
 ```bash
-streamlit run app.py
+uvicorn backend.main:app --reload --port 8000
+```
+- **REST API URL**: `http://localhost:8000`
+- **Interactive Swagger Documentation**: `http://localhost:8000/docs`
+
+---
+
+### 3. Start the Flutter Frontend
+Navigate to the `flutter_app` directory:
+```bash
+cd flutter_app
+flutter pub get
+```
+
+Run on Chrome (Web), Windows Desktop, or Mobile emulator:
+```bash
+flutter run -d chrome
+# or
+flutter run -d windows
 ```
