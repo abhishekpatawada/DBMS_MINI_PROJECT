@@ -10,7 +10,9 @@ from backend.restaurant_service import (
     get_restaurant_menu,
     add_restaurant_item,
     update_restaurant_item,
-    delete_restaurant_item
+    delete_restaurant_item,
+    get_all_dishes,
+    get_restaurant_revenue_analytics
 )
 
 router = APIRouter(prefix="/api/restaurants", tags=["Restaurants"])
@@ -29,6 +31,7 @@ class MenuItemCreate(BaseModel):
     is_veg: Optional[bool] = True
     base_price: float
     discount: Optional[float] = 0.0
+    image_url: Optional[str] = None
 
 
 class MenuItemUpdate(BaseModel):
@@ -37,11 +40,17 @@ class MenuItemUpdate(BaseModel):
     is_veg: Optional[bool] = True
     base_price: float
     discount: Optional[float] = 0.0
+    image_url: Optional[str] = None
 
 
 @router.get("")
 def list_restaurants():
     return get_all_restaurants()
+
+
+@router.get("/dishes/all")
+def list_all_dishes():
+    return get_all_dishes()
 
 
 @router.get("/{rest_id}")
@@ -82,14 +91,14 @@ def list_menu(rest_id: int):
 
 @router.post("/{rest_id}/menu")
 def add_menu_item(rest_id: int, req: MenuItemCreate):
-    if add_restaurant_item(rest_id, req.item_name, req.food_name, req.is_veg, req.base_price, req.discount):
+    if add_restaurant_item(rest_id, req.item_name, req.food_name, req.is_veg, req.base_price, req.discount, req.image_url):
         return {"status": "success", "message": "Menu item added"}
     raise HTTPException(status_code=400, detail="Failed to add menu item.")
 
 
 @router.put("/{rest_id}/menu/{item_name}")
 def edit_menu_item(rest_id: int, item_name: str, req: MenuItemUpdate):
-    if update_restaurant_item(rest_id, item_name, req.new_item_name, req.food_name, req.is_veg, req.base_price, req.discount):
+    if update_restaurant_item(rest_id, item_name, req.new_item_name, req.food_name, req.is_veg, req.base_price, req.discount, req.image_url):
         return {"status": "success", "message": "Menu item updated"}
     raise HTTPException(status_code=400, detail="Failed to update menu item.")
 
@@ -99,3 +108,14 @@ def remove_menu_item(rest_id: int, item_name: str):
     if delete_restaurant_item(rest_id, item_name):
         return {"status": "success", "message": "Menu item deleted"}
     raise HTTPException(status_code=400, detail="Failed to delete menu item.")
+
+
+# --- Big Screen Revenue Dashboard Analytics ---
+
+@router.get("/{rest_id}/revenue-analytics")
+def restaurant_revenue_analytics(rest_id: int):
+    analytics = get_restaurant_revenue_analytics(rest_id)
+    if not analytics:
+        raise HTTPException(status_code=404, detail="Restaurant analytics unavailable.")
+    return analytics
+

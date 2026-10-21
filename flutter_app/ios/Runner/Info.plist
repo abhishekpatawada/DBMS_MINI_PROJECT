@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Flutter App</string>
+	<string>BiteHub</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,13 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>flutter_app</string>
+	<string>BiteHub</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>BiteHub needs your location to deliver food and groceries to your doorstep.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>BiteHub requires camera access to scan item barcodes and take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>BiteHub requires photo library access to upload item and profile pictures.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

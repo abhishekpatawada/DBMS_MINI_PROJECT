@@ -10,7 +10,9 @@ from backend.grocery_service import (
     get_groceries_by_store,
     add_grocery_item,
     update_grocery_item,
-    delete_grocery_item
+    delete_grocery_item,
+    get_all_groceries,
+    get_dark_store_revenue_analytics
 )
 
 router = APIRouter(prefix="/api/dark-stores", tags=["Dark Stores & Groceries"])
@@ -27,17 +29,24 @@ class GroceryItemCreate(BaseModel):
     item_name: str
     price: float
     available_count: int
+    image_url: Optional[str] = None
 
 
 class GroceryItemUpdate(BaseModel):
     new_item_name: str
     price: float
     available_count: int
+    image_url: Optional[str] = None
 
 
 @router.get("")
 def list_dark_stores():
     return get_all_dark_stores()
+
+
+@router.get("/groceries/all")
+def list_all_groceries(store_id: Optional[int] = None):
+    return get_all_groceries(store_id)
 
 
 @router.get("/{store_id}")
@@ -78,14 +87,14 @@ def list_groceries(store_id: int):
 
 @router.post("/{store_id}/groceries")
 def add_grocery(store_id: int, req: GroceryItemCreate):
-    if add_grocery_item(store_id, req.item_name, req.price, req.available_count):
+    if add_grocery_item(store_id, req.item_name, req.price, req.available_count, req.image_url):
         return {"status": "success", "message": "Grocery item added"}
     raise HTTPException(status_code=400, detail="Failed to add grocery item.")
 
 
 @router.put("/{store_id}/groceries/{item_name}")
 def edit_grocery(store_id: int, item_name: str, req: GroceryItemUpdate):
-    if update_grocery_item(store_id, item_name, req.new_item_name, req.price, req.available_count):
+    if update_grocery_item(store_id, item_name, req.new_item_name, req.price, req.available_count, req.image_url):
         return {"status": "success", "message": "Grocery item updated"}
     raise HTTPException(status_code=400, detail="Failed to update grocery item.")
 
@@ -95,3 +104,14 @@ def remove_grocery(store_id: int, item_name: str):
     if delete_grocery_item(store_id, item_name):
         return {"status": "success", "message": "Grocery item deleted"}
     raise HTTPException(status_code=400, detail="Failed to delete grocery item.")
+
+
+# --- Big Screen Revenue Dashboard Analytics ---
+
+@router.get("/{store_id}/revenue-analytics")
+def dark_store_revenue_analytics(store_id: int):
+    analytics = get_dark_store_revenue_analytics(store_id)
+    if not analytics:
+        raise HTTPException(status_code=404, detail="Dark store analytics unavailable.")
+    return analytics
+

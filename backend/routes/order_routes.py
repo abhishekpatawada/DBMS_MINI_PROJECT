@@ -23,10 +23,16 @@ class OrderItemInput(BaseModel):
 
 class PlaceOrderRequest(BaseModel):
     user_id: int
+    rest_id: Optional[int] = None
+    store_id: Optional[int] = None
     agent_id: Optional[int] = None
-    order_type: str  # "Restaurant" or "Grocery"
-    payment_method: str  # "UPI", "Credit Card", "Debit Card", "Cash on Delivery"
+    order_type: str = "Restaurant"  # "Restaurant" or "Grocery"
+    payment_method: str = "UPI"  # "UPI", "Credit Card", "Debit Card", "Cash on Delivery"
+    delivery_addr: Optional[str] = None
     items: List[OrderItemInput]
+    discount_amount: Optional[float] = 0.0
+    delivery_fee: Optional[float] = 0.0
+    taxes: Optional[float] = 0.0
 
 
 class UpdateStatusRequest(BaseModel):
@@ -64,7 +70,13 @@ def place_order(req: PlaceOrderRequest):
         agent_id=req.agent_id,
         order_type=req.order_type,
         items=items_dicts,
-        payment_method=req.payment_method
+        payment_method=req.payment_method,
+        rest_id=req.rest_id,
+        store_id=req.store_id,
+        delivery_addr=req.delivery_addr,
+        discount_amount=req.discount_amount or 0.0,
+        delivery_fee=req.delivery_fee or 0.0,
+        taxes=req.taxes or 0.0,
     )
     if success:
         return {"status": "success", "order_id": order_id, "message": "Order placed successfully"}

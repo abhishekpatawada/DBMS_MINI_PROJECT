@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'screens/role_selection_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
-  runApp(const DBMSDeliveryApp());
+  runApp(const BiteHubApp());
 }
 
-class DBMSDeliveryApp extends StatelessWidget {
-  const DBMSDeliveryApp({Key? key}) : super(key: key);
+class BiteHubApp extends StatelessWidget {
+  const BiteHubApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DBMS Project',
+      title: 'BiteHub',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: const RoleSelectionScreen(),
+      home: const SplashScreen(),
     );
   }
 }

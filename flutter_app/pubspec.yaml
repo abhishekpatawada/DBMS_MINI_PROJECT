@@ -1,5 +1,5 @@
 name: flutter_app
-description: "DBMS Project - Food & Grocery Delivery App"
+description: "BiteHub - Food & Grocery Delivery Platform. Your cravings, our command."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -20,3 +20,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/images/logo.png
+    - assets/images/logo.jpg

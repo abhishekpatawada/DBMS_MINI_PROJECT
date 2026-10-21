@@ -9,7 +9,8 @@ from backend.delivery_service import (
     delete_delivery_agent,
     get_agent_assigned_orders,
     update_order_status,
-    assign_agent_to_order
+    assign_agent_to_order,
+    get_agent_earnings_analytics
 )
 
 router = APIRouter(prefix="/api/delivery-agents", tags=["Delivery Agents"])
@@ -69,3 +70,12 @@ def remove_agent(agent_id: int):
 @router.get("/{agent_id}/orders")
 def list_agent_orders(agent_id: int):
     return get_agent_assigned_orders(agent_id)
+
+
+@router.get("/{agent_id}/revenue")
+@router.get("/{agent_id}/earnings")
+def get_agent_revenue(agent_id: int):
+    analytics = get_agent_earnings_analytics(agent_id)
+    if not analytics:
+        raise HTTPException(status_code=404, detail="Agent revenue analytics not found.")
+    return analytics

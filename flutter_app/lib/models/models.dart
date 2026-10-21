@@ -96,6 +96,10 @@ class RestaurantItemModel {
   final double basePrice;
   final double discount;
   final double finalPrice;
+  final String? imageUrl;
+  final String? restaurantName;
+  final String? restaurantLocation;
+  final double? restaurantRating;
 
   RestaurantItemModel({
     required this.restId,
@@ -105,6 +109,10 @@ class RestaurantItemModel {
     required this.basePrice,
     required this.discount,
     required this.finalPrice,
+    this.imageUrl,
+    this.restaurantName,
+    this.restaurantLocation,
+    this.restaurantRating,
   });
 
   factory RestaurantItemModel.fromJson(Map<String, dynamic> json) {
@@ -120,6 +128,10 @@ class RestaurantItemModel {
       basePrice: base,
       discount: disc,
       finalPrice: fin,
+      imageUrl: json['Image_Url'] ?? json['image_url'] ?? json['imageUrl'],
+      restaurantName: json['Restaurant_Name'] ?? json['restaurantName'] ?? json['RName'],
+      restaurantLocation: json['Restaurant_Location'] ?? json['restaurantLocation'] ?? json['RLocation'],
+      restaurantRating: double.tryParse(json['Restaurant_Rating']?.toString() ?? json['RRating']?.toString() ?? ''),
     );
   }
 }
@@ -155,12 +167,22 @@ class GroceryItemModel {
   final String itemName;
   final double price;
   final int availableCount;
+  final String? imageUrl;
+  final String? storeArea;
+  final String? storeStreet;
+  final String? storeState;
+  final String? storePincode;
 
   GroceryItemModel({
     required this.storeId,
     required this.itemName,
     required this.price,
     required this.availableCount,
+    this.imageUrl,
+    this.storeArea,
+    this.storeStreet,
+    this.storeState,
+    this.storePincode,
   });
 
   factory GroceryItemModel.fromJson(Map<String, dynamic> json) {
@@ -169,6 +191,11 @@ class GroceryItemModel {
       itemName: json['Item_Name'] ?? json['itemName'] ?? '',
       price: double.tryParse(json['Price']?.toString() ?? '0.0') ?? 0.0,
       availableCount: json['Available_count'] ?? json['availableCount'] ?? 0,
+      imageUrl: json['Image_Url'] ?? json['image_url'] ?? json['imageUrl'],
+      storeArea: json['DS_Area'] ?? json['dsArea'] ?? json['storeArea'],
+      storeStreet: json['DS_Street'] ?? json['dsStreet'] ?? json['storeStreet'],
+      storeState: json['DS_State'] ?? json['dsState'] ?? json['storeState'],
+      storePincode: json['DS_Pincode'] ?? json['dsPincode'] ?? json['storePincode'],
     );
   }
 }
@@ -180,12 +207,20 @@ class OrderModel {
   final String? userPhone;
   final int? agentId;
   final String? agentName;
+  final String? agentPhone;
+  final String? agentVehicle;
+  final double? agentRating;
+  final int? restId;
+  final String? restName;
+  final int? storeId;
+  final String? storeArea;
   final String orderType;
   final String orderStatus;
   final double totalAmount;
   final String? orderDate;
   final String? paymentMethod;
   final String? paymentStatus;
+  final String? deliveryAddr;
 
   OrderModel({
     required this.orderId,
@@ -194,13 +229,23 @@ class OrderModel {
     this.userPhone,
     this.agentId,
     this.agentName,
+    this.agentPhone,
+    this.agentVehicle,
+    this.agentRating,
+    this.restId,
+    this.restName,
+    this.storeId,
+    this.storeArea,
     required this.orderType,
     required this.orderStatus,
     required this.totalAmount,
     this.orderDate,
     this.paymentMethod,
     this.paymentStatus,
+    this.deliveryAddr,
   });
+
+  String get deliveryAddress => deliveryAddr ?? '';
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     return OrderModel(
@@ -210,12 +255,45 @@ class OrderModel {
       userPhone: json['User_Phone'] ?? json['userPhone'],
       agentId: json['Agent_Id'] ?? json['agentId'],
       agentName: json['Agent_Name'] ?? json['agentName'],
+      agentPhone: json['Agent_Phone'] ?? json['agentPhone'],
+      agentVehicle: json['Agent_Vehicle'] ?? json['VehicleNO'] ?? json['vehicleNo'],
+      agentRating: double.tryParse(json['Agent_Rating']?.toString() ?? json['Rating']?.toString() ?? '5.0'),
+      restId: json['Rest_Id'] ?? json['restId'],
+      restName: json['Rest_Name'] ?? json['restName'] ?? json['RName'],
+      storeId: json['Store_Id'] ?? json['storeId'],
+      storeArea: json['Store_Area'] ?? json['storeArea'] ?? json['DS_Area'],
       orderType: json['Order_Type'] ?? json['orderType'] ?? 'Restaurant',
       orderStatus: json['Order_Status'] ?? json['orderStatus'] ?? 'Placed',
       totalAmount: double.tryParse(json['Total_Amount']?.toString() ?? '0.0') ?? 0.0,
-      orderDate: json['Order_Date']?.toString(),
+      orderDate: json['Order_Date']?.toString() ?? json['PlacedAt']?.toString(),
       paymentMethod: json['Payment_Method'] ?? json['paymentMethod'],
       paymentStatus: json['Payment_Status'] ?? json['paymentStatus'],
+      deliveryAddr: json['Delivery_Addr'] ?? json['deliveryAddr'] ?? json['Delivery_Address'],
     );
   }
 }
+
+class CartItemModel {
+  final String itemName;
+  final String? foodName;
+  final double price;
+  final bool isVeg;
+  final String? imageUrl;
+  int quantity;
+
+  CartItemModel({
+    required this.itemName,
+    this.foodName,
+    required this.price,
+    this.isVeg = true,
+    this.imageUrl,
+    this.quantity = 1,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'name': itemName,
+        'quantity': quantity,
+        'price': price,
+      };
+}
+

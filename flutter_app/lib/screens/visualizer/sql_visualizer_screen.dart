@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import '../../services/api_service.dart';
 
 class SqlVisualizerScreen extends StatefulWidget {
-  const SqlVisualizerScreen({Key? key}) : super(key: key);
+  const SqlVisualizerScreen({super.key});
 
   @override
   State<SqlVisualizerScreen> createState() => _SqlVisualizerScreenState();

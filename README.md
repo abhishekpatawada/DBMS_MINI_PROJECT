@@ -1,4 +1,5 @@
-# DBMS Project - Food & Grocery Delivery Platform
+# BiteHub - Food & Grocery Delivery Platform
+> *"Your cravings, our command."*
 
 A full-stack multi-vendor Food & Grocery delivery database management system built with **Flutter** (Frontend), **Python FastAPI** (Backend REST API), and **MySQL** (Database).
 
@@ -6,16 +7,10 @@ A full-stack multi-vendor Food & Grocery delivery database management system bui
 
 ## 📱 User Interface Navigation Flow
 
-1. **Screen 1: Role Selection**
-   - Choose one of the 4 roles:
-     - 👤 **Customer (User)**
-     - 🛵 **Delivery Agent**
-     - 🏪 **Restaurant Partner**
-     - 🏬 **Dark Store Hub**
-2. **Screen 2: Sign In / Sign Up (with Phone Number)**
-   - **Sign In**: Login using registered phone number / identifier.
-   - **Sign Up**: Register new profile with dynamic form fields tailored to the chosen role.
-3. **Screen 3: Role-Specific Dashboards (Full CRUD)**
+1. **Screen 1: Unified Sign In / Create Account (BiteHub Auth)**
+   - **Sign In**: Direct login using mobile number & password. Automatically detects role (Customer, Delivery Agent, Restaurant, or Dark Store) and routes to the appropriate dashboard.
+   - **Create Account**: Prompts user to choose their role (*Customer, Delivery Agent, Restaurant, or Dark Store Hub*) and dynamically renders role-tailored registration fields.
+2. **Screen 2: Role-Specific Dashboards (Full CRUD)**
    - **Customer**: Place orders from restaurants/dark stores, view live orders, cancel/delete orders.
    - **Delivery Agent**: View assigned drop-offs, fast-action status updates (`Out for Delivery`, `Delivered`).
    - **Restaurant Partner**: Full menu management (Add/Edit/Delete dishes), set discounts, update order progress.
@@ -39,12 +34,11 @@ dbms_project/
 │   │   ├── services/
 │   │   │   └── api_service.dart        # Centralized HTTP client
 │   │   └── screens/
-│   │       ├── role_selection_screen.dart   # Screen 1: Role Selection
-│   │       ├── auth_screen.dart             # Screen 2: Sign In / Sign Up
-│   │       ├── user/                        # Screen 3: Customer Dashboard
-│   │       ├── delivery_agent/              # Screen 3: Agent Dashboard
-│   │       ├── restaurant/                  # Screen 3: Restaurant Dashboard
-│   │       └── dark_store/                  # Screen 3: Dark Store Hub
+│   │       ├── auth_screen.dart             # Screen 1: Unified Login & Registration
+│   │       ├── user/                        # Screen 2: Customer Dashboard
+│   │       ├── delivery_agent/              # Screen 2: Agent Dashboard
+│   │       ├── restaurant/                  # Screen 2: Restaurant Dashboard
+│   │       └── dark_store/                  # Screen 2: Dark Store Hub
 │
 ├── backend/                            # ⚡ Python FastAPI REST API
 │   ├── main.py                         # FastAPI app & CORS configuration
@@ -97,24 +91,31 @@ Install Python dependencies:
 pip install -r requirements.txt
 ```
 
-Run the backend server:
+Run the backend server (accessible from other devices on Wi-Fi):
 ```bash
-uvicorn backend.main:app --reload --port 8000
+# Double click start_server.bat OR run:
+uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
-- **REST API URL**: `http://localhost:8000`
+- **Local API URL**: `http://localhost:8000`
+- **Wi-Fi Network API URL**: `http://10.102.3.137:8000` (or your laptop's Wi-Fi IP from `ipconfig`)
 - **Interactive Swagger Documentation**: `http://localhost:8000/docs`
 
 ---
 
 ### 3. Start the Flutter Frontend
-Navigate to the `flutter_app` directory:
+
+#### Option A: Access from Phone / Other Devices (Web)
+```bash
+# Double click start_web.bat OR run:
+cd flutter_app
+flutter run -d web-server --web-hostname 0.0.0.0 --web-port 3000
+```
+Then on your phone or other device connected to the same Wi-Fi, open in browser:
+`http://10.102.3.137:3000`
+
+#### Option B: Run Locally on Laptop (Desktop / Chrome)
 ```bash
 cd flutter_app
-flutter pub get
-```
-
-Run on Chrome (Web), Windows Desktop, or Mobile emulator:
-```bash
 flutter run -d chrome
 # or
 flutter run -d windows

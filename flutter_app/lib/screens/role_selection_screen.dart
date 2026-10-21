@@ -1,111 +1,166 @@
 import 'package:flutter/material.dart';
-import '../services/dbms_settings_service.dart';
 import 'auth_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
-  const RoleSelectionScreen({Key? key}) : super(key: key);
+  const RoleSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("DBMS Delivery System"),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: DbmsSimulationToggleSwitch(),
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // App Branding
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Center(
-                      child: Text("📦", style: TextStyle(fontSize: 36)),
-                    ),
+              constraints: const BoxConstraints(maxWidth: 460),
+              child: Card(
+                elevation: 4,
+                shadowColor: Colors.black.withOpacity(0.08),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                  side: const BorderSide(color: Color(0xFFE2E8F0)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(22),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF4F46E5).withOpacity(0.18),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(22),
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                    'assets/images/logo.jpg',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error2, stackTrace2) => Container(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(22),
+                                      ),
+                                      child: const Center(
+                                        child: Text(
+                                          "B",
+                                          style: TextStyle(
+                                            fontSize: 38,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              "BiteHub",
+                              style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              "Your cravings, our command.",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF6366F1),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              "Select your role to continue",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF64748B),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _roleTile(
+                        context,
+                        title: "Customer / Foodie",
+                        subtitle: "Order food & groceries instantly",
+                        icon: "👤",
+                        role: "User",
+                        color: const Color(0xFF4F46E5),
+                      ),
+                      const SizedBox(height: 12),
+                      _roleTile(
+                        context,
+                        title: "Delivery Agent",
+                        subtitle: "Deliver orders & earn payouts",
+                        icon: "🛵",
+                        role: "Delivery Agent",
+                        color: const Color(0xFF059669),
+                      ),
+                      const SizedBox(height: 12),
+                      _roleTile(
+                        context,
+                        title: "Restaurant Partner",
+                        subtitle: "Manage menu, orders & revenue",
+                        icon: "🏪",
+                        role: "Restaurant",
+                        color: const Color(0xFFEA580C),
+                      ),
+                      const SizedBox(height: 12),
+                      _roleTile(
+                        context,
+                        title: "Dark Store Hub",
+                        subtitle: "Inventory, grocery dispatch & revenue",
+                        icon: "🏬",
+                        role: "Dark Store",
+                        color: const Color(0xFF7C3AED),
+                      ),
+                      const SizedBox(height: 24),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const AuthScreen()),
+                          );
+                        },
+                        child: const Text(
+                          "Direct Sign In",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF4F46E5),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "DBMS Project",
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    "Food & Grocery Multi-Vendor Delivery System",
-                    style: TextStyle(fontSize: 15, color: Color(0xFF64748B)),
-                  ),
-                  const SizedBox(height: 36),
-
-                  // Header
-                  const Text(
-                    "Select Your Role",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1E293B),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Role Cards
-                  _buildRoleCard(
-                    context: context,
-                    role: "User",
-                    icon: "👤",
-                    title: "Customer (User)",
-                    subtitle: "Order food from restaurants & groceries from dark stores",
-                    badgeColor: const Color(0xFF6366F1),
-                  ),
-                  const SizedBox(height: 14),
-
-                  _buildRoleCard(
-                    context: context,
-                    role: "Delivery Agent",
-                    icon: "🛵",
-                    title: "Delivery Agent",
-                    subtitle: "View assigned deliveries & update live delivery transit statuses",
-                    badgeColor: const Color(0xFF10B981),
-                  ),
-                  const SizedBox(height: 14),
-
-                  _buildRoleCard(
-                    context: context,
-                    role: "Restaurant",
-                    icon: "🏪",
-                    title: "Restaurant Partner",
-                    subtitle: "Manage menus, dishes, discounts, and prepare food orders",
-                    badgeColor: const Color(0xFFF59E0B),
-                  ),
-                  const SizedBox(height: 14),
-
-                  _buildRoleCard(
-                    context: context,
-                    role: "Dark Store",
-                    icon: "🏬",
-                    title: "Dark Store Hub",
-                    subtitle: "Manage grocery inventory counts, prices & dispatch supplies",
-                    badgeColor: const Color(0xFF8B5CF6),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -114,72 +169,63 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRoleCard({
-    required BuildContext context,
-    required String role,
-    required String icon,
+  Widget _roleTile(
+    BuildContext context, {
     required String title,
     required String subtitle,
-    required Color badgeColor,
+    required String icon,
+    required String role,
+    required Color color,
   }) {
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AuthScreen(selectedRole: role),
-            ),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Row(
-            children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: badgeColor.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(icon, style: const TextStyle(fontSize: 26)),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0F172A),
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF64748B),
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16,
-                color: Color(0xFF94A3B8),
-              ),
-            ],
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AuthScreen(selectedRole: role),
           ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FAFC),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(icon, style: const TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

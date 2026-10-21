@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS USERS (
     User_Id INT PRIMARY KEY,
     User_Name VARCHAR(100) NOT NULL,
     User_Phone VARCHAR(15),
+    Password VARCHAR(255) DEFAULT '123456',
     Street VARCHAR(100),
     Area VARCHAR(100),
     State VARCHAR(50),
@@ -30,6 +31,7 @@ CREATE TABLE IF NOT EXISTS DELIVERY_AGENT (
     Agent_Id INT PRIMARY KEY,
     Agent_Name VARCHAR(100) NOT NULL,
     Agent_Phone VARCHAR(15),
+    Password VARCHAR(255) DEFAULT '123456',
     VehicleNO VARCHAR(30),
     V_Type VARCHAR(50),
     Has_license BOOLEAN,
@@ -46,6 +48,7 @@ CREATE TABLE IF NOT EXISTS RESTAURANT (
     RName VARCHAR(100) NOT NULL,
     RLocation VARCHAR(200),
     RPhone VARCHAR(15),
+    Password VARCHAR(255) DEFAULT '123456',
     RRating DECIMAL(3,2)
 );
 
@@ -64,6 +67,7 @@ CREATE TABLE IF NOT EXISTS REST_ITEMS (
     BasePrice DECIMAL(10,2),
     Discount DECIMAL(5,2),
     FinalPrice DECIMAL(10,2),
+    Image_Url VARCHAR(500),
 
     PRIMARY KEY (Rest_Id, Item_Name),
 
@@ -80,6 +84,8 @@ CREATE TABLE IF NOT EXISTS REST_ITEMS (
 
 CREATE TABLE IF NOT EXISTS DARK_STORE (
     Store_Id INT PRIMARY KEY,
+    DS_Phone VARCHAR(15) DEFAULT '9810099999',
+    Password VARCHAR(255) DEFAULT '123456',
     DS_Street VARCHAR(100),
     DS_Area VARCHAR(100),
     DS_State VARCHAR(50),
@@ -100,6 +106,7 @@ CREATE TABLE IF NOT EXISTS GROCERIES (
     Item_Name VARCHAR(100),
     Price DECIMAL(10,2),
     Available_count INT,
+    Image_Url VARCHAR(500),
 
     PRIMARY KEY (Store_Id, Item_Name),
 
