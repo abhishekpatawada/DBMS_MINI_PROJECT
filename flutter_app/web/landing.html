@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BiteHub - Food & Grocery Delivered in 10 Mins</title>
+  <meta name="description" content="Hyperlocal quick-commerce & gourmet food delivery platform. Fast 10-minute delivery.">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Consistent BiteHub Brand Tokens */
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --card-subtle: #F1F5F9;
+      --border-color: #E2E8F0;
+      --border-focus: #CBD5E1;
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --primary-light: #EEF2FF;
+      --primary-glow: rgba(99, 102, 241, 0.2);
+      --secondary: #10B981;
+      --secondary-dark: #059669;
+      --secondary-light: #ECFDF5;
+      --accent: #F59E0B;
+      --accent-light: #FFFBEB;
+      --error: #EF4444;
+      --text-primary: #0F172A;
+      --text-secondary: #64748B;
+      --text-muted: #94A3B8;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+      --shadow-lg: 0 16px 36px -4px rgba(15, 23, 42, 0.08), 0 6px 12px -2px rgba(15, 23, 42, 0.04);
+      --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient radial highlights */
+    .ambient-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+    }
+    .glow-1 {
+      width: 600px;
+      height: 600px;
+      top: -150px;
+      right: -100px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    }
+    .glow-2 {
+      width: 550px;
+      height: 550px;
+      top: 700px;
+      left: -150px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Fixed Clean Navigation Bar */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 76px;
+      background: rgba(255, 255, 255, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    nav.nav-scrolled {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+      border-bottom-color: #CBD5E1;
+    }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .brand-badge {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      color: white;
+      box-shadow: 0 4px 12px var(--primary-glow);
+      transition: transform 0.35s var(--ease-spring), box-shadow 0.35s ease;
+    }
+    .brand-logo:hover .brand-badge {
+      transform: scale(1.08) rotate(-4deg);
+      box-shadow: 0 6px 18px var(--primary-glow);
+    }
+    .brand-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 24px;
+      color: var(--text-primary);
+      letter-spacing: -0.6px;
+    }
+    .brand-name span {
+      color: var(--primary);
+    }
+    .web-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: var(--secondary-light);
+      border: 1px solid #A7F3D0;
+      color: var(--secondary-dark);
+      letter-spacing: 0.6px;
+      margin-left: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .web-tag::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--secondary);
+    }
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 500;
+      position: relative;
+      padding: 4px 0;
+      transition: color 0.25s ease;
+    }
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.28s var(--ease-premium);
+    }
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-actions .btn-primary {
+      transition: transform 0.25s var(--ease-premium), box-shadow 0.25s ease;
+    }
+    .nav-actions .btn-primary:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    /* Buttons and Interactive States */
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.22s var(--ease-premium), box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      position: relative;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+    .btn:active {
+      transform: translateY(1px) scale(0.98);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 14px var(--primary-glow);
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transform: rotate(25deg);
+      animation: btnShimmer 3.5s ease-in-out infinite;
+    }
+    .btn-primary:hover::after {
+      animation-duration: 1.5s;
+    }
+    @keyframes btnShimmer {
+      0% { left: -60%; }
+      30%, 100% { left: 160%; }
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--primary-glow);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover {
+      color: var(--text-primary);
+      background: var(--card-subtle);
+    }
+    .btn-outline {
+      background: white;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding-top: 140px;
+      padding-bottom: 70px;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 52px;
+      align-items: center;
+    }
+
+    /* Hero Entrance Stagger Sequence */
+    .hero-entrance-badge {
+      opacity: 0;
+      animation: heroFadeSlideDown 0.75s var(--ease-premium) 0.1s forwards;
+    }
+    .hero-entrance-title {
+      opacity: 0;
+      animation: heroFadeSlideUp 0.85s var(--ease-premium) 0.25s forwards;
+    }
+    .hero-entrance-gradient {
+      opacity: 0;
+      animation: heroFadeSlideUp 0.85s var(--ease-premium) 0.4s forwards;
+    }
+    .hero-entrance-sub {
+      opacity: 0;
+      animation: heroFadeSlideUp 0.85s var(--ease-premium) 0.55s forwards;
+    }
+    .hero-entrance-checker {
+      opacity: 0;
+      animation: heroFadeSlideUp 0.85s var(--ease-premium) 0.7s forwards;
+    }
+    .hero-entrance-buttons {
+      opacity: 0;
+      animation: heroFadeSlideUp 0.85s var(--ease-premium) 0.85s forwards;
+    }
+    .hero-entrance-ratings {
+      opacity: 0;
+      animation: heroFadeSlideUp 0.85s var(--ease-premium) 1.0s forwards;
+    }
+    .hero-entrance-card {
+      opacity: 0;
+      animation: cardEntrance 0.95s var(--ease-premium) 0.35s forwards;
+    }
+
+    @keyframes heroFadeSlideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes heroFadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(22px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateX(36px) translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0) translateY(0);
+      }
+    }
+
+    /* Star Pop Animation */
+    .star-pop {
+      display: inline-block;
+      opacity: 0;
+      transform: scale(0.2);
+      animation: starPop 0.4s var(--ease-spring) forwards;
+    }
+    .star-pop:nth-child(1) { animation-delay: 1.05s; }
+    .star-pop:nth-child(2) { animation-delay: 1.15s; }
+    .star-pop:nth-child(3) { animation-delay: 1.25s; }
+    .star-pop:nth-child(4) { animation-delay: 1.35s; }
+    .star-pop:nth-child(5) { animation-delay: 1.45s; }
+    @keyframes starPop {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .pill-announcement {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-light);
+      border: 1px solid #C7D2FE;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary-hover);
+      letter-spacing: 0.6px;
+      margin-bottom: 20px;
+      animation: pillPulse 3s ease-in-out infinite;
+    }
+    @keyframes pillPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(99, 102, 241, 0); }
+      50% { transform: scale(1.02); box-shadow: 0 0 16px rgba(99, 102, 241, 0.18); }
+    }
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 58px;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -1.8px;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .hero-gradient-text {
+      background: linear-gradient(135deg, #4F46E5, #059669);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: block;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 18px;
+    }
+    .hero-subtitle {
+      font-size: 16.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 30px;
+      max-width: 540px;
+    }
+
+    /* Speed Checker Input */
+    .speed-checker {
+      display: flex;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 6px;
+      max-width: 480px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-md);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+    }
+    .speed-checker:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-glow), var(--shadow-md);
+      transform: translateY(-1px);
+    }
+    .loc-pin-icon {
+      padding: 10px 0 10px 14px;
+      font-size: 16px;
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+    .speed-checker:focus-within .loc-pin-icon {
+      animation: pinBounce 0.45s var(--ease-spring);
+    }
+    @keyframes pinBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px) scale(1.2); }
+    }
+    .speed-checker input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+    }
+    .speed-checker input::placeholder {
+      color: var(--text-muted);
+    }
+    .speed-checker button {
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+    .speed-checker button:hover {
+      background: var(--secondary-dark);
+      transform: scale(1.02);
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+    }
+    .speed-checker button:active {
+      transform: scale(0.98);
+    }
+
+    /* Hero CTA Row */
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 36px;
+    }
+    .btn-large {
+      padding: 16px 28px;
+      font-size: 15.5px;
+      border-radius: 14px;
+      font-weight: 700;
+    }
+
+    /* Live Radar Mockup Card with Levitation */
+    .mockup-wrapper {
+      position: relative;
+    }
+    .hero-mockup-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      z-index: 1;
+      animation: cardLevitate 5s ease-in-out infinite;
+      transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease;
+    }
+    @keyframes cardLevitate {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .hero-mockup-card:hover {
+      animation-play-state: paused;
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px -4px rgba(15, 23, 42, 0.12), 0 8px 16px -2px rgba(15, 23, 42, 0.06);
+    }
+    .floating-chip {
+      position: absolute;
+      background: white;
+      border: 1px solid var(--border-color);
+      padding: 9px 15px;
+      border-radius: 24px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 25;
+      animation: chipFloat 4s ease-in-out infinite;
+      transition: transform 0.25s ease;
+    }
+    .chip-top {
+      top: -16px;
+      left: -16px;
+      animation-delay: 0s;
+    }
+    .chip-bottom {
+      bottom: -16px;
+      right: -16px;
+      animation-delay: -2s;
+    }
+    @keyframes chipFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(1.5deg); }
+    }
+    .floating-chip:hover {
+      transform: scale(1.05);
+    }
+
+    .mockup-header {
+      padding: 14px 20px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.5px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+
+    .mockup-body {
+      padding: 24px;
+    }
+    .status-tracker-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .tracker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .live-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--secondary);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: statusPulse 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+      display: inline-block;
+    }
+    @keyframes statusPulse {
+      to {
+        box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+      }
+    }
+    .eta-pill {
+      background: var(--secondary-light);
+      border: 1px solid #A7F3D0;
+      color: var(--secondary-dark);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      animation: etaBreathe 2s ease-in-out infinite alternate;
+    }
+    @keyframes etaBreathe {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.06); box-shadow: 0 0 10px rgba(16, 185, 129, 0.25); }
+    }
+    .progress-bar-bg {
+      height: 10px;
+      background: #E2E8F0;
+      border-radius: 8px;
+      position: relative;
+      margin: 20px 0 24px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 8px;
+      animation: progressFill 1.6s var(--ease-premium) 0.8s forwards;
+    }
+    @keyframes progressFill {
+      from { width: 0%; }
+      to { width: 76%; }
+    }
+    /* Animated courier on progress route */
+    .courier-marker {
+      position: absolute;
+      top: -15px;
+      left: 70%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: courierGlide 3.2s ease-in-out infinite alternate;
+    }
+    .courier-bike {
+      font-size: 22px;
+      display: inline-block;
+      transform: scaleX(-1);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+      animation: bikeBob 0.8s ease-in-out infinite alternate;
+    }
+    @keyframes courierGlide {
+      0% { left: 45%; }
+      100% { left: 74%; }
+    }
+    @keyframes bikeBob {
+      0% { transform: scaleX(-1) translateY(0); }
+      100% { transform: scaleX(-1) translateY(-3px); }
+    }
+    .radar-pulse-ring {
+      position: absolute;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--secondary);
+      background: rgba(16, 185, 129, 0.12);
+      animation: radarRipple 1.6s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+      pointer-events: none;
+    }
+    @keyframes radarRipple {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(2.4); opacity: 0; }
+    }
+    .tracker-steps {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .order-mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .mini-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.25s var(--ease-premium), box-shadow 0.25s ease, border-color 0.25s ease;
+      cursor: pointer;
+    }
+    .mini-card:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: var(--shadow-md);
+      border-color: #CBD5E1;
+    }
+    .mini-card .emoji {
+      font-size: 24px;
+      transition: transform 0.3s var(--ease-spring);
+    }
+    .mini-card:hover .emoji {
+      transform: scale(1.2) rotate(6deg);
+    }
+    .mini-card .title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .mini-card .price {
+      font-size: 13px;
+      color: var(--secondary-dark);
+      font-weight: 800;
+    }
+
+    /* Primary card CTA highlight sweep */
+    .card-cta-btn {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      justify-content: center;
+    }
+    .card-cta-btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+      transform: skewX(-20deg);
+      transition: none;
+    }
+    .card-cta-btn:hover::before {
+      left: 140%;
+      transition: left 0.75s var(--ease-premium);
+    }
+
+    /* Stats Ribbon */
+    .stats-ribbon {
+      margin: 40px auto 80px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-item h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .stat-item p {
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Scroll Reveal System */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s var(--ease-premium), transform 0.8s var(--ease-premium);
+      will-change: opacity, transform;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* Section Headings */
+    .section-header {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+    .badge-label {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--primary-light);
+      border: 1px solid #C7D2FE;
+      color: var(--primary-hover);
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.8px;
+      margin-bottom: 10px;
+    }
+    .section-sub {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Category Filter Tabs */
+    .category-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 36px;
+      flex-wrap: wrap;
+    }
+    .cat-btn {
+      padding: 9px 18px;
+      border-radius: 20px;
+      background: white;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 600;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .cat-btn.active, .cat-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* Food Cards Grid */
+    .food-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    .food-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease, border-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+    }
+    .food-card:hover {
+      transform: translateY(-8px);
+      border-color: #CBD5E1;
+      box-shadow: var(--shadow-lg);
+    }
+    .food-thumb {
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      position: relative;
+    }
+    .food-thumb .emoji-art {
+      display: inline-block;
+      transition: transform 0.35s var(--ease-spring);
+      will-change: transform;
+    }
+    .food-card:hover .food-thumb .emoji-art {
+      transform: scale(1.18) translateY(-4px) rotate(-3deg);
+    }
+    .food-thumb .tag-pill {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(15, 23, 42, 0.7);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .food-thumb .time-pill {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--secondary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .food-info {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .food-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .food-desc {
+      color: var(--text-secondary);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .food-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .food-price {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--secondary-dark);
+    }
+
+    /* Speed Simulator Section */
+    .simulator-box {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 44px;
+      margin-bottom: 90px;
+      box-shadow: var(--shadow-md);
+    }
+    .simulator-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .sim-slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 6px;
+      background: #E2E8F0;
+      outline: none;
+      -webkit-appearance: none;
+      margin: 16px 0 24px;
+    }
+    .sim-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--secondary);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+      transition: transform 0.2s var(--ease-spring);
+    }
+    .sim-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Dynamic Animated Road Track */
+    .animated-road-track {
+      margin: -10px 0 22px;
+      background: #0F172A;
+      border-radius: 12px;
+      padding: 6px 14px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .road-surface {
+      position: relative;
+      height: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .road-dashes {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, #FFFFFF, #FFFFFF 14px, transparent 14px, transparent 28px);
+      background-size: 56px 2px;
+      animation: roadFlow 0.5s linear infinite;
+      opacity: 0.5;
+    }
+    @keyframes roadFlow {
+      from { background-position: 0 0; }
+      to { background-position: -56px 0; }
+    }
+    .road-courier {
+      position: absolute;
+      left: 20%;
+      transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 2;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+    }
+    .sim-courier-icon {
+      display: inline-block;
+      animation: courierSpeedBob 0.6s ease-in-out infinite alternate;
+    }
+    @keyframes courierSpeedBob {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-2px); }
+    }
+
+    .transport-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .mode-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      padding: 14px 10px;
+      border-radius: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s var(--ease-premium), border-color 0.2s, background 0.2s;
+    }
+    .mode-card:hover {
+      transform: translateY(-2px);
+    }
+    .mode-card.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .mode-card.active div:first-child {
+      color: var(--primary);
+    }
+    .eta-display {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      text-align: center;
+    }
+    .eta-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 68px;
+      font-weight: 900;
+      color: var(--secondary-dark);
+      line-height: 1;
+      margin: 10px 0;
+      transition: transform 0.2s ease;
+    }
+
+    /* 4-Way Ecosystem Cards */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 90px;
+    }
+    .role-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease, border-color 0.3s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    .role-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: #CBD5E1;
+    }
+    .role-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+      transition: transform 0.3s var(--ease-spring);
+    }
+    .role-card:hover .role-icon-box {
+      transform: scale(1.15) rotate(4deg);
+    }
+    .role-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .role-sub {
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .role-desc {
+      color: var(--text-secondary);
+      font-size: 13.5px;
+      line-height: 1.55;
+      margin-bottom: 22px;
+    }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+      margin-bottom: 90px;
+    }
+    .bento-7 { grid-column: span 7; }
+    .bento-5 { grid-column: span 5; }
+    .bento-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease;
+    }
+    .bento-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .bento-card h4 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .bento-card p {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* Testimonials */
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 90px;
+    }
+    .review-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease;
+    }
+    .review-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    .review-card .stars {
+      color: var(--accent);
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .review-card p {
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.55;
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+    .review-card .author {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 13.5px;
+    }
+    .review-card .role {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    /* CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary), #4338CA);
+      border-radius: 28px;
+      padding: 56px 40px;
+      text-align: center;
+      margin-bottom: 90px;
+      color: white;
+      box-shadow: 0 16px 36px var(--primary-glow);
+      transition: transform 0.3s var(--ease-premium), box-shadow 0.3s ease;
+    }
+    .cta-banner:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 44px var(--primary-glow);
+    }
+    .cta-banner h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+    .cta-banner p {
+      font-size: 16.5px;
+      color: #E0E7FF;
+      margin-bottom: 28px;
+    }
+
+    /* Footer */
+    footer {
+      background: white;
+      border-top: 1px solid var(--border-color);
+      padding: 36px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Reduced Motion Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .hero-mockup-card,
+      .floating-chip,
+      .pill-announcement,
+      .courier-marker,
+      .courier-bike,
+      .radar-pulse-ring,
+      .live-status-dot,
+      .road-dashes,
+      .sim-courier-icon {
+        animation: none !important;
+      }
+      .hero-entrance-badge,
+      .hero-entrance-title,
+      .hero-entrance-gradient,
+      .hero-entrance-sub,
+      .hero-entrance-checker,
+      .hero-entrance-buttons,
+      .hero-entrance-ratings,
+      .hero-entrance-card,
+      .star-pop,
+      .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+      }
+      .progress-bar-fill {
+        width: 76% !important;
+        animation: none !important;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero-grid, .simulator-grid {
+        grid-template-columns: 1fr;
+      }
+      .nav-links { display: none; }
+      .hero-title { font-size: 40px; }
+      .bento-7, .bento-5 { grid-column: span 12; }
+      .stats-ribbon { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient light blobs -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <div class="brand-badge">B</div>
+        <div class="brand-name">Bite<span>Hub</span></div>
+        <span class="web-tag">WEB PORTAL</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#menu">Live Menu</a></li>
+        <li><a href="#simulator">Speed Test</a></li>
+        <li><a href="#ecosystem">Ecosystem</a></li>
+        <li><a href="#why">Why Us</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-ghost">Partner Login</a>
+        <a href="index.html" class="btn btn-primary">Launch App 🚀</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-text">
+          <div class="pill-announcement hero-entrance-badge">
+            <span>⚡</span> FASTEST 10-MINUTE QUICK-COMMERCE & FOOD
+          </div>
+          <h1 class="hero-title hero-entrance-title">Your Cravings,<br>Our Command.</h1>
+          <div class="hero-gradient-text hero-entrance-gradient">10-Minute Dark Store & Gourmet Dining.</div>
+          <p class="hero-subtitle hero-entrance-sub">
+            Order mouthwatering chef specialties or midnight groceries. Powered by instant hyperlocal AI batch-dispatch and precision courier routing.
+          </p>
+
+          <div class="speed-checker hero-entrance-checker">
+            <span class="loc-pin-icon">📍</span>
+            <input type="text" id="pincodeInput" placeholder="Enter pincode or delivery area...">
+            <button onclick="checkPincode()">Check Speed</button>
+          </div>
+          <div id="pincodeFeedback" style="display:none; color: var(--secondary-dark); font-size: 13px; font-weight: 700; margin-top: -18px; margin-bottom: 24px;"></div>
+
+          <div class="hero-buttons hero-entrance-buttons">
+            <a href="index.html" class="btn btn-primary btn-large">Order Food & Mart →</a>
+            <a href="#menu" class="btn btn-outline btn-large">Explore Live Menu</a>
+          </div>
+
+          <div class="hero-social-proof hero-entrance-ratings" style="display:flex; align-items:center; gap:12px;">
+            <div style="color: var(--accent); font-size: 18px; letter-spacing: 2px;">
+              <span class="star-pop">★</span><span class="star-pop">★</span><span class="star-pop">★</span><span class="star-pop">★</span><span class="star-pop">★</span>
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">
+              4.95/5 Rating • 150,000+ orders fulfilled this month
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Mockup Card with Levitation & Floating Chips -->
+        <div class="mockup-wrapper hero-entrance-card">
+          <div class="hero-mockup-card">
+            <div class="mockup-header">
+              <div class="dot dot-red"></div>
+              <div class="dot dot-yellow"></div>
+              <div class="dot dot-green"></div>
+              <span style="margin-left:auto;">⚡ LIVE DISPATCH RADAR #BH-9821</span>
+            </div>
+            <div class="mockup-body">
+              <div class="status-tracker-box">
+                <div class="tracker-header">
+                  <div>
+                    <div style="font-weight: 700; font-size: 14.5px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                      <span class="live-status-dot"></span>
+                      Courier Alex (EV Bike #402)
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">0.6 km from your doorstep</div>
+                  </div>
+                  <div class="eta-pill">ETA 5 MINS</div>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill"></div>
+                  <div class="courier-marker">
+                    <span class="courier-bike">🛵</span>
+                    <span class="radar-pulse-ring"></span>
+                  </div>
+                </div>
+                <div class="tracker-steps">
+                  <span>Kitchen Ready</span>
+                  <span style="color:var(--secondary-dark); font-weight:700;">Out for Delivery 🚀</span>
+                  <span>Your Door</span>
+                </div>
+              </div>
+
+            <div class="order-mini-grid">
+              <div class="mini-card">
+                <div class="emoji">🍔</div>
+                <div>
+                  <div class="title">Truffle Wagyu</div>
+                  <div class="price">₹249</div>
+                </div>
+              </div>
+              <div class="mini-card">
+                <div class="emoji">🥑</div>
+                <div>
+                  <div class="title">Hass Avocado Box</div>
+                  <div class="price">₹149</div>
+                </div>
+              </div>
+            </div>
+
+            <a href="index.html" class="btn btn-primary card-cta-btn">
+              Launch Live App Experience →
+            </a>
+          </div>
+        </div>
+
+        <div class="floating-chip chip-top">
+          <span>🔥</span> 10-Min Dispatch
+        </div>
+        <div class="floating-chip chip-bottom">
+          <span>⭐</span> 4.95 Rating (85k+ Reviews)
+        </div>
+      </div>
+      </div>
+
+      <!-- Stats Ribbon with Animated Counter -->
+      <div class="stats-ribbon reveal">
+        <div class="stat-item">
+          <h3><span class="counter" data-target="9.4" data-decimals="1">0</span> Mins</h3>
+          <p>Avg Urban Delivery</p>
+        </div>
+        <div class="stat-item">
+          <h3><span class="counter" data-target="150" data-suffix="k+">0</span></h3>
+          <p>Happy Foodies</p>
+        </div>
+        <div class="stat-item">
+          <h3><span class="counter" data-target="2400" data-suffix="+">0</span></h3>
+          <p>Kitchens & Dark Stores</p>
+        </div>
+        <div class="stat-item">
+          <h3><span class="counter" data-target="99.98" data-decimals="2" data-suffix="%">0</span></h3>
+          <p>On-Time Precision</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Menu Section -->
+  <section id="menu" class="container">
+    <div class="section-header reveal">
+      <div class="badge-label">CRAVE-WORTHY SELECTIONS</div>
+      <h2 class="section-title">Fresh From Kitchens & Automated Hubs</h2>
+      <p class="section-sub">Choose a category to browse trending dishes, organic mart items, and chef specialties.</p>
+    </div>
+
+    <div class="category-tabs reveal reveal-delay-1">
+      <button class="cat-btn active" onclick="filterItems('all', this)">🔥 All Trending</button>
+      <button class="cat-btn" onclick="filterItems('most-ordered', this)">⭐ Most Ordered</button>
+      <button class="cat-btn" onclick="filterItems('food', this)">🍕 Gourmet Dining</button>
+      <button class="cat-btn" onclick="filterItems('mart', this)">🥦 10-Min Dark Store</button>
+      <button class="cat-btn" onclick="filterItems('dessert', this)">🍰 Desserts</button>
+    </div>
+
+    <div class="food-grid" id="foodGrid">
+      <div class="food-card reveal reveal-delay-1" data-cat="food most-ordered">
+        <div class="food-thumb" style="background: linear-gradient(135deg, #FFF1F2, #FFE4E6);">
+          <span class="emoji-art">🍔</span>
+          <span class="tag-pill">🔥 #1 Most Ordered (8.4k)</span>
+          <span class="time-pill">⚡ 12 mins</span>
+        </div>
+        <div class="food-info">
+          <div>
+            <div class="food-title">Smoked Truffle Wagyu Burger</div>
+            <div class="food-desc">Aged gouda, grilled wagyu patty, black truffle aioli on toasted butter brioche.</div>
+          </div>
+          <div class="food-footer">
+            <div class="food-price">₹249</div>
+            <a href="index.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Order Now</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card reveal reveal-delay-2" data-cat="food most-ordered">
+        <div class="food-thumb" style="background: linear-gradient(135deg, #FEF3C7, #FDE68A);">
+          <span class="emoji-art">🍛</span>
+          <span class="tag-pill">⭐ 12.1k Orders • Meghana Foods</span>
+          <span class="time-pill">⚡ 15 mins</span>
+        </div>
+        <div class="food-info">
+          <div>
+            <div class="food-title">Hyderabadi Royal Dum Biryani</div>
+            <div class="food-desc">Slow-cooked saffron basmati rice with tender spices, salan & mint raita.</div>
+          </div>
+          <div class="food-footer">
+            <div class="food-price">₹280</div>
+            <a href="index.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Order Now</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card reveal reveal-delay-2" data-cat="food most-ordered">
+        <div class="food-thumb" style="background: linear-gradient(135deg, #FFF7ED, #FFEDD5);">
+          <span class="emoji-art">🍕</span>
+          <span class="tag-pill">Wood-Fired Favorite</span>
+          <span class="time-pill">⚡ 14 mins</span>
+        </div>
+        <div class="food-info">
+          <div>
+            <div class="food-title">Artisanal Burrata Margherita</div>
+            <div class="food-desc">San Marzano tomatoes, chilled burrata cream, torn sweet basil, virgin olive oil.</div>
+          </div>
+          <div class="food-footer">
+            <div class="food-price">₹299</div>
+            <a href="index.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Order Now</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card reveal reveal-delay-3" data-cat="mart most-ordered">
+        <div class="food-thumb" style="background: linear-gradient(135deg, #ECFDF5, #D1FAE5);">
+          <span class="emoji-art">🥑</span>
+          <span class="tag-pill">🥦 Top Grocery Pick (14k)</span>
+          <span class="time-pill">⚡ 8 mins</span>
+        </div>
+        <div class="food-info">
+          <div>
+            <div class="food-title">Organic Hass Avocados & Berry Box</div>
+            <div class="food-desc">Freshly harvested organic avocados and wild blueberries. Bagged in 90 seconds.</div>
+          </div>
+          <div class="food-footer">
+            <div class="food-price">₹149</div>
+            <a href="index.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Order Now</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card reveal reveal-delay-3" data-cat="mart most-ordered">
+        <div class="food-thumb" style="background: linear-gradient(135deg, #F0FDF4, #DCFCE7);">
+          <span class="emoji-art">🥛</span>
+          <span class="tag-pill">🥛 #1 Daily Essential (19k)</span>
+          <span class="time-pill">⚡ 7 mins</span>
+        </div>
+        <div class="food-info">
+          <div>
+            <div class="food-title">Farm Fresh Milk & Country Eggs Pack</div>
+            <div class="food-desc">Pasteurized pure whole milk pouch (1L) paired with farm-fresh organic brown eggs.</div>
+          </div>
+          <div class="food-footer">
+            <div class="food-price">₹95</div>
+            <a href="index.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Order Now</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="food-card reveal reveal-delay-4" data-cat="dessert most-ordered">
+        <div class="food-thumb" style="background: linear-gradient(135deg, #FAF5FF, #F3E8FF);">
+          <span class="emoji-art">🍫</span>
+          <span class="tag-pill">Sweet Indulgence (6.2k)</span>
+          <span class="time-pill">⚡ 10 mins</span>
+        </div>
+        <div class="food-info">
+          <div>
+            <div class="food-title">Molten Belgian Lava Cake</div>
+            <div class="food-desc">Warm 70% dark chocolate core served with Madagascan vanilla cream gelato.</div>
+          </div>
+          <div class="food-footer">
+            <div class="food-price">₹180</div>
+            <a href="index.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 13px;">Order Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Speed & ETA Simulator -->
+  <section id="simulator" class="container">
+    <div class="simulator-box reveal">
+      <div class="section-header" style="margin-bottom: 30px;">
+        <div class="badge-label">REAL-TIME ENGINE TESTBENCH</div>
+        <h2 class="section-title">Speed & Distance ETA Simulator</h2>
+        <p class="section-sub">Drag the distance slider to preview BiteHub's AI courier dispatch prediction.</p>
+      </div>
+
+      <div class="simulator-grid">
+        <div>
+          <div style="display: flex; justify-content: space-between; font-weight: 700;">
+            <span style="color: var(--text-primary); font-size: 15px;">Delivery Distance:</span>
+            <span style="color: var(--secondary-dark); font-size: 18px;" id="distLabel">3.5 km</span>
+          </div>
+          <input type="range" min="0.5" max="15" step="0.5" value="3.5" class="sim-slider" id="distSlider" oninput="updateEta()">
+
+          <!-- Dynamic Animated Road Track -->
+          <div class="animated-road-track">
+            <div class="road-surface">
+              <div class="road-dashes"></div>
+              <div class="road-courier" id="simCourier">
+                <span class="sim-courier-icon" id="simCourierIcon">⚡🛵</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-weight: 600; margin-bottom: 12px; font-size: 14px; color: var(--text-primary);">Select Dispatch Mode:</div>
+          <div class="transport-selector">
+            <div class="mode-card active" onclick="setMode(0, this)">
+              <div style="font-weight: 700; font-size: 13px;">⚡ Hyper Bike</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Sub-12 min</div>
+            </div>
+            <div class="mode-card" onclick="setMode(1, this)">
+              <div style="font-weight: 700; font-size: 13px;">🛸 Drone Air</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Express Pilot</div>
+            </div>
+            <div class="mode-card" onclick="setMode(2, this)">
+              <div style="font-weight: 700; font-size: 13px;">🚲 Eco Rider</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Zero Carbon</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="eta-display">
+          <div style="font-size: 11.5px; font-weight: 800; color: var(--text-secondary); letter-spacing: 0.8px;">PREDICTED ARRIVAL TIME</div>
+          <div class="eta-number" id="etaMinutes">10</div>
+          <div style="font-weight: 700; color: var(--text-primary); font-size: 14px;">MINUTES</div>
+          <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; font-size: 13px;">
+            <span style="color: var(--text-secondary);">Delivery Fee: <b id="etaFee" style="color: var(--secondary-dark);">FREE</b></span>
+            <span style="color: var(--text-secondary);">Carbon Saved: <b style="color: var(--secondary-dark);">100% Green</b></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4-Way Ecosystem -->
+  <section id="ecosystem" class="container">
+    <div class="section-header reveal">
+      <div class="badge-label">ONE PLATFORM • FOUR EXPERIENCES</div>
+      <h2 class="section-title">The Complete BiteHub Ecosystem</h2>
+      <p class="section-sub">Whether dining, cooking, packing, or riding, every role enjoys an effortless experience.</p>
+    </div>
+
+    <div class="roles-grid">
+      <div class="role-card reveal reveal-delay-1">
+        <div class="role-icon-box" style="background: var(--primary-light);">🍔</div>
+        <div class="role-title">Hungry Foodies</div>
+        <div class="role-sub">Customer App</div>
+        <div class="role-desc">Instant 1-tap checkout, live GPS tracking, zero minimum order, and personalized cravings.</div>
+        <a href="index.html" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 13px;">Customer Portal →</a>
+      </div>
+
+      <div class="role-card reveal reveal-delay-2">
+        <div class="role-icon-box" style="background: var(--accent-light);">🍳</div>
+        <div class="role-title">Kitchen Partners</div>
+        <div class="role-sub" style="color: var(--accent);">Restaurant Manager</div>
+        <div class="role-desc">Live kitchen display system (KDS), automated menu sync, dish availability toggles, and daily payouts.</div>
+        <a href="index.html" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 13px;">Restaurant Portal →</a>
+      </div>
+
+      <div class="role-card reveal reveal-delay-3">
+        <div class="role-icon-box" style="background: var(--secondary-light);">🏪</div>
+        <div class="role-title">Hyperlocal Hubs</div>
+        <div class="role-sub" style="color: var(--secondary-dark);">Dark Store Inventory</div>
+        <div class="role-desc">Real-time barcode inventory scan, instant stock replenishment alerts, and 90s bag dispatch.</div>
+        <a href="index.html" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 13px;">Dark Store Portal →</a>
+      </div>
+
+      <div class="role-card reveal reveal-delay-4">
+        <div class="role-icon-box" style="background: #FFF1F2;">🛵</div>
+        <div class="role-title">Speed Couriers</div>
+        <div class="role-sub" style="color: #E11D48;">Delivery Fleet</div>
+        <div class="role-desc">AI multi-order batch routing, surge pricing incentives, flexible shifts, and instant wallet cashout.</div>
+        <a href="index.html" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 13px;">Courier Portal →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Features -->
+  <section id="why" class="container">
+    <div class="section-header reveal">
+      <div class="badge-label">HYPER-ENGINEERED</div>
+      <h2 class="section-title">Why BiteHub Delivers Differently</h2>
+    </div>
+
+    <div class="bento-grid">
+      <div class="bento-card bento-7 reveal reveal-delay-1">
+        <h4>🌡️ Temperature-Lock Thermal Pods</h4>
+        <p>Patented insulated compartments keep wood-fired pizzas crisp at 65°C and gelato frosty at -5°C throughout transit.</p>
+      </div>
+      <div class="bento-card bento-5 reveal reveal-delay-2">
+        <h4>📡 Micro-GPS Live Radar</h4>
+        <p>Direct sub-meter live coordinates with turn-by-turn routing for zero driver disorientation.</p>
+      </div>
+      <div class="bento-card bento-5 reveal reveal-delay-3">
+        <h4>🍃 100% Green Urban Fleet</h4>
+        <p>All urban express dispatches are conducted via zero-emission electric cargo bikes and e-mopeds.</p>
+      </div>
+      <div class="bento-card bento-7 reveal reveal-delay-4">
+        <h4>🛡️ Tamper-Evident Safety Seals</h4>
+        <p>Every bag is digitally sealed with dual verification barcodes that only you can unlock upon delivery.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section id="reviews" class="container">
+    <div class="section-header reveal">
+      <div class="badge-label">COMMUNITY LOVE</div>
+      <h2 class="section-title">Trusted By 150,000+ Foodies & Partners</h2>
+    </div>
+
+    <div class="reviews-grid">
+      <div class="review-card reveal reveal-delay-1">
+        <div class="stars">★★★★★</div>
+        <p>"BiteHub is ridiculously fast. My smashed burger arrived piping hot in 11 minutes while I was in a meeting!"</p>
+        <div class="author">Sarah Jenkins</div>
+        <div class="role">Verified Foodie • 42 orders</div>
+      </div>
+      <div class="review-card reveal reveal-delay-2">
+        <div class="stars">★★★★★</div>
+        <p>"The Restaurant Partner Dashboard allows us to handle 200+ lunch orders with zero confusion. Game changer."</p>
+        <div class="author">Chef Marco Rossi</div>
+        <div class="role">Owner, Bella Napoli Trattoria</div>
+      </div>
+      <div class="review-card reveal reveal-delay-3">
+        <div class="stars">★★★★★</div>
+        <p>"Ran out of milk and eggs for breakfast—the 10-minute dark store delivery arrived in 8 minutes flat."</p>
+        <div class="author">David K.</div>
+        <div class="role">Verified Foodie • 18 orders</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner -->
+  <div class="container">
+    <div class="cta-banner reveal">
+      <h2>Hungry Right Now?</h2>
+      <p>Order gourmet meals or dark store groceries. Delivery arrives at your door in minutes.</p>
+      <a href="index.html" class="btn btn-outline btn-large" style="background: white; color: var(--primary-hover); font-weight: 800; border: none; box-shadow: var(--shadow-md);">
+        Launch BiteHub Web App →
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <b style="color: var(--text-primary);">BiteHub Platform</b> &copy; 2026. All rights reserved.
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--secondary);"></span>
+        <span>All systems operational &bull; Web Edition</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // 1. Navigation scroll state (dynamic glassmorphism shadow)
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('nav');
+      if (nav) {
+        if (window.scrollY > 24) {
+          nav.classList.add('nav-scrolled');
+        } else {
+          nav.classList.remove('nav-scrolled');
+        }
+      }
+    }, { passive: true });
+
+    // 2. Scroll-triggered IntersectionObserver for section and card reveals
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      rootMargin: '0px 0px -50px 0px',
+      threshold: 0.12
+    });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // 3. High-precision animated statistics count-up
+    const counterObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const counter = entry.target;
+          const target = parseFloat(counter.getAttribute('data-target'));
+          const decimals = parseInt(counter.getAttribute('data-decimals') || '0', 10);
+          const prefix = counter.getAttribute('data-prefix') || '';
+          const suffix = counter.getAttribute('data-suffix') || '';
+          const duration = 1500;
+          const startTime = performance.now();
+
+          function updateCount(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease-out cubic curve
+            const easeOut = 1 - Math.pow(1 - progress, 3);
+            const currentVal = target * easeOut;
+
+            counter.innerText = prefix + (decimals > 0 ? currentVal.toFixed(decimals) : Math.round(currentVal).toLocaleString()) + suffix;
+
+            if (progress < 1) {
+              requestAnimationFrame(updateCount);
+            }
+          }
+
+          requestAnimationFrame(updateCount);
+          observer.unobserve(counter);
+        }
+      });
+    }, { threshold: 0.25 });
+
+    document.querySelectorAll('.counter').forEach(c => counterObserver.observe(c));
+
+    // 4. Pincode speed checker
+    function checkPincode() {
+      const val = document.getElementById('pincodeInput').value.trim();
+      const fb = document.getElementById('pincodeFeedback');
+      if (!val) {
+        alert('Please enter a location or pincode!');
+        return;
+      }
+      fb.style.display = 'block';
+      fb.innerText = `⚡ Lightning Hub Active in ${val}! Instant dispatch in 9-11 mins.`;
+    }
+
+    // 5. Category tabs filter
+    function filterItems(cat, btn) {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cards = document.querySelectorAll('.food-card');
+      cards.forEach(card => {
+        const itemCat = card.getAttribute('data-cat') || '';
+        if (cat === 'all' || itemCat.split(' ').includes(cat)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // 6. ETA Simulator with real-time road corridor synchronization
+    let currentMode = 0;
+    const modeIcons = ['⚡🛵', '🛸', '🚲'];
+
+    function setMode(mode, el) {
+      currentMode = mode;
+      document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      const iconEl = document.getElementById('simCourierIcon');
+      if (iconEl) iconEl.innerText = modeIcons[mode];
+      updateEta();
+    }
+
+    function updateEta() {
+      const dist = parseFloat(document.getElementById('distSlider').value);
+      document.getElementById('distLabel').innerText = dist.toFixed(1) + ' km';
+      const multipliers = [1.8, 1.2, 2.5];
+      const mins = Math.round(4 + (dist * multipliers[currentMode]));
+      document.getElementById('etaMinutes').innerText = mins;
+      document.getElementById('etaFee').innerText = dist > 5 ? '₹35' : 'FREE';
+
+      // Animate road courier position based on slider percentage
+      const courierEl = document.getElementById('simCourier');
+      if (courierEl) {
+        const pct = Math.min(84, Math.max(4, ((dist - 0.5) / 14.5) * 82));
+        courierEl.style.left = pct + '%';
+      }
+    }
+
+    // Initialize road courier position on DOM load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateEta();
+    });
+  </script>
+</body>
+</html>

@@ -199,7 +199,6 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Container(
-                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
@@ -211,58 +210,95 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              // Top Restaurant Banner
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                child: AppCachedNetworkImage(
+                                  imageUrl: ItemImageHelper.getBannerForRestaurant(
+                                    r.rName,
+                                    restId: r.restId,
+                                    imageUrl: r.imageUrl,
+                                  ),
+                                  height: 140,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                  placeholder: Container(
+                                    height: 140,
+                                    width: double.infinity,
+                                    color: const Color(0xFFF1F5F9),
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                                      ),
+                                    ),
+                                  ),
+                                  errorWidget: Container(
+                                    height: 140,
+                                    width: double.infinity,
+                                    color: const Color(0xFFEEF2FF),
+                                    child: const Center(child: Icon(Icons.restaurant, color: Color(0xFF4F46E5), size: 36)),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          r.rName,
-                                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                r.rName,
+                                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                                              ),
+                                              const SizedBox(height: 3),
+                                              Text(
+                                                r.rLocation,
+                                                style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        const SizedBox(height: 3),
-                                        Text(
-                                          r.rLocation,
-                                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                        // Yellow rating pill: ★ 5.0 (2.1k) (Screen 4)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFEF3C7),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(Icons.star_rounded, size: 14, color: Color(0xFFD97706)),
+                                              const SizedBox(width: 3),
+                                              Text(
+                                                "${r.rRating.toStringAsFixed(1)} (2.1k)",
+                                                style: const TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.bold, fontSize: 11),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                  // Yellow rating pill: ★ 5.0 (2.1k) (Screen 4)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFFEF3C7),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
+                                    const SizedBox(height: 14),
+                                    Row(
                                       children: [
-                                        const Icon(Icons.star_rounded, size: 14, color: Color(0xFFD97706)),
-                                        const SizedBox(width: 3),
-                                        Text(
-                                          "${r.rRating.toStringAsFixed(1)} (2.1k)",
-                                          style: const TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.bold, fontSize: 11),
-                                        ),
+                                        _metaItem(Icons.timer_outlined, eta, "Delivery"),
+                                        const SizedBox(width: 16),
+                                        _metaItem(Icons.location_on_outlined, dist, "Distance"),
+                                        const SizedBox(width: 16),
+                                        _metaItem(Icons.payments_outlined, costForTwo, "Cost for two"),
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                children: [
-                                  _metaItem(Icons.timer_outlined, eta, "Delivery"),
-                                  const SizedBox(width: 16),
-                                  _metaItem(Icons.location_on_outlined, dist, "Distance"),
-                                  const SizedBox(width: 16),
-                                  _metaItem(Icons.payments_outlined, costForTwo, "Cost for two"),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              // Promo offer banner (Screen 4)
-                              Container(
+                                    const SizedBox(height: 14),
+                                    // Promo offer banner (Screen 4)
+                                    Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 decoration: BoxDecoration(
@@ -295,8 +331,11 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                             ],
                           ),
                         ),
-                      ),
+                      ],
                     ),
+                  ),
+                ),
+              ),
 
                     // Category Pills Row (Popular, Biryani, Starters, Main Course - Screen 4)
                     SliverToBoxAdapter(

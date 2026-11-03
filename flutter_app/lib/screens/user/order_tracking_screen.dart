@@ -503,6 +503,65 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
         const SizedBox(height: 20),
 
+        if (!isDelivered && !isCancelled) ...[
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.cancel_outlined, size: 16),
+              label: const Text("Cancel This Order", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFDC2626),
+                side: const BorderSide(color: Color(0xFFFCA5A5)),
+                padding: const EdgeInsets.symmetric(vertical: 13),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () async {
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    title: const Text("Cancel Order?", style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text("Are you sure you want to cancel Order #${widget.orderId}?"),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text("Keep Order", style: TextStyle(color: Color(0xFF64748B))),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFDC2626),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text("Cancel Order"),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirm == true) {
+                  try {
+                    final ok = await ApiService.updateOrderStatus(widget.orderId, "Cancelled");
+                    if (mounted) {
+                      if (ok) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Order #${widget.orderId} cancelled."),
+                            backgroundColor: const Color(0xFFDC2626),
+                          ),
+                        );
+                      }
+                      _fetchOrderDetails();
+                    }
+                  } catch (_) {}
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
         // Reorder Button
         ElevatedButton(
           style: ElevatedButton.styleFrom(

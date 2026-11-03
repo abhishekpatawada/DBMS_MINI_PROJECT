@@ -1,9 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'user/user_dashboard_screen.dart';
 import 'delivery_agent/delivery_agent_dashboard_screen.dart';
 import 'restaurant/restaurant_dashboard_screen.dart';
 import 'dark_store/dark_store_dashboard_screen.dart';
+import 'landing/web_landing_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   final String? selectedRole;
@@ -75,7 +77,8 @@ class _AuthScreenState extends State<AuthScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("Filled demo credentials for $roleName ($phone / 123456)"),
+        content:
+            Text("Filled demo credentials for $roleName ($phone / 123456)"),
         duration: const Duration(seconds: 2),
         backgroundColor: const Color(0xFF4F46E5),
       ),
@@ -154,7 +157,8 @@ class _AuthScreenState extends State<AuthScreen> {
     final phone = _signUpPhoneController.text.trim();
     final password = _signUpPasswordController.text.trim();
 
-    if (_selectedSignUpRole != "Dark Store" && _signUpNameController.text.trim().isEmpty) {
+    if (_selectedSignUpRole != "Dark Store" &&
+        _signUpNameController.text.trim().isEmpty) {
       setState(() => _errorMessage = "Please enter your name.");
       return;
     }
@@ -205,7 +209,8 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       } else {
         // Dark Store
-        if (_streetController.text.trim().isEmpty || _areaController.text.trim().isEmpty) {
+        if (_streetController.text.trim().isEmpty ||
+            _areaController.text.trim().isEmpty) {
           throw Exception("Street and Area are required for Dark Store Hub.");
         }
         res = await ApiService.registerDarkStore({
@@ -221,7 +226,8 @@ class _AuthScreenState extends State<AuthScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Account created successfully as $_selectedSignUpRole!"),
+            content:
+                Text("Account created successfully as $_selectedSignUpRole!"),
             backgroundColor: Colors.green,
           ),
         );
@@ -272,6 +278,32 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (kIsWeb) ...[
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: TextButton.icon(
+                            onPressed: () {
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              } else {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (_) => const WebLandingScreen(),
+                                  ),
+                                );
+                              }
+                            },
+                            icon:
+                                const Icon(Icons.arrow_back_rounded, size: 16),
+                            label: const Text("Back to BiteHub Home"),
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF64748B),
+                              padding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       // Brand Header
                       Center(
                         child: Column(
@@ -284,7 +316,8 @@ class _AuthScreenState extends State<AuthScreen> {
                                 borderRadius: BorderRadius.circular(22),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF4F46E5).withOpacity(0.18),
+                                    color: const Color(0xFF4F46E5)
+                                        .withOpacity(0.18),
                                     blurRadius: 20,
                                     offset: const Offset(0, 8),
                                   ),
@@ -295,13 +328,19 @@ class _AuthScreenState extends State<AuthScreen> {
                                 child: Image.asset(
                                   'assets/images/logo.png',
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Image.asset(
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Image.asset(
                                     'assets/images/logo.jpg',
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error2, stackTrace2) => Container(
+                                    errorBuilder:
+                                        (context, error2, stackTrace2) =>
+                                            Container(
                                       decoration: BoxDecoration(
                                         gradient: const LinearGradient(
-                                          colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                                          colors: [
+                                            Color(0xFF6366F1),
+                                            Color(0xFF4F46E5)
+                                          ],
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
                                         ),
@@ -359,7 +398,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       // Error Alert Banner
                       if (_errorMessage != null) ...[
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 12),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFEF2F2),
                             borderRadius: BorderRadius.circular(12),
@@ -367,7 +407,8 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline_rounded, color: Color(0xFFDC2626), size: 20),
+                              const Icon(Icons.error_outline_rounded,
+                                  color: Color(0xFFDC2626), size: 20),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
@@ -407,7 +448,10 @@ class _AuthScreenState extends State<AuthScreen> {
       children: [
         const Text(
           "Mobile Number",
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF334155)),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -420,25 +464,43 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Text("🇮🇳 +91", style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155), fontSize: 14)),
+                  Text("🇮🇳 +91",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF334155),
+                          fontSize: 14)),
                   SizedBox(width: 8),
-                  SizedBox(height: 18, child: VerticalDivider(width: 1, color: Color(0xFFCBD5E1))),
+                  SizedBox(
+                      height: 18,
+                      child:
+                          VerticalDivider(width: 1, color: Color(0xFFCBD5E1))),
                 ],
               ),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF4F46E5), width: 2)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide:
+                    const BorderSide(color: Color(0xFF4F46E5), width: 2)),
           ),
         ),
         const SizedBox(height: 16),
 
         const Text(
           "Password",
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF334155)),
         ),
         const SizedBox(height: 6),
         TextField(
@@ -446,21 +508,33 @@ class _AuthScreenState extends State<AuthScreen> {
           obscureText: _obscurePassword,
           decoration: InputDecoration(
             hintText: "Enter your password",
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF64748B), size: 20),
+            prefixIcon: const Icon(Icons.lock_outline_rounded,
+                color: Color(0xFF64748B), size: 20),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: const Color(0xFF94A3B8),
                 size: 20,
               ),
-              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              onPressed: () =>
+                  setState(() => _obscurePassword = !_obscurePassword),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF4F46E5), width: 2)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide:
+                    const BorderSide(color: Color(0xFF4F46E5), width: 2)),
           ),
         ),
         const SizedBox(height: 18),
@@ -477,11 +551,15 @@ class _AuthScreenState extends State<AuthScreen> {
             children: [
               Row(
                 children: const [
-                  Icon(Icons.flash_on_rounded, size: 14, color: Color(0xFF6366F1)),
+                  Icon(Icons.flash_on_rounded,
+                      size: 14, color: Color(0xFF6366F1)),
                   SizedBox(width: 6),
                   Text(
                     "Quick Fill Demo Login:",
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF475569)),
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF475569)),
                   ),
                 ],
               ),
@@ -490,10 +568,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 spacing: 6,
                 runSpacing: 6,
                 children: [
-                  _demoChip("👤 Customer", "9810000001", "Customer", const Color(0xFF4F46E5)),
-                  _demoChip("🛵 Agent", "9876500001", "Delivery Agent", const Color(0xFF059669)),
-                  _demoChip("🏪 Restaurant", "0800000001", "Restaurant", const Color(0xFFEA580C)),
-                  _demoChip("🏬 Dark Store", "9810099999", "Dark Store", const Color(0xFF7C3AED)),
+                  _demoChip("👤 Customer", "9810000001", "Customer",
+                      const Color(0xFF4F46E5)),
+                  _demoChip("🛵 Agent", "9876500001", "Delivery Agent",
+                      const Color(0xFF059669)),
+                  _demoChip("🏪 Restaurant", "0800000001", "Restaurant",
+                      const Color(0xFFEA580C)),
+                  _demoChip("🏬 Dark Store", "9810099999", "Dark Store",
+                      const Color(0xFF7C3AED)),
                 ],
               ),
             ],
@@ -510,13 +592,15 @@ class _AuthScreenState extends State<AuthScreen> {
             elevation: 2,
             shadowColor: const Color(0xFF4F46E5).withOpacity(0.4),
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           child: _isLoading
               ? const SizedBox(
                   height: 20,
                   width: 20,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
                 )
               : const Text(
                   "Sign In to BiteHub",
@@ -575,7 +659,8 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: color),
+          style: TextStyle(
+              fontSize: 11, fontWeight: FontWeight.w600, color: color),
         ),
       ),
     );
@@ -593,24 +678,35 @@ class _AuthScreenState extends State<AuthScreen> {
         // Role Selection Header
         const Text(
           "I am joining BiteHub as:",
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1E293B)),
         ),
         const SizedBox(height: 10),
 
         // 4 Role Cards
         Row(
           children: [
-            Expanded(child: _roleCard("User", "👤", "Customer", "Order food & mart")),
+            Expanded(
+                child:
+                    _roleCard("User", "👤", "Customer", "Order food & mart")),
             const SizedBox(width: 8),
-            Expanded(child: _roleCard("Delivery Agent", "🛵", "Agent", "Deliver orders")),
+            Expanded(
+                child: _roleCard(
+                    "Delivery Agent", "🛵", "Agent", "Deliver orders")),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: _roleCard("Restaurant", "🏪", "Restaurant", "Sell dishes")),
+            Expanded(
+                child:
+                    _roleCard("Restaurant", "🏪", "Restaurant", "Sell dishes")),
             const SizedBox(width: 8),
-            Expanded(child: _roleCard("Dark Store", "🏬", "Dark Store", "Grocery hub")),
+            Expanded(
+                child:
+                    _roleCard("Dark Store", "🏬", "Dark Store", "Grocery hub")),
           ],
         ),
         const SizedBox(height: 20),
@@ -621,28 +717,47 @@ class _AuthScreenState extends State<AuthScreen> {
         // Form Fields for Selected Role
         if (_selectedSignUpRole != "Dark Store") ...[
           Text(
-            _selectedSignUpRole == "Restaurant" ? "Restaurant Name *" : "Full Name *",
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+            _selectedSignUpRole == "Restaurant"
+                ? "Restaurant Name *"
+                : "Full Name *",
+            style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155)),
           ),
           const SizedBox(height: 6),
           TextField(
             controller: _signUpNameController,
             decoration: InputDecoration(
-              hintText: _selectedSignUpRole == "Restaurant" ? "e.g. Royal Bistro" : "e.g. Aarav Sharma",
-              prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF64748B), size: 20),
+              hintText: _selectedSignUpRole == "Restaurant"
+                  ? "e.g. Royal Bistro"
+                  : "e.g. Aarav Sharma",
+              prefixIcon: const Icon(Icons.person_outline_rounded,
+                  color: Color(0xFF64748B), size: 20),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: activeColor, width: 2)),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+              focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: activeColor, width: 2)),
             ),
           ),
           const SizedBox(height: 14),
         ],
 
         // Mobile Number
-        const Text("Mobile Number *", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+        const Text("Mobile Number *",
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155))),
         const SizedBox(height: 6),
         TextField(
           controller: _signUpPhoneController,
@@ -654,62 +769,99 @@ class _AuthScreenState extends State<AuthScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Text("🇮🇳 +91", style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF334155), fontSize: 14)),
+                  Text("🇮🇳 +91",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF334155),
+                          fontSize: 14)),
                   SizedBox(width: 8),
-                  SizedBox(height: 18, child: VerticalDivider(width: 1, color: Color(0xFFCBD5E1))),
+                  SizedBox(
+                      height: 18,
+                      child:
+                          VerticalDivider(width: 1, color: Color(0xFFCBD5E1))),
                 ],
               ),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: activeColor, width: 2)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: activeColor, width: 2)),
           ),
         ),
         const SizedBox(height: 14),
 
         // Create Password
-        const Text("Create Password *", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+        const Text("Create Password *",
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF334155))),
         const SizedBox(height: 6),
         TextField(
           controller: _signUpPasswordController,
           obscureText: _obscureSignUpPassword,
           decoration: InputDecoration(
             hintText: "Minimum 6 characters",
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF64748B), size: 20),
+            prefixIcon: const Icon(Icons.lock_outline_rounded,
+                color: Color(0xFF64748B), size: 20),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureSignUpPassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                _obscureSignUpPassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: const Color(0xFF94A3B8),
                 size: 20,
               ),
-              onPressed: () => setState(() => _obscureSignUpPassword = !_obscureSignUpPassword),
+              onPressed: () => setState(
+                  () => _obscureSignUpPassword = !_obscureSignUpPassword),
             ),
             filled: true,
             fillColor: const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: activeColor, width: 2)),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: activeColor, width: 2)),
           ),
         ),
         const SizedBox(height: 14),
 
         // Delivery Agent Specific Fields
         if (_selectedSignUpRole == "Delivery Agent") ...[
-          const Text("Vehicle Number", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+          const Text("Vehicle Number",
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF334155))),
           const SizedBox(height: 6),
           TextField(
             controller: _vehicleNoController,
             decoration: InputDecoration(
               hintText: "e.g. KA-01-AB-1234",
-              prefixIcon: const Icon(Icons.two_wheeler_rounded, color: Color(0xFF64748B), size: 20),
+              prefixIcon: const Icon(Icons.two_wheeler_rounded,
+                  color: Color(0xFF64748B), size: 20),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
             ),
           ),
           const SizedBox(height: 14),
@@ -719,11 +871,17 @@ class _AuthScreenState extends State<AuthScreen> {
               labelText: "Vehicle Type",
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
             ),
-            items: ["Motorcycle", "Electric Scooter", "Scooter", "Bicycle", "Car"]
-                .map((v) => DropdownMenuItem(value: v, child: Text(v)))
-                .toList(),
+            items: [
+              "Motorcycle",
+              "Electric Scooter",
+              "Scooter",
+              "Bicycle",
+              "Car"
+            ].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
             onChanged: (val) => setState(() => _vType = val!),
           ),
           const SizedBox(height: 14),
@@ -731,35 +889,52 @@ class _AuthScreenState extends State<AuthScreen> {
 
         // Restaurant Location
         if (_selectedSignUpRole == "Restaurant") ...[
-          const Text("Restaurant Location / Area *", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+          const Text("Restaurant Location / Area *",
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF334155))),
           const SizedBox(height: 6),
           TextField(
             controller: _areaController,
             decoration: InputDecoration(
               hintText: "e.g. Indiranagar, Bengaluru",
-              prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF64748B), size: 20),
+              prefixIcon: const Icon(Icons.location_on_outlined,
+                  color: Color(0xFF64748B), size: 20),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
             ),
           ),
           const SizedBox(height: 14),
         ],
 
         // Customer & Dark Store Address
-        if (_selectedSignUpRole == "User" || _selectedSignUpRole == "Dark Store") ...[
-          const Text("Street Address", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+        if (_selectedSignUpRole == "User" ||
+            _selectedSignUpRole == "Dark Store") ...[
+          const Text("Street Address",
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF334155))),
           const SizedBox(height: 6),
           TextField(
             controller: _streetController,
             decoration: InputDecoration(
               hintText: "e.g. 12th Main, Plot 42",
-              prefixIcon: const Icon(Icons.home_outlined, color: Color(0xFF64748B), size: 20),
+              prefixIcon: const Icon(Icons.home_outlined,
+                  color: Color(0xFF64748B), size: 20),
               filled: true,
               fillColor: const Color(0xFFF8FAFC),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
             ),
           ),
           const SizedBox(height: 14),
@@ -769,7 +944,11 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Area / City *", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+                    const Text("Area / City *",
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF334155))),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _areaController,
@@ -777,8 +956,12 @@ class _AuthScreenState extends State<AuthScreen> {
                         hintText: "e.g. Koramangala",
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 14),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFCBD5E1))),
                       ),
                     ),
                   ],
@@ -789,7 +972,11 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Pincode", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+                    const Text("Pincode",
+                        style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF334155))),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _pincodeController,
@@ -798,8 +985,12 @@ class _AuthScreenState extends State<AuthScreen> {
                         hintText: "e.g. 560034",
                         filled: true,
                         fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 14),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFCBD5E1))),
                       ),
                     ),
                   ],
@@ -821,17 +1012,20 @@ class _AuthScreenState extends State<AuthScreen> {
             elevation: 2,
             shadowColor: activeColor.withOpacity(0.4),
             padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           ),
           child: _isLoading
               ? const SizedBox(
                   height: 20,
                   width: 20,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
                 )
               : Text(
                   "Register as $_selectedSignUpRole",
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w700),
                 ),
         ),
         const SizedBox(height: 20),
@@ -914,7 +1108,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
+                    style:
+                        const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),

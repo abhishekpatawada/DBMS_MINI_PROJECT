@@ -415,6 +415,55 @@ def get_dark_store_revenue_analytics(store_id: int) -> dict:
             "items": items
         })
 
+    # 6. Top Customers Leaderboard ("who ordered the more")
+    top_customers = []
+    try:
+        cust_query = """
+            SELECT 
+                o.User_Id,
+                u.User_Name,
+                u.User_Phone,
+                COALESCE(u.Area, 'Indiranagar Hub') AS user_area,
+                COUNT(o.Order_Id) AS order_count,
+                COALESCE(SUM(p.Amount), 0.0) AS total_spent,
+                MAX(o.PlacedAt) AS last_order_date
+            FROM ORDERS o
+            JOIN USERS u ON o.User_Id = u.User_Id
+            LEFT JOIN PAYMENT p ON o.Order_Id = p.Order_Id
+            WHERE o.Store_Id = %s
+            GROUP BY o.User_Id, u.User_Name, u.User_Phone, u.Area
+            ORDER BY order_count DESC, total_spent DESC
+            LIMIT 15;
+        """
+        raw_custs = fetch_all(cust_query, (store_id,))
+        for c in raw_custs:
+            u_id = c["User_Id"]
+            fav_item_query = """
+                SELECT og.Item_Name, SUM(og.Quantity) AS qty
+                FROM ORDER_GROCERY og
+                JOIN ORDERS o ON og.Order_Id = o.Order_Id
+                WHERE o.Store_Id = %s AND o.User_Id = %s
+                GROUP BY og.Item_Name
+                ORDER BY qty DESC
+                LIMIT 1;
+            """
+            fav_res = fetch_one(fav_item_query, (store_id, u_id))
+            top_customers.append({
+                "user_id": u_id,
+                "user_name": c["User_Name"],
+                "user_phone": c["User_Phone"],
+                "user_area": c["user_area"],
+                "order_count": int(c["order_count"]),
+                "total_spent": round(float(c["total_spent"]), 2),
+                "last_order_date": str(c["last_order_date"]),
+                "favorite_item": fav_res["Item_Name"] if fav_res else (top_items[0]["Item_Name"] if top_items else "Daily Essentials")
+            })
+    except Exception as e:
+        print(f"Error computing dark store top customers: {e}")
+
+    if not top_customers:
+        top_customers = []
+
     return {
         "status": "success",
         "store_id": store_id,
@@ -439,6 +488,7 @@ def get_dark_store_revenue_analytics(store_id: int) -> dict:
         },
         "timeline": timeline,
         "top_items": top_items,
+        "top_customers": top_customers,
         "payment_methods": payment_methods,
         "live_orders": live_orders
     }

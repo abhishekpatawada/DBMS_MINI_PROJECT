@@ -86,6 +86,40 @@ DEFAULT_GROCERY_IMAGES = {
 }
 
 
+DEFAULT_RESTAURANT_IMAGES = {
+    1: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",  # Royal Palace - Fine Dining Banquet
+    2: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&auto=format&fit=crop&q=80",  # Spice House - Indian Curry & Spices
+    3: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80",  # Taste of Bawarchi - Dum Biryani & Kebabs
+    4: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",  # The Golden Junction - Warm Bistro & Grill
+    5: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80",  # Urban Tales - Modern Cafe & Brunch
+    6: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=80",  # Flavors of Street - Street Food & Sizzlers
+    7: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",  # Grand Plate - Italian Pizzeria & Pasta
+    8: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&auto=format&fit=crop&q=80",  # Desi Diner - Punjabi Dhaba & Tandoor
+    9: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80",  # Kitchen Grill - Smokehouse BBQ & Steaks
+    10: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop&q=80", # Saffron Hub - Royal Kashmiri & Mughlai
+}
+
+CURATED_RESTAURANT_POOL = [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=800&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=800&auto=format&fit=crop&q=80",
+]
+
+
 def _match_image(name: str, mapping: dict, fallback: str) -> str:
     lower = name.lower()
     for key, url in mapping.items():
@@ -151,6 +185,31 @@ def ensure_image_schema():
         if groceries:
             conn.commit()
             print(f"Backfilled images for {len(groceries)} items in GROCERIES.")
+
+        # 5. Add Image_Url column to RESTAURANT and backfill unique pictures
+        try:
+            cursor.execute("ALTER TABLE RESTAURANT ADD COLUMN Image_Url VARCHAR(500) DEFAULT NULL;")
+            conn.commit()
+            print("Added Image_Url column to RESTAURANT table.")
+        except Exception:
+            pass  # already exists
+
+        cursor.execute("SELECT Rest_Id, RName, Image_Url FROM RESTAURANT WHERE Image_Url IS NULL OR Image_Url = '';")
+        restaurants = cursor.fetchall()
+        for idx, r in enumerate(restaurants):
+            r_id = r.get("Rest_Id")
+            r_name = r.get("RName", "")
+            img = DEFAULT_RESTAURANT_IMAGES.get(
+                r_id,
+                CURATED_RESTAURANT_POOL[(r_id or idx) % len(CURATED_RESTAURANT_POOL)]
+            )
+            cursor.execute(
+                "UPDATE RESTAURANT SET Image_Url = %s WHERE Rest_Id = %s;",
+                (img, r_id)
+            )
+        if restaurants:
+            conn.commit()
+            print(f"Backfilled distinct images for {len(restaurants)} restaurants in RESTAURANT.")
 
     except Exception as e:
         print(f"Image schema migration warning: {e}")

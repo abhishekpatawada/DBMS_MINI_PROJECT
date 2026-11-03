@@ -68,6 +68,7 @@ class RestaurantModel {
   final String rLocation;
   final String? rPhone;
   final double rRating;
+  final String? imageUrl;
 
   RestaurantModel({
     required this.restId,
@@ -75,6 +76,7 @@ class RestaurantModel {
     required this.rLocation,
     this.rPhone,
     required this.rRating,
+    this.imageUrl,
   });
 
   factory RestaurantModel.fromJson(Map<String, dynamic> json) {
@@ -84,6 +86,7 @@ class RestaurantModel {
       rLocation: json['RLocation'] ?? json['rlocation'] ?? '',
       rPhone: json['RPhone'] ?? json['rphone'],
       rRating: double.tryParse(json['RRating']?.toString() ?? '4.0') ?? 4.0,
+      imageUrl: json['Image_Url'] ?? json['imageUrl'] ?? json['Banner_Url'],
     );
   }
 }

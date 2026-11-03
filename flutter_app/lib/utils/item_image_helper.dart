@@ -1,4 +1,6 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class GalleryImageItem {
   final String title;
@@ -422,27 +424,83 @@ class ItemImageHelper {
     return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80";
   }
 
-  static String getBannerForRestaurant(String rName) {
+  static const List<String> curatedRestaurantBanners = [
+    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80",  // 1: Royal Palace (Fine Dining Banquet)
+    "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800&auto=format&fit=crop&q=80",  // 2: Spice House (Indian Curries & Spices)
+    "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80",  // 3: Taste of Bawarchi (Authentic Biryani & Kebabs)
+    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80",  // 4: The Golden Junction (Warm Gourmet Bistro)
+    "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=800&auto=format&fit=crop&q=80",  // 5: Urban Tales (Modern Aesthetic Cafe & Brunch)
+    "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&auto=format&fit=crop&q=80",  // 6: Flavors of Street (Sizzling Street Food & Tandoor)
+    "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80",  // 7: Grand Plate (Italian Artisan Pizzeria & Pasta)
+    "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=800&auto=format&fit=crop&q=80",  // 8: Desi Diner (Punjabi Highway Dhaba)
+    "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&auto=format&fit=crop&q=80",  // 9: Kitchen Grill (Smoked Charcoal BBQ & Steaks)
+    "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop&q=80",  // 10: Saffron Hub (Saffron Royal Mughlai)
+    "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&auto=format&fit=crop&q=80",  // 11: Crispy Dosa & South Indian
+    "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&auto=format&fit=crop&q=80",  // 12: Dimsum & Asian Wok Noodles
+    "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&auto=format&fit=crop&q=80",  // 13: Artisan Desserts & Bakery
+    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&auto=format&fit=crop&q=80",  // 14: Gourmet Juicy Burgers & Shakes
+    "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop&q=80",  // 15: Fresh Mediterranean & Salad Bar
+    "https://images.unsplash.com/photo-1579027989536-b7b1f875659b?w=800&auto=format&fit=crop&q=80",  // 16: Sizzling Tacos & Mexican
+    "https://images.unsplash.com/photo-1590846406792-0adc7f938f1d?w=800&auto=format&fit=crop&q=80",  // 17: Rooftop Lounge & Cocktails
+  ];
+
+  static String getBannerForRestaurant(String rName, {int? restId, String? imageUrl}) {
+    if (imageUrl != null && imageUrl.trim().isNotEmpty) {
+      return imageUrl.trim();
+    }
+
     final lower = rName.toLowerCase();
-    if (lower.contains("biryani") || lower.contains("behrouz") || lower.contains("darbar")) {
-      return "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("royal") || lower.contains("palace")) {
+      return curatedRestaurantBanners[0];
     }
-    if (lower.contains("pizza") || lower.contains("oven") || lower.contains("crust")) {
-      return "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("spice") || lower.contains("house") || lower.contains("curry")) {
+      return curatedRestaurantBanners[1];
     }
-    if (lower.contains("burger") || lower.contains("mcdonald") || lower.contains("king")) {
-      return "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("bawarchi") || lower.contains("biryani") || lower.contains("darbar") || lower.contains("behrouz")) {
+      return curatedRestaurantBanners[2];
     }
-    if (lower.contains("chinese") || lower.contains("noodle") || lower.contains("wok") || lower.contains("momo")) {
-      return "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("golden") || lower.contains("junction")) {
+      return curatedRestaurantBanners[3];
     }
-    if (lower.contains("sweet") || lower.contains("dessert") || lower.contains("baker") || lower.contains("cake")) {
-      return "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("urban") || lower.contains("tales") || lower.contains("cafe") || lower.contains("bistro")) {
+      return curatedRestaurantBanners[4];
     }
-    if (lower.contains("south") || lower.contains("dosa") || lower.contains("sagar")) {
-      return "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("flavor") || lower.contains("street") || lower.contains("chaat")) {
+      return curatedRestaurantBanners[5];
     }
-    return "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80";
+    if (lower.contains("grand") || lower.contains("plate") || lower.contains("pizza") || lower.contains("italian")) {
+      return curatedRestaurantBanners[6];
+    }
+    if (lower.contains("desi") || lower.contains("diner") || lower.contains("dhaba") || lower.contains("punjabi")) {
+      return curatedRestaurantBanners[7];
+    }
+    if (lower.contains("grill") || lower.contains("kitchen") || lower.contains("bbq") || lower.contains("smoke")) {
+      return curatedRestaurantBanners[8];
+    }
+    if (lower.contains("saffron") || lower.contains("hub") || lower.contains("mughlai")) {
+      return curatedRestaurantBanners[9];
+    }
+    if (lower.contains("south") || lower.contains("dosa") || lower.contains("idli") || lower.contains("sagar")) {
+      return curatedRestaurantBanners[10];
+    }
+    if (lower.contains("chinese") || lower.contains("noodle") || lower.contains("wok") || lower.contains("momo") || lower.contains("asian")) {
+      return curatedRestaurantBanners[11];
+    }
+    if (lower.contains("sweet") || lower.contains("dessert") || lower.contains("baker") || lower.contains("cake") || lower.contains("pastry")) {
+      return curatedRestaurantBanners[12];
+    }
+    if (lower.contains("burger") || lower.contains("king") || lower.contains("mcdonald")) {
+      return curatedRestaurantBanners[13];
+    }
+    if (lower.contains("salad") || lower.contains("healthy") || lower.contains("bowl") || lower.contains("green")) {
+      return curatedRestaurantBanners[14];
+    }
+
+    // Deterministic distinct banner selection based on restId or name hash
+    final index = (restId != null && restId > 0)
+        ? (restId - 1) % curatedRestaurantBanners.length
+        : rName.hashCode.abs() % curatedRestaurantBanners.length;
+    return curatedRestaurantBanners[index];
   }
 
   // ===========================================================================
@@ -740,6 +798,132 @@ class ItemImageHelper {
 }
 
 // =============================================================================
+// FAST RESILIENT IMAGE CACHE & REUSABLE CACHED NETWORK IMAGE WIDGET
+// =============================================================================
+
+/// Global memory cache holding downloaded image bytes for instant re-use without re-downloading
+class AppImageCache {
+  static final Map<String, Uint8List> _cache = {};
+  static final Map<String, Future<Uint8List?>> _inFlight = {};
+
+  static bool contains(String url) => _cache.containsKey(url);
+  static Uint8List? get(String url) => _cache[url];
+
+  static Future<Uint8List?> getOrFetch(String url) async {
+    final clean = url.trim();
+    if (clean.isEmpty) return null;
+
+    if (_cache.containsKey(clean)) {
+      return _cache[clean];
+    }
+    if (_inFlight.containsKey(clean)) {
+      return await _inFlight[clean];
+    }
+
+    final future = _downloadBytes(clean);
+    _inFlight[clean] = future;
+    try {
+      final bytes = await future;
+      if (bytes != null && bytes.isNotEmpty) {
+        _cache[clean] = bytes;
+      }
+      return bytes;
+    } finally {
+      _inFlight.remove(clean);
+    }
+  }
+
+  static Future<Uint8List?> _downloadBytes(String url) async {
+    try {
+      final res = await http.get(Uri.parse(url));
+      if (res.statusCode == 200 && res.bodyBytes.isNotEmpty) {
+        return res.bodyBytes;
+      }
+    } catch (_) {}
+    return null;
+  }
+}
+
+/// A resilient cached network image widget that uses Flutter's native image engine,
+/// avoids browser CORS blocks on Web, and caches in memory across all screens.
+class AppCachedNetworkImage extends StatelessWidget {
+  final String imageUrl;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+  final BorderRadius? borderRadius;
+  final Widget? placeholder;
+  final Widget? errorWidget;
+
+  const AppCachedNetworkImage({
+    super.key,
+    required this.imageUrl,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.borderRadius,
+    this.placeholder,
+    this.errorWidget,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanUrl = imageUrl.trim();
+    if (cleanUrl.isEmpty) {
+      return _buildFallback();
+    }
+
+    Widget content = Image.network(
+      cleanUrl,
+      width: width,
+      height: height,
+      fit: fit,
+      gaplessPlayback: true,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return placeholder ??
+            Container(
+              width: width,
+              height: height,
+              color: const Color(0xFFF1F5F9),
+              child: const Center(
+                child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
+                ),
+              ),
+            );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return errorWidget ?? _buildFallback();
+      },
+    );
+
+    if (borderRadius != null) {
+      return ClipRRect(borderRadius: borderRadius!, child: content);
+    }
+    return content;
+  }
+
+  Widget _buildFallback() {
+    Widget fallback = errorWidget ??
+        Container(
+          width: width,
+          height: height,
+          color: const Color(0xFFEEF2FF),
+          child: const Center(
+            child: Icon(Icons.restaurant, color: Color(0xFF4F46E5), size: 28),
+          ),
+        );
+    if (borderRadius != null) {
+      return ClipRRect(borderRadius: borderRadius!, child: fallback);
+    }
+    return fallback;
+  }
+}
+
+// =============================================================================
 // REUSABLE ITEM IMAGE WIDGET (With shimmer/loader & graceful fallback)
 // =============================================================================
 class ItemImageWidget extends StatelessWidget {
@@ -775,43 +959,33 @@ class ItemImageWidget extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(borderRadius),
-      child: Container(
+      child: AppCachedNetworkImage(
+        imageUrl: resolvedUrl,
         width: width,
         height: height,
-        color: const Color(0xFFF1F5F9),
-        child: Image.network(
-          resolvedUrl,
+        fit: fit,
+        placeholder: Container(
           width: width,
           height: height,
-          fit: fit,
-          loadingBuilder: (ctx, child, progress) {
-            if (progress == null) return child;
-            return Container(
-              width: width,
-              height: height,
-              color: const Color(0xFFF1F5F9),
-              child: const Center(
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
-                ),
-              ),
-            );
-          },
-          errorBuilder: (ctx, err, stack) {
-            return Container(
-              width: width,
-              height: height,
-              color: const Color(0xFFE2E8F0),
-              child: Center(
-                child: Text(
-                  isGrocery ? "🏬" : "🍽️",
-                  style: TextStyle(fontSize: width * 0.35),
-                ),
-              ),
-            );
-          },
+          color: const Color(0xFFF1F5F9),
+          child: const Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
+            ),
+          ),
+        ),
+        errorWidget: Container(
+          width: width,
+          height: height,
+          color: const Color(0xFFE2E8F0),
+          child: Center(
+            child: Text(
+              isGrocery ? "🏬" : "🍽️",
+              style: TextStyle(fontSize: width * 0.35),
+            ),
+          ),
         ),
       ),
     );

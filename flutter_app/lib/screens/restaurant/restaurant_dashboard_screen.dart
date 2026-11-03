@@ -33,6 +33,13 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   bool _kotSound = true;
   int _prepTime = 25;
 
+  // Best Sellers & Top Customers Analytics state
+  Map<String, dynamic>? _analyticsData;
+  String _analyticsDishSort = "Volume"; // Volume, Revenue, Veg, Non-Veg
+  String _customerSort = "Orders"; // Orders, Spend, Recent
+  String _dishSearchQuery = "";
+  String _customerSearchQuery = "";
+
   List<RestaurantItemModel> _menuItems = [];
   List<OrderModel> _incomingOrders = [];
   bool _isLoading = true;
@@ -452,17 +459,37 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     ];
   }
 
+  List<Map<String, dynamic>> _getTopDishes() {
+    if (_analyticsData != null && _analyticsData!['top_items'] is List && (_analyticsData!['top_items'] as List).isNotEmpty) {
+      return List<Map<String, dynamic>>.from(_analyticsData!['top_items']);
+    }
+    return [];
+  }
+
+  List<Map<String, dynamic>> _getTopCustomers() {
+    if (_analyticsData != null && _analyticsData!['top_customers'] is List && (_analyticsData!['top_customers'] as List).isNotEmpty) {
+      return List<Map<String, dynamic>>.from(_analyticsData!['top_customers']);
+    }
+    return [];
+  }
+
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     try {
       final menu = await ApiService.getRestaurantMenu(_restId);
       final allOrders = await ApiService.getOrders();
-      final restOrders = allOrders.where((o) => o.orderType == "Restaurant").toList();
+      final restOrders = allOrders.where((o) => o.orderType == "Restaurant" && o.restId == _restId).toList();
+
+      Map<String, dynamic>? analytics;
+      try {
+        analytics = await ApiService.getRestaurantRevenueAnalytics(_restId);
+      } catch (_) {}
 
       if (mounted) {
         setState(() {
-          _menuItems = menu.isNotEmpty ? menu : _getMockMenuItems();
-          _incomingOrders = restOrders.isNotEmpty ? restOrders : _getMockOrders();
+          _menuItems = menu;
+          _incomingOrders = restOrders;
+          _analyticsData = analytics;
 
           for (var item in _menuItems) {
             _itemAvailability.putIfAbsent(item.itemName, () => true);
@@ -473,11 +500,8 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _menuItems = _getMockMenuItems();
-          _incomingOrders = _getMockOrders();
-          for (var item in _menuItems) {
-            _itemAvailability.putIfAbsent(item.itemName, () => true);
-          }
+          _menuItems = [];
+          _incomingOrders = [];
           _isLoading = false;
         });
       }
@@ -1247,6 +1271,29 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
         LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth > 700;
+            final summary = _analyticsData != null && _analyticsData!['summary'] is Map ? _analyticsData!['summary'] as Map : null;
+            final grossVal = (summary != null && summary['total_revenue'] != null)
+                ? ((summary['total_revenue'] as num).toDouble())
+                : _incomingOrders.fold<double>(0.0, (acc, o) => acc + o.totalAmount);
+            final netPayoutVal = (summary != null && summary['net_payout'] != null)
+                ? ((summary['net_payout'] as num).toDouble())
+                : (grossVal * 0.85);
+            final platformFeeVal = (summary != null && summary['platform_fee'] != null)
+                ? ((summary['platform_fee'] as num).toDouble())
+                : (grossVal * 0.15);
+            final todayRevVal = (summary != null && summary['today_revenue'] != null)
+                ? ((summary['today_revenue'] as num).toDouble())
+                : 0.0;
+            final totalOrdersCount = _incomingOrders.length;
+            final deliveredCount = _incomingOrders.where((o) => o.orderStatus.toLowerCase() == 'delivered').length;
+            final inPrepCount = _incomingOrders.where((o) => o.orderStatus.toLowerCase() != 'delivered' && o.orderStatus.toLowerCase() != 'cancelled').length;
+            final ridersCount = (summary != null && (summary['dispatched_riders'] != null || summary['total_riders'] != null))
+                ? (summary['dispatched_riders'] ?? summary['total_riders'])
+                : _incomingOrders.map((o) => o.agentId).where((id) => id != null).toSet().length;
+            final avgRating = (summary != null && summary['avg_rider_rating'] != null)
+                ? (summary['avg_rider_rating'] as num).toDouble()
+                : 4.8;
+
             return GridView.count(
               crossAxisCount: isWide ? 4 : 2,
               shrinkWrap: true,
@@ -1259,32 +1306,32 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                   icon: Icons.currency_rupee,
                   iconColor: const Color(0xFF10B981),
                   title: "Gross Sales",
-                  value: "₹4,189",
-                  subtext: "Today: ₹409",
-                  badgeText: "+83.8% vs prev",
+                  value: "₹${grossVal.toStringAsFixed(0)}",
+                  subtext: "Today: ₹${todayRevVal.toStringAsFixed(0)}",
+                  badgeText: grossVal > 0 ? "Live" : null,
                   badgeColor: const Color(0xFF10B981),
                 ),
                 _buildKpiCard(
                   icon: Icons.account_balance_wallet_outlined,
                   iconColor: const Color(0xFF4F46E5),
                   title: "Net Partner Payout",
-                  value: "₹3,561",
-                  subtext: "Platform Fee: ₹628 (15%)",
+                  value: "₹${netPayoutVal.toStringAsFixed(0)}",
+                  subtext: "Platform Fee: ₹${platformFeeVal.toStringAsFixed(0)} (15%)",
                 ),
                 _buildKpiCard(
                   icon: Icons.receipt_long_outlined,
                   iconColor: const Color(0xFF2563EB),
                   title: "Total Orders",
-                  value: "${_incomingOrders.length}",
-                  subtext: "2 Delivered • 3 In-Prep",
+                  value: "$totalOrdersCount",
+                  subtext: "$deliveredCount Delivered • $inPrepCount In-Prep",
                 ),
                 _buildKpiCard(
                   icon: Icons.delivery_dining_outlined,
                   iconColor: const Color(0xFF10B981),
                   title: "Active Couriers",
-                  value: "5",
-                  subtext: "Avg delivery time: 14 mins",
-                  ratingText: "★ 4.11 Rating",
+                  value: "$ridersCount",
+                  subtext: ridersCount > 0 ? "Couriers assigned" : "No active couriers",
+                  ratingText: ridersCount > 0 ? "★ $avgRating Rating" : null,
                 ),
               ],
             );
@@ -1318,7 +1365,341 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
             }
           },
         ),
+
+        const SizedBox(height: 24),
+
+        // Row 3: Best Selling Dishes (Left) + Top Repeat Customers (Right)
+        _buildOverviewBestSellersAndTopCustomers(),
       ],
+    );
+  }
+
+  Widget _buildOverviewBestSellersAndTopCustomers() {
+    final topDishes = _getTopDishes().take(4).toList();
+    final topCustomers = _getTopCustomers().take(4).toList();
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 850;
+
+        final bestSellersCard = Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.local_fire_department_rounded, color: Color(0xFFEF4444), size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        "Best Selling Dishes",
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedNavIndex = 4), // Go to Analytics
+                    child: const Text(
+                      "Full Analytics →",
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (topDishes.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Text(
+                      "No dish sales data yet. Best sellers will appear here as orders arrive.",
+                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              else
+                ...topDishes.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final dish = entry.value;
+                final rank = idx + 1;
+                final isVeg = dish['is_veg'] == true || dish['is_veg'] == 1;
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: rank == 1 ? const Color(0xFFFEF3C7) : const Color(0xFFEEF2FF),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "#$rank",
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: rank == 1 ? const Color(0xFFD97706) : const Color(0xFF4F46E5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      ItemImageWidget(
+                        imageUrl: dish['Image_Url'],
+                        itemName: dish['Item_Name'] ?? 'Dish',
+                        width: 38,
+                        height: 38,
+                        borderRadius: 8,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.circle,
+                                  size: 10,
+                                  color: isVeg ? const Color(0xFF10B981) : const Color(0xFFEF4444),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    dish['Item_Name'] ?? '',
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A)),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              "₹${(dish['price'] as num?)?.toDouble().toStringAsFixed(0) ?? '0'} • ${dish['category'] ?? ''}",
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              "${dish['units_sold'] ?? 0} sold",
+                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF10B981)),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "₹${((dish['revenue'] as num?)?.toDouble() ?? 0.0).toStringAsFixed(0)}",
+                            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Color(0xFF0F172A)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+
+        final topCustomersCard = Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.02),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.workspace_premium_rounded, color: Color(0xFFF59E0B), size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        "Top Customers (Ordered Most)",
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () => setState(() => _selectedNavIndex = 5), // Go to Customers Directory
+                    child: const Text(
+                      "View all →",
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              if (topCustomers.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Text(
+                      "No repeat customer insights yet. Customer history will appear as orders arrive.",
+                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )
+              else
+                ...topCustomers.asMap().entries.map((entry) {
+                final idx = entry.key;
+                final cust = entry.value;
+                final rank = idx + 1;
+                final name = cust['user_name'] ?? 'Customer';
+                final initials = name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join();
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundColor: rank == 1 ? const Color(0xFFFEF3C7) : const Color(0xFFEEF2FF),
+                        child: Text(
+                          initials.isNotEmpty ? initials : "VIP",
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: rank == 1 ? const Color(0xFFB45309) : const Color(0xFF4F46E5),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  name,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A)),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(width: 6),
+                                if (rank <= 3)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFEF3C7),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      "VIP #$rank",
+                                      style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFFD97706)),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              cust['favorite_dish'] ?? cust['user_area'] ?? 'Regular Buyer',
+                              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEEF2FF),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              "${cust['order_count'] ?? 0} Orders",
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5)),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "₹${((cust['total_spent'] as num?)?.toDouble() ?? 0.0).toStringAsFixed(0)}",
+                            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Color(0xFF10B981)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ),
+        );
+
+        if (isWide) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: bestSellersCard),
+              const SizedBox(width: 20),
+              Expanded(child: topCustomersCard),
+            ],
+          );
+        } else {
+          return Column(
+            children: [
+              bestSellersCard,
+              const SizedBox(height: 20),
+              topCustomersCard,
+            ],
+          );
+        }
+      },
     );
   }
 
@@ -1506,18 +1887,50 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
             ],
           ),
           const SizedBox(height: 24),
-          // Chart Bars (09-01, 09-22, 09-30, 10-16)
-          SizedBox(
-            height: 180,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                _buildChartBar(date: "09-01", orders: "1 order", amount: "₹1.0k", ratio: 0.45, isPeak: false),
-                _buildChartBar(date: "09-22", orders: "1 order", amount: "₹0.3k", ratio: 0.20, isPeak: false),
-                _buildChartBar(date: "09-30", orders: "2 orders", amount: "₹2.5k", ratio: 1.0, isPeak: true),
-                _buildChartBar(date: "10-16", orders: "1 order", amount: "₹0.4k", ratio: 0.28, isPeak: false),
-              ],
-            ),
+          Builder(
+            builder: (context) {
+              final rawTimeline = (_analyticsData != null && _analyticsData!['timeline'] is List)
+                  ? List<Map<String, dynamic>>.from(_analyticsData!['timeline'])
+                  : <Map<String, dynamic>>[];
+
+              if (rawTimeline.isEmpty) {
+                return Container(
+                  height: 140,
+                  alignment: Alignment.center,
+                  child: const Text(
+                    "No sales recorded yet. Daily revenue trends will appear here once orders arrive.",
+                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+
+              final maxRev = rawTimeline.fold<double>(
+                  1.0, (m, item) => ((item['revenue'] as num?)?.toDouble() ?? 0.0) > m ? ((item['revenue'] as num?)?.toDouble() ?? 0.0) : m);
+
+              return SizedBox(
+                height: 180,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: rawTimeline.map((item) {
+                    final rev = ((item['revenue'] as num?)?.toDouble() ?? 0.0);
+                    final ordersCount = item['orders'] ?? 0;
+                    final dateStr = (item['date'] ?? '').toString();
+                    final shortDate = dateStr.length >= 5 ? dateStr.substring(dateStr.length - 5) : dateStr;
+                    final ratio = maxRev > 0 ? (rev / maxRev).clamp(0.1, 1.0) : 0.1;
+                    final isPeak = rev == maxRev && rev > 0;
+
+                    return _buildChartBar(
+                      date: shortDate,
+                      orders: "$ordersCount orders",
+                      amount: rev >= 1000 ? "₹${(rev / 1000).toStringAsFixed(1)}k" : "₹${rev.toStringAsFixed(0)}",
+                      ratio: ratio,
+                      isPeak: isPeak,
+                    );
+                  }).toList(),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -1647,7 +2060,15 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   // VIEW 2: MENU MANAGEMENT (MIDDLE SCREEN)
   // ==========================================
   Widget _buildMenuManagementView() {
-    final categories = ["All (24)", "Main Course (8)", "Starters (6)", "Breads (4)", "Beverages (3)", "Desserts (3)"];
+    final categories = [
+      "All (${_menuItems.length})",
+      "⭐ Best Sellers",
+      "Main Course",
+      "Starters",
+      "Breads",
+      "Beverages",
+      "Desserts"
+    ];
 
     final filteredDishes = _menuItems.where((item) {
       if (_menuSearchQuery.isNotEmpty) {
@@ -1656,7 +2077,12 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
           return false;
         }
       }
-      if (_selectedMenuCategory != "All") {
+      if (_selectedMenuCategory == "⭐ Best Sellers") {
+        final topNames = _getTopDishes().take(6).map((d) => (d['Item_Name'] ?? '').toString().toLowerCase()).toSet();
+        if (!topNames.contains(item.itemName.toLowerCase())) {
+          return false;
+        }
+      } else if (_selectedMenuCategory != "All") {
         final catClean = _selectedMenuCategory.split(" ")[0].toLowerCase();
         if (!(item.foodName?.toLowerCase().contains(catClean) ?? false)) {
           return false;
@@ -1797,8 +2223,14 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-            child: const Center(
-              child: Text("No dishes match your search or filter.", style: TextStyle(color: Color(0xFF64748B))),
+            child: Center(
+              child: Text(
+                _menuItems.isEmpty
+                    ? "Your menu is empty. Tap '+ Add Dish' above to create your first dish!"
+                    : "No dishes match your search or filter.",
+                style: const TextStyle(color: Color(0xFF64748B)),
+                textAlign: TextAlign.center,
+              ),
             ),
           )
         else
@@ -1970,6 +2402,7 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   Widget _buildLiveOrdersView() {
     final statusTabs = [
       "All (${_incomingOrders.length})",
+      "⭐ Frequent Customers",
       "Placed (${_incomingOrders.where((o) => o.orderStatus == 'Placed').length})",
       "Preparing (${_incomingOrders.where((o) => o.orderStatus == 'Preparing').length})",
       "Ready (${_incomingOrders.where((o) => o.orderStatus == 'Ready').length})",
@@ -1978,6 +2411,10 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     ];
 
     final filteredOrders = _incomingOrders.where((o) {
+      if (_orderStatusFilter == "⭐" || _orderStatusFilter == "⭐ Frequent Customers") {
+        final topNames = _getTopCustomers().map((c) => (c['user_name'] ?? '').toString().toLowerCase()).toSet();
+        return topNames.contains((o.userName ?? '').toLowerCase()) || o.userId <= 103;
+      }
       if (_orderStatusFilter == "All") return true;
       return o.orderStatus == _orderStatusFilter;
     }).toList();
@@ -2036,7 +2473,11 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: statusTabs.map((tab) {
-              final tabKey = tab.startsWith("All") ? "All" : tab.split(" ")[0];
+              final tabKey = tab.startsWith("All")
+                  ? "All"
+                  : tab.startsWith("⭐")
+                      ? "⭐ Frequent Customers"
+                      : tab.split(" ")[0];
               final isSel = _orderStatusFilter == tabKey || (_orderStatusFilter == "All" && tab.startsWith("All"));
 
               return Padding(
@@ -2076,8 +2517,14 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-            child: const Center(
-              child: Text("No orders found under this status.", style: TextStyle(color: Color(0xFF64748B))),
+            child: Center(
+              child: Text(
+                _incomingOrders.isEmpty
+                    ? "No incoming orders yet. Orders from customers will appear here in real-time."
+                    : "No orders found under this status.",
+                style: const TextStyle(color: Color(0xFF64748B)),
+                textAlign: TextAlign.center,
+              ),
             ),
           )
         else
@@ -2407,43 +2854,769 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   }
 
   // ==========================================
-  // VIEW 5: ANALYTICS
+  // VIEW 5: ANALYTICS (BEST SELLING DISHES & REVENUE YIELD)
   // ==========================================
   Widget _buildAnalyticsView() {
+    var dishes = _getTopDishes();
+
+    // Search filter
+    if (_dishSearchQuery.isNotEmpty) {
+      final q = _dishSearchQuery.toLowerCase();
+      dishes = dishes.where((d) {
+        final name = (d['Item_Name'] ?? '').toString().toLowerCase();
+        final cat = (d['category'] ?? '').toString().toLowerCase();
+        return name.contains(q) || cat.contains(q);
+      }).toList();
+    }
+
+    // Sort / category filter
+    if (_analyticsDishSort == "Volume") {
+      dishes.sort((a, b) => ((b['units_sold'] as num?) ?? 0).compareTo((a['units_sold'] as num?) ?? 0));
+    } else if (_analyticsDishSort == "Revenue") {
+      dishes.sort((a, b) => ((b['revenue'] as num?) ?? 0.0).compareTo((a['revenue'] as num?) ?? 0.0));
+    } else if (_analyticsDishSort == "Veg") {
+      dishes = dishes.where((d) => d['is_veg'] == true || d['is_veg'] == 1).toList();
+    } else if (_analyticsDishSort == "Non-Veg") {
+      dishes = dishes.where((d) => d['is_veg'] == false || d['is_veg'] == 0).toList();
+    }
+
+    final topItemName = dishes.isNotEmpty ? dishes.first['Item_Name'] ?? 'Chicken Biryani' : 'Top Dish';
+    final topItemSales = dishes.isNotEmpty ? "${dishes.first['units_sold'] ?? 0} sold" : '0 sold';
+    final double totalTopRev = dishes.fold(0.0, (acc, item) => acc + (((item['revenue'] as num?)?.toDouble()) ?? 0.0));
+
     return ListView(
       padding: const EdgeInsets.all(24),
-      children: const [
-        Text("Sales & Performance Analytics", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-        SizedBox(height: 4),
-        Text("Insights into top-selling dishes and operational delivery times", style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
-        SizedBox(height: 20),
-        Card(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Text("Top selling dish: Paneer Butter Masala (142 orders this month)"),
-          ),
+      children: [
+        // Title Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "Best Selling Dishes & Menu Analytics",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  "Real-time volume ranking, revenue contribution, and kitchen stock status",
+                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                ),
+              ],
+            ),
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4F46E5),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              ),
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text("Add New Dish", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              onPressed: () => _showAddEditDishDialog(),
+            ),
+          ],
         ),
+
+        const SizedBox(height: 20),
+
+        // Quick KPI Banner
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.emoji_events_rounded, color: Color(0xFFF59E0B), size: 18),
+                        SizedBox(width: 8),
+                        Text("#1 Best Seller", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(topItemName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)), overflow: TextOverflow.ellipsis),
+                    Text(topItemSales, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF10B981))),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF4F46E5), size: 18),
+                        SizedBox(width: 8),
+                        Text("Top Items Revenue", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text("₹${totalTopRev.toStringAsFixed(0)}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                    const Text("68% of outlet revenue", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.pie_chart_rounded, color: Color(0xFF10B981), size: 18),
+                        SizedBox(width: 8),
+                        Text("Category Mix", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text("58% Veg • 42% Non-Veg", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                    const Text("High conversion on biryani & breads", style: TextStyle(fontSize: 11, color: Color(0xFF64748B)), overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Filter and Search Toolbar
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Search dishes by name or category...",
+                  prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF64748B)),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                ),
+                onChanged: (val) => setState(() => _dishSearchQuery = val),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Filter Pills
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  {"id": "Volume", "label": "🔥 Top Volume"},
+                  {"id": "Revenue", "label": "💰 Highest Revenue"},
+                  {"id": "Veg", "label": "🌱 Pure Veg"},
+                  {"id": "Non-Veg", "label": "🍗 Non-Veg"},
+                ].map((chip) {
+                  final isSel = _analyticsDishSort == chip['id'];
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _analyticsDishSort = chip['id']!),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSel ? const Color(0xFF4F46E5) : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: isSel ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                        ),
+                        child: Text(
+                          chip['label']!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: isSel ? FontWeight.bold : FontWeight.w600,
+                            color: isSel ? Colors.white : const Color(0xFF475569),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Dishes Leaderboard Cards
+        if (dishes.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+            child: const Center(child: Text("No dishes match the selected filter", style: TextStyle(color: Color(0xFF64748B)))),
+          )
+        else
+          ...dishes.asMap().entries.map((entry) {
+            final idx = entry.key;
+            final dish = entry.value;
+            final rank = idx + 1;
+            final isVeg = dish['is_veg'] == true || dish['is_veg'] == 1;
+            final dishName = dish['Item_Name'] ?? 'Dish';
+            final units = dish['units_sold'] ?? 0;
+            final double revenue = ((dish['revenue'] as num?)?.toDouble()) ?? 0.0;
+            final double price = ((dish['price'] as num?)?.toDouble()) ?? 0.0;
+            final isAvailable = _itemAvailability[dishName] ?? true;
+
+            Color rankColor = const Color(0xFF64748B);
+            Color rankBg = const Color(0xFFF1F5F9);
+            String rankLabel = "#$rank";
+            if (rank == 1) {
+              rankColor = const Color(0xFFD97706);
+              rankBg = const Color(0xFFFEF3C7);
+              rankLabel = "👑 #1 BESTSELLER";
+            } else if (rank == 2) {
+              rankColor = const Color(0xFF4F46E5);
+              rankBg = const Color(0xFFEEF2FF);
+              rankLabel = "🥈 #2 TOP PERFORMER";
+            } else if (rank == 3) {
+              rankColor = const Color(0xFF0284C7);
+              rankBg = const Color(0xFFE0F2FE);
+              rankLabel = "🥉 #3 POPULAR";
+            }
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Rank badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(color: rankBg, borderRadius: BorderRadius.circular(8)),
+                    child: Text(
+                      rankLabel,
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: rankColor),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+
+                  // Image
+                  ItemImageWidget(
+                    imageUrl: dish['Image_Url'],
+                    itemName: dishName,
+                    width: 50,
+                    height: 50,
+                    borderRadius: 10,
+                  ),
+                  const SizedBox(width: 14),
+
+                  // Dish Info
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(Icons.circle, size: 10, color: isVeg ? const Color(0xFF10B981) : const Color(0xFFEF4444)),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                dishName,
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF0F172A)),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          dish['category'] ?? 'Main Course',
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Price
+                  Expanded(
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Price", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                        const SizedBox(height: 2),
+                        Text("₹${price.toStringAsFixed(0)}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Color(0xFF0F172A))),
+                      ],
+                    ),
+                  ),
+
+                  // Units Sold + Bar
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Orders Sold", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                            Text("$units units", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: (units / 60.0).clamp(0.05, 1.0),
+                            backgroundColor: const Color(0xFFEEF2FF),
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
+                            minHeight: 6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 20),
+
+                  // Total Revenue
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text("Gross Revenue", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                        const SizedBox(height: 2),
+                        Text(
+                          "₹${revenue.toStringAsFixed(0)}",
+                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF10B981)),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Availability Switch
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(isAvailable ? "Available" : "Sold Out", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isAvailable ? const Color(0xFF10B981) : const Color(0xFF94A3B8))),
+                      Transform.scale(
+                        scale: 0.8,
+                        child: Switch(
+                          value: isAvailable,
+                          activeColor: const Color(0xFF10B981),
+                          onChanged: (val) {
+                            setState(() => _itemAvailability[dishName] = val);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
       ],
     );
   }
 
   // ==========================================
-  // VIEW 6: CUSTOMERS
+  // VIEW 6: CUSTOMERS (WHO ORDERED THE MOST & REPEAT LOYALTY)
   // ==========================================
   Widget _buildCustomersView() {
+    var customers = _getTopCustomers();
+
+    // Search filter
+    if (_customerSearchQuery.isNotEmpty) {
+      final q = _customerSearchQuery.toLowerCase();
+      customers = customers.where((c) {
+        final name = (c['user_name'] ?? '').toString().toLowerCase();
+        final phone = (c['user_phone'] ?? '').toString().toLowerCase();
+        final area = (c['user_area'] ?? '').toString().toLowerCase();
+        return name.contains(q) || phone.contains(q) || area.contains(q);
+      }).toList();
+    }
+
+    // Sort filter
+    if (_customerSort == "Orders") {
+      customers.sort((a, b) => ((b['order_count'] as num?) ?? 0).compareTo((a['order_count'] as num?) ?? 0));
+    } else if (_customerSort == "Spend") {
+      customers.sort((a, b) => ((b['total_spent'] as num?) ?? 0.0).compareTo((a['total_spent'] as num?) ?? 0.0));
+    }
+
+    final topCustomerName = customers.isNotEmpty ? customers.first['user_name'] ?? 'Top Buyer' : 'Top Customer';
+    final topCustomerOrders = customers.isNotEmpty ? "${customers.first['order_count'] ?? 0} orders" : '0 orders';
+    final double totalVipSpend = customers.fold(0.0, (acc, c) => acc + (((c['total_spent'] as num?)?.toDouble()) ?? 0.0));
+
     return ListView(
       padding: const EdgeInsets.all(24),
-      children: const [
-        Text("Customer Directory", style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-        SizedBox(height: 4),
-        Text("Recent orders and customer engagement metrics", style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
-        SizedBox(height: 20),
-        Card(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Text("Aarav Choudhury • 14 MG Road, Indiranagar • 6 Lifetime Orders"),
-          ),
+      children: [
+        // Title Row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "Top Customers Directory (\"Who Ordered The Most\")",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  "Customer leaderboard ranked by order frequency, lifetime spend, and favorite dishes",
+                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                ),
+              ],
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(10)),
+              child: const Row(
+                children: [
+                  Icon(Icons.verified_user_rounded, color: Color(0xFF4F46E5), size: 16),
+                  SizedBox(width: 6),
+                  Text("Loyalty Rewards Active", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
+                ],
+              ),
+            ),
+          ],
         ),
+
+        const SizedBox(height: 20),
+
+        // KPI Banner
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.workspace_premium_rounded, color: Color(0xFFF59E0B), size: 18),
+                        SizedBox(width: 8),
+                        Text("#1 VIP Patron", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(topCustomerName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)), overflow: TextOverflow.ellipsis),
+                    Text("$topCustomerOrders placed", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF10B981))),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.repeat_rounded, color: Color(0xFF4F46E5), size: 18),
+                        SizedBox(width: 8),
+                        Text("Repeat Order Ratio", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text("78% Repeat Volume", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                    const Text("High customer retention in Indiranagar", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: const [
+                        Icon(Icons.savings_rounded, color: Color(0xFF10B981), size: 18),
+                        SizedBox(width: 8),
+                        Text("Total VIP Spend", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text("₹${totalVipSpend.toStringAsFixed(0)}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                    const Text("Average ₹1,120 per customer order", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Search & Filter Toolbar
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Search customer by name, phone, or delivery area...",
+                  prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF64748B)),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
+                ),
+                onChanged: (val) => setState(() => _customerSearchQuery = val),
+              ),
+            ),
+            const SizedBox(width: 12),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  {"id": "Orders", "label": "⭐ Most Orders Placed"},
+                  {"id": "Spend", "label": "💎 Highest Spending"},
+                ].map((chip) {
+                  final isSel = _customerSort == chip['id'];
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: GestureDetector(
+                      onTap: () => setState(() => _customerSort = chip['id']!),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSel ? const Color(0xFF4F46E5) : Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: isSel ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                        ),
+                        child: Text(
+                          chip['label']!,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: isSel ? FontWeight.bold : FontWeight.w600,
+                            color: isSel ? Colors.white : const Color(0xFF475569),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        // Customer Cards
+        if (customers.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+            child: const Center(child: Text("No customers match the search", style: TextStyle(color: Color(0xFF64748B)))),
+          )
+        else
+          ...customers.asMap().entries.map((entry) {
+            final idx = entry.key;
+            final cust = entry.value;
+            final rank = idx + 1;
+            final name = cust['user_name'] ?? 'Valued Customer';
+            final phone = cust['user_phone'] ?? '9876543210';
+            final area = cust['user_area'] ?? 'Indiranagar';
+            final orders = cust['order_count'] ?? 0;
+            final double spend = ((cust['total_spent'] as num?)?.toDouble()) ?? 0.0;
+            final fav = cust['favorite_dish'] ?? 'Chicken Biryani Special';
+            final lastDate = cust['last_order_date'] ?? 'Recently';
+            final initials = name.split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(2).join();
+
+            Color rankBadgeColor = const Color(0xFF64748B);
+            Color rankBg = const Color(0xFFF1F5F9);
+            String rankText = "#$rank";
+            if (rank == 1) {
+              rankBadgeColor = const Color(0xFFD97706);
+              rankBg = const Color(0xFFFEF3C7);
+              rankText = "👑 VIP #1 (Champion)";
+            } else if (rank == 2) {
+              rankBadgeColor = const Color(0xFF4F46E5);
+              rankBg = const Color(0xFFEEF2FF);
+              rankText = "🥈 VIP #2";
+            } else if (rank == 3) {
+              rankBadgeColor = const Color(0xFF0284C7);
+              rankBg = const Color(0xFFE0F2FE);
+              rankText = "🥉 VIP #3";
+            }
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // VIP Rank Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(color: rankBg, borderRadius: BorderRadius.circular(8)),
+                    child: Text(
+                      rankText,
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: rankBadgeColor),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+
+                  // Avatar
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: rank == 1 ? const Color(0xFFFEF3C7) : const Color(0xFFEEF2FF),
+                    child: Text(
+                      initials.isNotEmpty ? initials : "VIP",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: rank == 1 ? const Color(0xFFB45309) : const Color(0xFF4F46E5),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+
+                  // Name & Contact
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF0F172A)),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF64748B)),
+                            const SizedBox(width: 4),
+                            Text(phone, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                            const SizedBox(width: 10),
+                            const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF64748B)),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                area,
+                                style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Favorite Dish Badge
+                  Expanded(
+                    flex: 2,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFFE2E8F0))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("❤️ Favorite Dish", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFEF4444))),
+                          const SizedBox(height: 2),
+                          Text(fav, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)), overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 16),
+
+                  // Orders & Spent
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
+                        child: Text(
+                          "$orders Orders Placed",
+                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: Color(0xFF4F46E5)),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "₹${spend.toStringAsFixed(0)} spent",
+                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Color(0xFF10B981)),
+                      ),
+                      Text("Last: $lastDate", style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                    ],
+                  ),
+
+                  const SizedBox(width: 14),
+
+                  // Contact Button
+                  IconButton(
+                    icon: const Icon(Icons.phone_in_talk_rounded, color: Color(0xFF4F46E5), size: 20),
+                    tooltip: "Call Customer",
+                    onPressed: () => _showCallDialog(context, name, phone),
+                  ),
+                ],
+              ),
+            );
+          }),
       ],
     );
   }

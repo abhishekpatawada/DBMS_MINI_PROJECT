@@ -4,20 +4,30 @@ import 'package:http/http.dart' as http;
 import '../models/models.dart';
 
 class ApiService {
-  // Known local Wi-Fi host IP of the development laptop
-  static const String defaultLaptopIp = "10.102.3.137";
+  // Known local host IP of the development machine (from ipconfig active adapter)
+  static const String defaultLaptopIp = "10.74.88.1";
 
   static String _resolveInitialBaseUrl() {
     if (kIsWeb) {
       try {
         final host = Uri.base.host;
-        if (host.isNotEmpty && host != 'localhost' && host != '127.0.0.1') {
+        if (host.isNotEmpty) {
+          // On web, always connect to port 8000 on the same host that served the page
+          // (whether it is localhost, 127.0.0.1, or the local LAN Wi-Fi IP).
           return "http://$host:8000/api";
         }
       } catch (_) {}
+      return "http://localhost:8000/api";
     }
-    // Default to the host laptop's local LAN IP so mobile phones & other devices
-    // on the same Wi-Fi can connect directly without getting localhost connection errors.
+
+    // On Windows, macOS, or Linux desktop, connect directly to local machine
+    if (defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.linux) {
+      return "http://localhost:8000/api";
+    }
+
+    // Default for physical mobile devices connected to the same LAN / Wi-Fi
     return "http://$defaultLaptopIp:8000/api";
   }
 
@@ -404,6 +414,21 @@ class ApiService {
     return [];
   }
 
+  static Future<Map<String, dynamic>> getUserMostOrdered(int userId) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/orders/user/$userId/most-ordered'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      }
+    } catch (_) {}
+    return {
+      'dishes': [],
+      'groceries': [],
+      'restaurants': [],
+    };
+  }
+
+
   static Future<Map<String, dynamic>> placeOrder(Map<String, dynamic> orderPayload) async {
     final response = await http.post(
       Uri.parse('$baseUrl/orders'),
@@ -482,7 +507,7 @@ class ApiService {
     // Fallback: build analytics from all orders and menu
     try {
       final allOrders = await getOrders();
-      final restOrders = allOrders.where((o) => o.restId == restId || o.orderType == "Restaurant").toList();
+      final restOrders = allOrders.where((o) => o.restId == restId && o.orderType == "Restaurant").toList();
       double totalRev = 0.0;
       int delivered = 0;
       int active = 0;
@@ -506,42 +531,24 @@ class ApiService {
         "status": "success",
         "restaurant_id": restId,
         "summary": {
-          "total_revenue": totalRev > 0 ? totalRev : 48650.0,
-          "net_payout": totalRev > 0 ? totalRev * 0.85 : 41352.5,
-          "platform_fee": totalRev > 0 ? totalRev * 0.15 : 7297.5,
-          "today_revenue": totalRev > 0 ? totalRev * 0.18 : 8750.0,
-          "yesterday_revenue": totalRev > 0 ? totalRev * 0.15 : 7450.0,
-          "growth_pct": 17.4,
-          "total_orders": restOrders.isNotEmpty ? restOrders.length : 118,
-          "delivered_orders": delivered > 0 ? delivered : 106,
-          "active_orders": active > 0 ? active : 12,
+          "total_revenue": totalRev,
+          "net_payout": totalRev * 0.85,
+          "platform_fee": totalRev * 0.15,
+          "today_revenue": totalRev * 0.18,
+          "yesterday_revenue": totalRev * 0.15,
+          "growth_pct": totalRev > 0 ? 17.4 : 0.0,
+          "total_orders": restOrders.length,
+          "delivered_orders": delivered,
+          "active_orders": active,
           "cancelled_orders": 0,
-          "avg_order_value": aov > 0 ? aov : 412.0,
-          "unique_customers": customers.isNotEmpty ? customers.length : 84,
-          "dispatched_riders": riders.isNotEmpty ? riders.length : 26,
-          "avg_rider_rating": 4.88
+          "avg_order_value": aov,
+          "unique_customers": customers.length,
+          "dispatched_riders": riders.length,
+          "avg_rider_rating": riders.isNotEmpty ? 4.88 : 0.0
         },
-        "timeline": [
-          {"date": "Mon", "orders": 14, "revenue": 5800.0},
-          {"date": "Tue", "orders": 19, "revenue": 7950.0},
-          {"date": "Wed", "orders": 16, "revenue": 6640.0},
-          {"date": "Thu", "orders": 22, "revenue": 9180.0},
-          {"date": "Fri", "orders": 28, "revenue": 11560.0},
-          {"date": "Sat", "orders": 35, "revenue": 14780.0},
-          {"date": "Sun", "orders": 31, "revenue": 13240.0},
-        ],
-        "top_items": [
-          {"Item_Name": "Butter Chicken", "category": "Curry", "is_veg": false, "price": 320.0, "units_sold": 64, "revenue": 20480.0, "Image_Url": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Paneer Tikka Masala", "category": "Veg Curry", "is_veg": true, "price": 280.0, "units_sold": 52, "revenue": 14560.0, "Image_Url": "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Hyderabadi Dum Biryani", "category": "Biryani", "is_veg": false, "price": 340.0, "units_sold": 48, "revenue": 16320.0, "Image_Url": "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Garlic Butter Naan", "category": "Breads", "is_veg": true, "price": 60.0, "units_sold": 95, "revenue": 5700.0, "Image_Url": "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Dal Makhani", "category": "Dal", "is_veg": true, "price": 220.0, "units_sold": 38, "revenue": 8360.0, "Image_Url": "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&auto=format&fit=crop&q=80"},
-        ],
-        "payment_methods": [
-          {"method": "UPI", "count": 72, "amount": 29800.0},
-          {"method": "Credit / Debit Card", "count": 32, "amount": 13950.0},
-          {"method": "Cash on Delivery", "count": 14, "amount": 4900.0},
-        ],
+        "timeline": <Map<String, dynamic>>[],
+        "top_items": <Map<String, dynamic>>[],
+        "payment_methods": <Map<String, dynamic>>[],
         "live_orders": []
       };
     } catch (_) {
@@ -560,7 +567,7 @@ class ApiService {
     // Fallback: build analytics from all orders and groceries
     try {
       final allOrders = await getOrders();
-      final storeOrders = allOrders.where((o) => o.storeId == storeId || o.orderType == "Grocery").toList();
+      final storeOrders = allOrders.where((o) => o.storeId == storeId && o.orderType == "Grocery").toList();
       double totalRev = 0.0;
       int delivered = 0;
       int active = 0;
@@ -584,45 +591,27 @@ class ApiService {
         "status": "success",
         "store_id": storeId,
         "summary": {
-          "total_revenue": totalRev > 0 ? totalRev : 54200.0,
-          "net_payout": totalRev > 0 ? totalRev * 0.90 : 48780.0,
-          "platform_fee": totalRev > 0 ? totalRev * 0.10 : 5420.0,
-          "today_revenue": totalRev > 0 ? totalRev * 0.20 : 10840.0,
-          "yesterday_revenue": totalRev > 0 ? totalRev * 0.16 : 8670.0,
-          "growth_pct": 25.0,
-          "total_orders": storeOrders.isNotEmpty ? storeOrders.length : 142,
-          "delivered_orders": delivered > 0 ? delivered : 130,
-          "active_orders": active > 0 ? active : 12,
+          "total_revenue": totalRev,
+          "net_payout": totalRev * 0.90,
+          "platform_fee": totalRev * 0.10,
+          "today_revenue": totalRev * 0.20,
+          "yesterday_revenue": totalRev * 0.16,
+          "growth_pct": totalRev > 0 ? 25.0 : 0.0,
+          "total_orders": storeOrders.length,
+          "delivered_orders": delivered,
+          "active_orders": active,
           "cancelled_orders": 0,
-          "avg_order_value": aov > 0 ? aov : 381.5,
-          "unique_customers": customers.isNotEmpty ? customers.length : 96,
-          "dispatched_riders": riders.isNotEmpty ? riders.length : 32,
-          "avg_rider_rating": 4.92,
-          "total_skus": 35,
-          "inventory_valuation": 128450.0,
-          "low_stock_count": 3
+          "avg_order_value": aov,
+          "unique_customers": customers.length,
+          "dispatched_riders": riders.length,
+          "avg_rider_rating": riders.isNotEmpty ? 4.92 : 0.0,
+          "total_skus": 0,
+          "inventory_valuation": 0.0,
+          "low_stock_count": 0
         },
-        "timeline": [
-          {"date": "Mon", "orders": 18, "revenue": 6800.0},
-          {"date": "Tue", "orders": 24, "revenue": 9150.0},
-          {"date": "Wed", "orders": 21, "revenue": 8100.0},
-          {"date": "Thu", "orders": 27, "revenue": 10450.0},
-          {"date": "Fri", "orders": 34, "revenue": 13200.0},
-          {"date": "Sat", "orders": 42, "revenue": 16400.0},
-          {"date": "Sun", "orders": 38, "revenue": 14750.0},
-        ],
-        "top_items": [
-          {"Item_Name": "Amul Butter 500g", "price": 275.0, "stock": 85, "units_sold": 42, "revenue": 11550.0, "Image_Url": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Nandini GoodLife Milk 1L", "price": 62.0, "stock": 120, "units_sold": 98, "revenue": 6076.0, "Image_Url": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Farm Fresh Eggs (12 pcs)", "price": 92.0, "stock": 90, "units_sold": 65, "revenue": 5980.0, "Image_Url": "https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Aashirvaad Atta 5kg", "price": 245.0, "stock": 75, "units_sold": 38, "revenue": 9310.0, "Image_Url": "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80"},
-          {"Item_Name": "Fortune Sunflower Oil 1L", "price": 160.0, "stock": 110, "units_sold": 45, "revenue": 7200.0, "Image_Url": "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&auto=format&fit=crop&q=80"},
-        ],
-        "payment_methods": [
-          {"method": "UPI", "count": 92, "amount": 35200.0},
-          {"method": "Credit / Debit Card", "count": 38, "amount": 14800.0},
-          {"method": "Cash on Delivery", "count": 12, "amount": 4200.0},
-        ],
+        "timeline": <Map<String, dynamic>>[],
+        "top_items": <Map<String, dynamic>>[],
+        "payment_methods": <Map<String, dynamic>>[],
         "live_orders": []
       };
     } catch (_) {

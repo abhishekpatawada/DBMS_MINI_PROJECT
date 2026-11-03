@@ -358,23 +358,155 @@ def create_order_with_items(
 
 def update_order_status(order_id: int, new_status: str) -> bool:
     """Update order status cleanly with DeliveredAt tracking."""
+    conn = get_db_connection()
+    if not conn:
+        return False
     try:
+        cursor = conn.cursor()
+        # Self-healing migration to ensure Order_Status in ORDERS
+        try:
+            cursor.execute("ALTER TABLE ORDERS ADD COLUMN Order_Status VARCHAR(50) DEFAULT 'Placed';")
+            conn.commit()
+        except Exception:
+            pass
+
         if new_status.lower() == "delivered":
             query = "UPDATE ORDERS SET Order_Status = %s, DeliveredAt = NOW() WHERE Order_Id = %s;"
         elif new_status.lower() == "cancelled":
-            query = "UPDATE ORDERS SET Order_Status = %s WHERE Order_Id = %s;"
+            query = "UPDATE ORDERS SET Order_Status = %s, DeliveredAt = NULL WHERE Order_Id = %s;"
         else:
             query = "UPDATE ORDERS SET Order_Status = %s, DeliveredAt = NULL WHERE Order_Id = %s;"
-        return execute_query(query, (new_status, order_id))
-    except Exception:
-        # Fallback if Order_Status column hasn't migrated yet
-        if new_status.lower() == "delivered":
-            return execute_query("UPDATE ORDERS SET DeliveredAt = NOW() WHERE Order_Id = %s;", (order_id,))
-        else:
-            return execute_query("UPDATE ORDERS SET DeliveredAt = NULL WHERE Order_Id = %s;", (order_id,))
+        cursor.execute(query, (new_status, order_id))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error updating order status: {e}")
+        conn.rollback()
+        return False
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
 
 
 def delete_order(order_id: int) -> bool:
     """Delete an order, cascading to line items and payments (Delete)."""
     query = "DELETE FROM ORDERS WHERE Order_Id = %s;"
     return execute_query(query, (order_id,))
+
+
+def get_user_most_ordered(user_id: int) -> dict:
+    """
+    Retrieve user's most ordered:
+    1. Food items (dishes) ordered most frequently by the user (excluding cancelled orders)
+    2. Grocery items ordered most frequently by the user (excluding cancelled orders)
+    3. Restaurants ordered from most frequently by the user (excluding cancelled orders)
+    """
+    # 1. Most ordered food dishes
+    dishes = []
+    try:
+        dishes_query = """
+            SELECT 
+                oi.Item_Name,
+                oi.Rest_Id,
+                COALESCE(r.RName, 'Restaurant') AS Rest_Name,
+                COALESCE(ri.Food_Name, oi.Item_Name) AS Food_Name,
+                COALESCE(ri.FinalPrice, ri.BasePrice, 199.00) AS Price,
+                COALESCE(ri.Is_Veg, TRUE) AS Is_Veg,
+                COALESCE(ri.Image_Url, '') AS Image_Url,
+                SUM(COALESCE(oi.Food_quantity, 1)) AS Total_Quantity,
+                COUNT(DISTINCT oi.Order_Id) AS Order_Count
+            FROM ORDER_ITEM oi
+            JOIN ORDERS o ON oi.Order_Id = o.Order_Id
+            LEFT JOIN REST_ITEMS ri ON oi.Rest_Id = ri.Rest_Id AND oi.Item_Name = ri.Item_Name
+            LEFT JOIN RESTAURANT r ON oi.Rest_Id = r.Rest_Id
+            WHERE o.User_Id = %s AND LOWER(COALESCE(o.Order_Status, '')) != 'cancelled'
+            GROUP BY oi.Item_Name, oi.Rest_Id, r.RName, ri.Food_Name, ri.FinalPrice, ri.BasePrice, ri.Is_Veg, ri.Image_Url
+            ORDER BY Order_Count DESC, Total_Quantity DESC
+            LIMIT 15;
+        """
+        dishes = fetch_all(dishes_query, (user_id,))
+    except Exception as e:
+        print(f"Error fetching user most ordered dishes: {e}")
+        dishes = []
+
+    # 2. Most ordered grocery items
+    groceries = []
+    try:
+        groceries_query = """
+            SELECT 
+                og.Item_Name,
+                og.Store_Id,
+                COALESCE(ds.DS_Area, 'Indiranagar Hub') AS Store_Area,
+                COALESCE(g.Price, 45.00) AS Price,
+                COALESCE(g.Image_Url, '') AS Image_Url,
+                SUM(COALESCE(og.Quantity, 1)) AS Total_Quantity,
+                COUNT(DISTINCT og.Order_Id) AS Order_Count
+            FROM ORDER_GROCERY og
+            JOIN ORDERS o ON og.Order_Id = o.Order_Id
+            LEFT JOIN GROCERIES g ON og.Store_Id = g.Store_Id AND og.Item_Name = g.Item_Name
+            LEFT JOIN DARK_STORE ds ON og.Store_Id = ds.Store_Id
+            WHERE o.User_Id = %s AND LOWER(COALESCE(o.Order_Status, '')) != 'cancelled'
+            GROUP BY og.Item_Name, og.Store_Id, ds.DS_Area, g.Price, g.Image_Url
+            ORDER BY Order_Count DESC, Total_Quantity DESC
+            LIMIT 15;
+        """
+        groceries = fetch_all(groceries_query, (user_id,))
+    except Exception as e:
+        print(f"Error fetching user most ordered groceries: {e}")
+        try:
+            groceries_query_fallback = """
+                SELECT 
+                    og.Item_Name,
+                    og.Store_Id,
+                    COALESCE(ds.DS_Area, 'Indiranagar Hub') AS Store_Area,
+                    COALESCE(g.Price, 45.00) AS Price,
+                    COALESCE(g.Image_Url, '') AS Image_Url,
+                    COUNT(og.Order_Id) AS Total_Quantity,
+                    COUNT(DISTINCT og.Order_Id) AS Order_Count
+                FROM ORDER_GROCERY og
+                JOIN ORDERS o ON og.Order_Id = o.Order_Id
+                LEFT JOIN GROCERIES g ON og.Store_Id = g.Store_Id AND og.Item_Name = g.Item_Name
+                LEFT JOIN DARK_STORE ds ON og.Store_Id = ds.Store_Id
+                WHERE o.User_Id = %s AND LOWER(COALESCE(o.Order_Status, '')) != 'cancelled'
+                GROUP BY og.Item_Name, og.Store_Id, ds.DS_Area, g.Price, g.Image_Url
+                ORDER BY Order_Count DESC, Total_Quantity DESC
+                LIMIT 15;
+            """
+            groceries = fetch_all(groceries_query_fallback, (user_id,))
+        except Exception:
+            groceries = []
+
+    # 3. Most ordered restaurants
+    restaurants = []
+    try:
+        restaurants_query = """
+            SELECT 
+                o.Rest_Id,
+                r.RName AS Rest_Name,
+                r.RLocation AS Rest_Location,
+                COALESCE(r.RRating, 4.2) AS Rest_Rating,
+                'Multi-Cuisine' AS Cuisine_Type,
+                '' AS Banner_Url,
+                COUNT(o.Order_Id) AS Order_Count,
+                COALESCE(SUM(p.Amount), 0.00) AS Total_Spent
+            FROM ORDERS o
+            JOIN RESTAURANT r ON o.Rest_Id = r.Rest_Id
+            LEFT JOIN PAYMENT p ON o.Order_Id = p.Order_Id
+            WHERE o.User_Id = %s AND o.Rest_Id IS NOT NULL AND LOWER(COALESCE(o.Order_Status, '')) != 'cancelled'
+            GROUP BY o.Rest_Id, r.RName, r.RLocation, r.RRating
+            ORDER BY Order_Count DESC, Total_Spent DESC
+            LIMIT 10;
+        """
+        restaurants = fetch_all(restaurants_query, (user_id,))
+    except Exception as e:
+        print(f"Error fetching user most ordered restaurants: {e}")
+        restaurants = []
+
+    return {
+        "dishes": dishes or [],
+        "groceries": groceries or [],
+        "restaurants": restaurants or [],
+    }
+
+

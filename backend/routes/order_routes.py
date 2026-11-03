@@ -8,7 +8,8 @@ from backend.order_service import (
     get_order_items,
     create_order_with_items,
     update_order_status,
-    delete_order
+    delete_order,
+    get_user_most_ordered
 )
 from backend.delivery_service import assign_agent_to_order
 
@@ -51,6 +52,11 @@ def list_orders():
 @router.get("/user/{user_id}")
 def list_user_orders(user_id: int):
     return get_user_orders(user_id)
+
+
+@router.get("/user/{user_id}/most-ordered")
+def list_user_most_ordered(user_id: int):
+    return get_user_most_ordered(user_id)
 
 
 @router.get("/{order_id}")

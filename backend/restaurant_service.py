@@ -208,19 +208,7 @@ def get_restaurant_revenue_analytics(rest_id: int) -> dict:
     """
     top_items = fetch_all(top_items_query, (rest_id,))
     if not top_items:
-        fallback_items = fetch_all("SELECT Item_Name, Food_Name AS category, Is_Veg, FinalPrice AS price, Image_Url FROM REST_ITEMS WHERE Rest_Id = %s LIMIT 6;", (rest_id,))
-        for idx, item in enumerate(fallback_items):
-            units = max(1, (10 - idx) * 3)
-            p = float(item["price"] or 150)
-            top_items.append({
-                "Item_Name": item["Item_Name"],
-                "category": item.get("category") or "Dish",
-                "is_veg": item.get("Is_Veg", True),
-                "price": p,
-                "Image_Url": item.get("Image_Url"),
-                "units_sold": units,
-                "revenue": round(units * p, 2)
-            })
+        top_items = []
 
     # 4. Payment breakdown
     pay_query = """
@@ -296,6 +284,55 @@ def get_restaurant_revenue_analytics(rest_id: int) -> dict:
             "items": items
         })
 
+    # 6. Top Customers Leaderboard ("who ordered the more")
+    top_customers = []
+    try:
+        cust_query = """
+            SELECT 
+                o.User_Id,
+                u.User_Name,
+                u.User_Phone,
+                COALESCE(u.Area, 'Indiranagar') AS user_area,
+                COUNT(o.Order_Id) AS order_count,
+                COALESCE(SUM(p.Amount), 0.0) AS total_spent,
+                MAX(o.PlacedAt) AS last_order_date
+            FROM ORDERS o
+            JOIN USERS u ON o.User_Id = u.User_Id
+            LEFT JOIN PAYMENT p ON o.Order_Id = p.Order_Id
+            WHERE o.Rest_Id = %s
+            GROUP BY o.User_Id, u.User_Name, u.User_Phone, u.Area
+            ORDER BY order_count DESC, total_spent DESC
+            LIMIT 15;
+        """
+        raw_custs = fetch_all(cust_query, (rest_id,))
+        for c in raw_custs:
+            u_id = c["User_Id"]
+            fav_dish_query = """
+                SELECT oi.Item_Name, SUM(oi.Food_quantity) AS qty
+                FROM ORDER_ITEM oi
+                JOIN ORDERS o ON oi.Order_Id = o.Order_Id
+                WHERE o.Rest_Id = %s AND o.User_Id = %s
+                GROUP BY oi.Item_Name
+                ORDER BY qty DESC
+                LIMIT 1;
+            """
+            fav_res = fetch_one(fav_dish_query, (rest_id, u_id))
+            top_customers.append({
+                "user_id": u_id,
+                "user_name": c["User_Name"],
+                "user_phone": c["User_Phone"],
+                "user_area": c["user_area"],
+                "order_count": int(c["order_count"]),
+                "total_spent": round(float(c["total_spent"]), 2),
+                "last_order_date": str(c["last_order_date"]),
+                "favorite_dish": fav_res["Item_Name"] if fav_res else (top_items[0]["Item_Name"] if top_items else "Signature Dish")
+            })
+    except Exception as e:
+        print(f"Error computing restaurant top customers: {e}")
+
+    if not top_customers:
+        top_customers = []
+
     return {
         "status": "success",
         "restaurant_id": rest_id,
@@ -317,6 +354,7 @@ def get_restaurant_revenue_analytics(rest_id: int) -> dict:
         },
         "timeline": timeline,
         "top_items": top_items,
+        "top_customers": top_customers,
         "payment_methods": payment_methods,
         "live_orders": live_orders
     }

@@ -233,11 +233,14 @@ def register_restaurant(req: RegisterRestaurantRequest):
         cursor.execute("SELECT COALESCE(MAX(Rest_Id), 0) + 1 AS next_id FROM RESTAURANT;")
         next_id = cursor.fetchone()["next_id"]
 
+        from backend.image_migration import CURATED_RESTAURANT_POOL
+        img = CURATED_RESTAURANT_POOL[next_id % len(CURATED_RESTAURANT_POOL)]
+
         query = """
-            INSERT INTO RESTAURANT (Rest_Id, RName, RLocation, RPhone, Password, RRating)
-            VALUES (%s, %s, %s, %s, %s, %s);
+            INSERT INTO RESTAURANT (Rest_Id, RName, RLocation, RPhone, Password, RRating, Image_Url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s);
         """
-        cursor.execute(query, (next_id, req.name, req.location, req.phone, req.password, req.rating))
+        cursor.execute(query, (next_id, req.name, req.location, req.phone, req.password, req.rating, img))
         conn.commit()
         created = fetch_one("SELECT * FROM RESTAURANT WHERE Rest_Id = %s;", (next_id,))
         return {"status": "success", "role": "Restaurant", "data": created}
