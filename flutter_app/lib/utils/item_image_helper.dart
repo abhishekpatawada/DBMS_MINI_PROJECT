@@ -957,33 +957,46 @@ class ItemImageWidget extends StatelessWidget {
       isGrocery: isGrocery,
     );
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadius),
-      child: AppCachedNetworkImage(
-        imageUrl: resolvedUrl,
-        width: width,
-        height: height,
-        fit: fit,
-        placeholder: Container(
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F2EA),
+        borderRadius: BorderRadius.circular(2.0),
+        border: Border.all(color: const Color(0xFF111111), width: 2.0),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(1.0),
+        child: AppCachedNetworkImage(
+          imageUrl: resolvedUrl,
           width: width,
           height: height,
-          color: const Color(0xFFF1F5F9),
-          child: const Center(
-            child: SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
+          fit: fit,
+          placeholder: Container(
+            width: width,
+            height: height,
+            color: const Color(0xFFEFFF00),
+            child: const Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFF111111),
+                ),
+              ),
             ),
           ),
-        ),
-        errorWidget: Container(
-          width: width,
-          height: height,
-          color: const Color(0xFFE2E8F0),
-          child: Center(
-            child: Text(
-              isGrocery ? "🏬" : "🍽️",
-              style: TextStyle(fontSize: width * 0.35),
+          errorWidget: Container(
+            width: width,
+            height: height,
+            color: const Color(0xFFF5F2EA),
+            child: Center(
+              child: Text(
+                isGrocery ? "🏬" : "🍽️",
+                style: TextStyle(fontSize: width * 0.35),
+              ),
             ),
           ),
         ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/models.dart';
 import '../../services/api_service.dart';
 import '../../services/cart_manager.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import 'cart_checkout_screen.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
@@ -85,9 +88,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
     final isRestaurant = _order?.orderType.toLowerCase() == "restaurant";
     for (final item in _items) {
-      final itemName = item['Item_Name']?.toString() ?? item['name']?.toString() ?? 'Dish';
-      final itemPrice = double.tryParse(item['Item_Price']?.toString() ?? item['price']?.toString() ?? '100') ?? 100.0;
-      final qty = int.tryParse(item['Quantity']?.toString() ?? item['Food_quantity']?.toString() ?? '1') ?? 1;
+      final itemName =
+          item['Item_Name']?.toString() ?? item['name']?.toString() ?? 'Dish';
+      final itemPrice = double.tryParse(item['Item_Price']?.toString() ??
+              item['price']?.toString() ??
+              '100') ??
+          100.0;
+      final qty = int.tryParse(item['Quantity']?.toString() ??
+              item['Food_quantity']?.toString() ??
+              '1') ??
+          1;
 
       for (int i = 0; i < qty; i++) {
         cartManager.addItem(
@@ -105,10 +115,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Items added to your cart!"),
-        backgroundColor: Color(0xFF10B981),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(
+          "ITEMS ADDED TO CART // REORDER ACTIVE",
+          style: GoogleFonts.ibmPlexMono(
+            fontWeight: FontWeight.w800,
+            color: AppTheme.black,
+          ),
+        ),
+        backgroundColor: AppTheme.green,
+        duration: const Duration(seconds: 2),
       ),
     );
 
@@ -123,48 +139,97 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          "Track Order",
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A)),
+        title: Text(
+          "TRACK ORDER #${widget.orderId}",
+          style: GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            color: AppTheme.black,
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Support team will contact you shortly.")),
-              );
-            },
-            child: const Text("Help", style: TextStyle(color: Color(0xFF4F46E5), fontWeight: FontWeight.bold, fontSize: 13)),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Center(
+              child: GestureDetector(
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "DISPATCH SUPPORT ALERTED FOR ORDER #${widget.orderId}",
+                        style: GoogleFonts.ibmPlexMono(
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.black,
+                        ),
+                      ),
+                      backgroundColor: AppTheme.yellow,
+                    ),
+                  );
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                  ),
+                  child: Text(
+                    "HELP",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 11,
+                      color: AppTheme.black,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 8),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: AppTheme.black,
+                strokeWidth: 3,
+              ),
+            )
           : _errorMessage != null
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("⚠️", style: TextStyle(fontSize: 48)),
-                        const SizedBox(height: 12),
-                        Text(_errorMessage!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red)),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _fetchOrderDetails,
-                          child: const Text("Retry"),
-                        ),
-                      ],
+                    child: BrutalistCard(
+                      bgColor: AppTheme.surface,
+                      padding: const EdgeInsets.all(24),
+                      shadowOffset: const Offset(5, 5),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.warning_amber_rounded,
+                              color: AppTheme.red, size: 48),
+                          const SizedBox(height: 12),
+                          Text(
+                            _errorMessage!.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.ibmPlexMono(
+                              color: AppTheme.red,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          BrutalistButton.white(
+                            text: "RETRY FETCH",
+                            onPressed: _fetchOrderDetails,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -177,26 +242,19 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final isDelivered = status.toLowerCase() == "delivered";
     final isCancelled = status.toLowerCase() == "cancelled";
     final stepIndex = _getStatusStepIndex(status);
-    final vendorTitle = _order?.restName ?? (_order?.storeArea != null ? "Dark Store #${_order?.storeId}" : "Royal Palace 1");
+    final vendorTitle = _order?.restName ??
+        (_order?.storeArea != null
+            ? "Dark Store #${_order?.storeId}"
+            : "Direct Hub Partner");
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        // 1. Order Status & Estimated Arrival Card (Screen 7)
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+        // 1. Order Status & Estimated Arrival Card
+        BrutalistCard(
+          bgColor: AppTheme.surface,
+          padding: const EdgeInsets.all(18),
+          shadowOffset: const Offset(4, 4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -208,68 +266,77 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          vendorTitle,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                          vendorTitle.toUpperCase(),
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.black,
+                          ),
                         ),
-                        const SizedBox(height: 3),
+                        const SizedBox(height: 2),
                         Text(
-                          "Order #${widget.orderId} • ${_order?.orderDate ?? '16 Oct 2026, 10:22 PM'}",
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                          "ORDER #${widget.orderId} • ${_order?.orderDate ?? 'LIVE SESSION'}",
+                          style: GoogleFonts.ibmPlexMono(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF666666),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isCancelled
-                          ? const Color(0xFFFEE2E2)
-                          : isDelivered
-                              ? const Color(0xFFD1FAE5)
-                              : const Color(0xFFD1FAE5),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: isCancelled ? const Color(0xFFDC2626) : const Color(0xFF10B981),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          isCancelled ? "Cancelled" : isDelivered ? "Delivered" : "On the way",
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: isCancelled ? const Color(0xFFDC2626) : const Color(0xFF065F46),
-                          ),
-                        ),
-                      ],
-                    ),
+                  BrutalistBadge(
+                    label: isCancelled
+                        ? "CANCELLED"
+                        : isDelivered
+                            ? "DELIVERED"
+                            : "ON THE WAY",
+                    bgColor: isCancelled
+                        ? AppTheme.red
+                        : isDelivered
+                            ? AppTheme.green
+                            : AppTheme.yellow,
+                    textColor:
+                        isCancelled ? AppTheme.surface : AppTheme.black,
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              Container(height: 2.0, color: AppTheme.black),
               const SizedBox(height: 14),
-              const Text("Estimated arrival", style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500)),
-              const SizedBox(height: 2),
+
+              Text(
+                "ESTIMATED DELIVERY WINDOW",
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF666666),
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 4),
               Row(
                 children: [
-                  const Icon(Icons.bolt_rounded, color: Color(0xFF10B981), size: 24),
+                  const Icon(Icons.bolt_rounded,
+                      color: AppTheme.black, size: 26),
                   const SizedBox(width: 4),
                   Text(
-                    isDelivered ? "Delivered!" : isCancelled ? "Order Cancelled" : "8 mins",
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                    isDelivered
+                        ? "DELIVERED!"
+                        : isCancelled
+                            ? "ORDER CANCELLED"
+                            : "8-12 MINS",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.black,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 18),
 
-              // Horizontal Step Tracker (Screen 7: Placed, Preparing, On the way, Delivered)
+              // Step Tracker
               _buildHorizontalStepTracker(stepIndex),
             ],
           ),
@@ -277,18 +344,27 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
         const SizedBox(height: 16),
 
-        // 2. Illustrated Map Route Container (Screen 7)
+        // 2. Illustrated Map Route Frame
         Container(
           height: 160,
           decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            color: AppTheme.bg,
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            border: Border.all(
+              color: AppTheme.black,
+              width: AppTheme.borderWidth,
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: AppTheme.black,
+                offset: Offset(3.5, 3.5),
+                blurRadius: 0,
+              ),
+            ],
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(
             children: [
-              // Map background grid illustration
               Positioned.fill(
                 child: CustomPaint(
                   painter: _MapRoutePainter(),
@@ -298,17 +374,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               Positioned(
                 top: 36,
                 left: 40,
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEF4444),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.restaurant, color: Colors.white, size: 14),
-                    ),
-                  ],
+                child: Container(
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    color: AppTheme.yellow,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                  ),
+                  child: const Icon(Icons.storefront_rounded,
+                      color: AppTheme.black, size: 16),
                 ),
               ),
               // Live Rider Pin
@@ -318,13 +393,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4F46E5),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: const Color(0xFF4F46E5).withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 2),
-                    ],
+                    color: AppTheme.blue,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
                   ),
-                  child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 16),
+                  child: const Icon(Icons.electric_moped_rounded,
+                      color: AppTheme.surface, size: 18),
                 ),
               ),
               // Destination Home Pin
@@ -332,12 +407,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 bottom: 30,
                 right: 40,
                 child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF10B981),
-                    shape: BoxShape.circle,
+                  padding: const EdgeInsets.all(7),
+                  decoration: BoxDecoration(
+                    color: AppTheme.green,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
                   ),
-                  child: const Icon(Icons.home, color: Colors.white, size: 14),
+                  child: const Icon(Icons.home_rounded,
+                      color: AppTheme.black, size: 16),
                 ),
               ),
             ],
@@ -346,75 +424,95 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
         const SizedBox(height: 16),
 
-        // 3. Rider Info Card with Call & Chat (Screen 7)
-        Container(
+        // 3. Rider Info Card
+        BrutalistCard(
+          bgColor: AppTheme.surface,
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
+          shadowOffset: const Offset(3.5, 3.5),
           child: Row(
             children: [
               Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEEF2FF),
-                  borderRadius: BorderRadius.circular(12),
+                  color: AppTheme.yellow,
+                  borderRadius:
+                      BorderRadius.circular(AppTheme.borderRadius),
+                  border: Border.all(color: AppTheme.black, width: 2),
                 ),
-                child: const Center(child: Icon(Icons.delivery_dining_rounded, color: Color(0xFF4F46E5), size: 26)),
+                child: const Center(
+                  child: Icon(Icons.delivery_dining_rounded,
+                      color: AppTheme.black, size: 26),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Rider is on the way",
-                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF0F172A)),
-                    ),
-                    const SizedBox(height: 2),
                     Text(
-                      _order?.agentName != null ? "${_order!.agentName} • ${_order?.agentVehicle ?? 'KA-05-AB-1234'}" : "Arjun • KA-05-AB-1234",
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                      "DISPATCH COURIER",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12,
+                        color: AppTheme.black,
+                      ),
+                    ),
+                    Text(
+                      _order?.agentName != null
+                          ? "${_order!.agentName} • ${_order?.agentVehicle ?? 'KA-05-AB-1234'}"
+                          : "Arjun • KA-05-AB-1234",
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF444444),
+                      ),
                     ),
                   ],
                 ),
               ),
-              // Call Button
-              IconButton(
-                style: IconButton.styleFrom(
-                  backgroundColor: const Color(0xFFECFDF5),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                icon: const Icon(Icons.phone_rounded, color: Color(0xFF10B981), size: 18),
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Calling rider: 9876543210")),
+                    const SnackBar(
+                      content: Text("DIALING RIDER: +91 9876543210"),
+                      backgroundColor: AppTheme.black,
+                    ),
                   );
                 },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.green,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                  ),
+                  child: const Icon(Icons.phone_rounded,
+                      size: 18, color: AppTheme.black),
+                ),
               ),
-              const SizedBox(width: 6),
-              // Chat Button
-              IconButton(
-                style: IconButton.styleFrom(
-                  backgroundColor: const Color(0xFFEEF2FF),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF4F46E5), size: 18),
-                onPressed: () {
+              const SizedBox(width: 8),
+              GestureDetector(
+                onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Opening live rider chat...")),
+                    const SnackBar(
+                      content: Text("OPENING LIVE COURIER CHAT..."),
+                      backgroundColor: AppTheme.black,
+                    ),
                   );
                 },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.yellow,
+                    borderRadius:
+                        BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                  ),
+                  child: const Icon(Icons.chat_bubble_rounded,
+                      size: 18, color: AppTheme.black),
+                ),
               ),
             ],
           ),
@@ -422,32 +520,42 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
         const SizedBox(height: 14),
 
-        // 4. Delivery Address Card (Screen 7)
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-          ),
+        // 4. Delivery Address Card
+        BrutalistCard(
+          bgColor: AppTheme.surface,
+          padding: const EdgeInsets.all(14),
+          shadowOffset: const Offset(3.5, 3.5),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.location_on_outlined, color: Color(0xFF4F46E5), size: 20),
+              const Icon(Icons.location_on_rounded,
+                  color: AppTheme.black, size: 20),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Delivery Address", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF94A3B8))),
-                    const SizedBox(height: 2),
-                    const Text("Home", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                    Text(
+                      "DELIVERING TO",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFF666666),
+                      ),
+                    ),
                     const SizedBox(height: 2),
                     Text(
-                      _order?.deliveryAddr != null && _order!.deliveryAddr!.isNotEmpty
-                          ? (_order!.deliveryAddr!.contains('•') ? _order!.deliveryAddr!.split('•').last.trim() : _order!.deliveryAddr!)
+                      _order?.deliveryAddr != null &&
+                              _order!.deliveryAddr!.isNotEmpty
+                          ? (_order!.deliveryAddr!.contains('•')
+                              ? _order!.deliveryAddr!.split('•').last.trim()
+                              : _order!.deliveryAddr!)
                           : "14 MG Road, Indiranagar, Bengaluru",
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                      style: GoogleFonts.inter(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.black,
+                      ),
                     ),
                   ],
                 ),
@@ -458,42 +566,82 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
         const SizedBox(height: 14),
 
-        // 5. Items Summary Card
-        Container(
+        // 5. Items Receipt
+        BrutalistCard(
+          bgColor: AppTheme.surface,
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-          ),
+          shadowOffset: const Offset(4, 4),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Items in this order", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+              Text(
+                "ORDER ITEMS (${_items.length})",
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  color: AppTheme.black,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(height: 2.0, color: AppTheme.black),
               const SizedBox(height: 10),
               ..._items.map((it) {
-                final name = it['Item_Name']?.toString() ?? it['name']?.toString() ?? 'Item';
-                final qty = it['Quantity']?.toString() ?? it['Food_quantity']?.toString() ?? '1';
-                final price = double.tryParse(it['Item_Price']?.toString() ?? it['price']?.toString() ?? '0') ?? 0.0;
+                final name = it['Item_Name']?.toString() ??
+                    it['name']?.toString() ??
+                    'Item';
+                final qty = it['Quantity']?.toString() ??
+                    it['Food_quantity']?.toString() ??
+                    '1';
+                final price = double.tryParse(it['Item_Price']?.toString() ??
+                        it['price']?.toString() ??
+                        '0') ??
+                    0.0;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 3),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("$qty x $name", style: const TextStyle(fontSize: 13, color: Color(0xFF334155))),
-                      Text("₹${(price * (int.tryParse(qty) ?? 1)).toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      Text(
+                        "$qty x $name",
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.black,
+                        ),
+                      ),
+                      Text(
+                        "₹${(price * (int.tryParse(qty) ?? 1)).toStringAsFixed(2)}",
+                        style: GoogleFonts.ibmPlexMono(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                          color: AppTheme.black,
+                        ),
+                      ),
                     ],
                   ),
                 );
               }),
-              const Divider(height: 20),
+              const SizedBox(height: 10),
+              Container(height: 2.0, color: AppTheme.black),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Total Paid", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
+                  Text(
+                    "TOTAL PAID",
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      color: AppTheme.black,
+                    ),
+                  ),
                   Text(
                     "₹${_order?.totalAmount.toStringAsFixed(2) ?? '0.00'}",
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Color(0xFF4F46E5)),
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      color: AppTheme.black,
+                    ),
                   ),
                 ],
               ),
@@ -501,91 +649,96 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           ),
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 18),
 
+        // Cancel Button (if active)
         if (!isDelivered && !isCancelled) ...[
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.cancel_outlined, size: 16),
-              label: const Text("Cancel This Order", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFDC2626),
-                side: const BorderSide(color: Color(0xFFFCA5A5)),
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (ctx) => AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    title: const Text("Cancel Order?", style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text("Are you sure you want to cancel Order #${widget.orderId}?"),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(ctx, false),
-                        child: const Text("Keep Order", style: TextStyle(color: Color(0xFF64748B))),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFDC2626),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        onPressed: () => Navigator.pop(ctx, true),
-                        child: const Text("Cancel Order"),
-                      ),
-                    ],
+          BrutalistButton.red(
+            text: "CANCEL ORDER",
+            icon: Icons.cancel_rounded,
+            fullWidth: true,
+            onPressed: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: AppTheme.bg,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    side: const BorderSide(color: AppTheme.black, width: 3),
                   ),
-                );
+                  title: Text(
+                    "CANCEL ORDER #${widget.orderId}?",
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.black,
+                    ),
+                  ),
+                  content: Text(
+                    "Are you sure you want to cancel this live order?",
+                    style: GoogleFonts.inter(fontSize: 13),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: Text(
+                        "KEEP ORDER",
+                        style: GoogleFonts.spaceGrotesk(
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.black,
+                        ),
+                      ),
+                    ),
+                    BrutalistButton.red(
+                      text: "CONFIRM CANCEL",
+                      height: 40,
+                      onPressed: () => Navigator.pop(ctx, true),
+                    ),
+                  ],
+                ),
+              );
 
-                if (confirm == true) {
-                  try {
-                    final ok = await ApiService.updateOrderStatus(widget.orderId, "Cancelled");
-                    if (mounted) {
-                      if (ok) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Order #${widget.orderId} cancelled."),
-                            backgroundColor: const Color(0xFFDC2626),
+              if (confirm == true) {
+                try {
+                  final ok = await ApiService.updateOrderStatus(
+                      widget.orderId, "Cancelled");
+                  if (mounted) {
+                    if (ok) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            "ORDER #${widget.orderId} CANCELLED",
+                            style: GoogleFonts.ibmPlexMono(
+                              fontWeight: FontWeight.w800,
+                              color: AppTheme.surface,
+                            ),
                           ),
-                        );
-                      }
-                      _fetchOrderDetails();
+                          backgroundColor: AppTheme.red,
+                        ),
+                      );
                     }
-                  } catch (_) {}
-                }
-              },
-            ),
+                    _fetchOrderDetails();
+                  }
+                } catch (_) {}
+              }
+            },
           ),
           const SizedBox(height: 12),
         ],
 
         // Reorder Button
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4F46E5),
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 14),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        BrutalistButton.yellow(
+          text: "REORDER THESE ITEMS ★",
+          fullWidth: true,
           onPressed: _reorderDishes,
-          child: const Text("Reorder These Items", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         ),
         const SizedBox(height: 24),
       ],
     );
   }
 
-  // Horizontal Step Tracker (Screen 7)
+  // Step Tracker with Brutalist Milestones
   Widget _buildHorizontalStepTracker(int currentStep) {
-    final steps = [
-      {"label": "Placed", "sub": "10:22 PM"},
-      {"label": "Preparing", "sub": ""},
-      {"label": "On the way", "sub": ""},
-      {"label": "Delivered", "sub": ""},
-    ];
+    final steps = ["PLACED", "PREPARING", "ON THE WAY", "DELIVERED"];
 
     return Row(
       children: List.generate(steps.length, (i) {
@@ -600,60 +753,69 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   Expanded(
                     child: Container(
                       height: 3,
-                      color: i == 0 ? Colors.transparent : (currentStep >= i ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                      color: i == 0
+                          ? Colors.transparent
+                          : (currentStep >= i
+                              ? AppTheme.black
+                              : const Color(0xFFCCCCCC)),
                     ),
                   ),
                   Container(
-                    width: 22,
-                    height: 22,
+                    width: 24,
+                    height: 24,
                     decoration: BoxDecoration(
                       color: isCompleted
-                          ? const Color(0xFF10B981)
+                          ? AppTheme.green
                           : isCurrent
-                              ? const Color(0xFF4F46E5)
-                              : const Color(0xFFE2E8F0),
-                      shape: BoxShape.circle,
+                              ? AppTheme.yellow
+                              : AppTheme.surface,
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.borderRadius),
+                      border: Border.all(color: AppTheme.black, width: 2),
                     ),
                     child: Center(
                       child: isCompleted
-                          ? const Icon(Icons.check, size: 13, color: Colors.white)
-                          : Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: isCurrent ? Colors.white : const Color(0xFF94A3B8),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+                          ? const Icon(Icons.check_rounded,
+                              size: 14, color: AppTheme.black)
+                          : isCurrent
+                              ? Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: AppTheme.black,
+                                    shape: BoxShape.circle,
+                                  ),
+                                )
+                              : null,
                     ),
                   ),
                   Expanded(
                     child: Container(
                       height: 3,
-                      color: i == steps.length - 1 ? Colors.transparent : (currentStep > i ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                      color: i == steps.length - 1
+                          ? Colors.transparent
+                          : (currentStep > i
+                              ? AppTheme.black
+                              : const Color(0xFFCCCCCC)),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 6),
               Text(
-                steps[i]["label"]!,
-                style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: isCurrent || isCompleted ? FontWeight.bold : FontWeight.w500,
+                steps[i],
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 9.5,
+                  fontWeight:
+                      isCurrent || isCompleted ? FontWeight.w900 : FontWeight.w600,
                   color: isCurrent
-                      ? const Color(0xFF4F46E5)
+                      ? AppTheme.black
                       : isCompleted
-                          ? const Color(0xFF0F172A)
-                          : const Color(0xFF94A3B8),
+                          ? const Color(0xFF333333)
+                          : const Color(0xFF888888),
                 ),
                 textAlign: TextAlign.center,
               ),
-              if (steps[i]["sub"]!.isNotEmpty)
-                Text(
-                  steps[i]["sub"]!,
-                  style: const TextStyle(fontSize: 9, color: Color(0xFF94A3B8)),
-                ),
             ],
           ),
         );
@@ -662,36 +824,30 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 }
 
-// Custom Painter to draw stylized map street grid and curved delivery path
 class _MapRoutePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFFE2E8F0));
-    final roadPaint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 6
-      ..style = PaintingStyle.stroke;
-
-    // Draw some horizontal and vertical roads
-    canvas.drawLine(Offset(0, size.height * 0.3), Offset(size.width, size.height * 0.3), roadPaint);
-    canvas.drawLine(Offset(0, size.height * 0.7), Offset(size.width, size.height * 0.7), roadPaint);
-    canvas.drawLine(Offset(size.width * 0.3, 0), Offset(size.width * 0.3, size.height), roadPaint);
-    canvas.drawLine(Offset(size.width * 0.7, 0), Offset(size.width * 0.7, size.height), roadPaint);
-
-    // Draw Route line in Indigo
-    final routePaint = Paint()
-      ..color = const Color(0xFF4F46E5)
-      ..strokeWidth = 3.5
+    final gridPaint = Paint()
+      ..color = const Color(0xFF111111).withValues(alpha: 0.08)
       ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
+      ..strokeWidth = 1.0;
 
-    final path = Path();
-    path.moveTo(48, 48);
-    path.lineTo(size.width * 0.3, 48);
-    path.lineTo(size.width * 0.3, size.height * 0.55);
-    path.lineTo(size.width * 0.7, size.height * 0.55);
-    path.lineTo(size.width * 0.7, size.height - 40);
-    path.lineTo(size.width - 48, size.height - 40);
+    for (double x = 0; x < size.width; x += 24) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
+    }
+    for (double y = 0; y < size.height; y += 24) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    final routePaint = Paint()
+      ..color = AppTheme.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5;
+
+    final path = Path()
+      ..moveTo(48, 48)
+      ..lineTo(148, 86)
+      ..lineTo(size.width - 48, size.height - 40);
 
     canvas.drawPath(path, routePaint);
   }

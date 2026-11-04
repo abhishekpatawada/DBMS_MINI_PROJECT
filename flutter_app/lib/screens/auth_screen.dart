@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
+import '../theme/app_theme.dart';
+import '../widgets/brutalist_widgets.dart';
 import 'user/user_dashboard_screen.dart';
 import 'delivery_agent/delivery_agent_dashboard_screen.dart';
 import 'restaurant/restaurant_dashboard_screen.dart';
@@ -77,10 +80,19 @@ class _AuthScreenState extends State<AuthScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text("Filled demo credentials for $roleName ($phone / 123456)"),
+        content: Text(
+          "FILLED CREDENTIALS: $roleName ($phone / 123456)",
+          style: GoogleFonts.ibmPlexMono(
+            fontWeight: FontWeight.w700,
+            color: AppTheme.black,
+          ),
+        ),
         duration: const Duration(seconds: 2),
-        backgroundColor: const Color(0xFF4F46E5),
+        backgroundColor: AppTheme.yellow,
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(color: AppTheme.black, width: 2),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+        ),
       ),
     );
   }
@@ -130,7 +142,6 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      // Backend automatically detects the user's role across all 4 tables!
       final res = await ApiService.login(phone, password);
       final role = res['role'] as String? ?? 'User';
       final data = res['data'] as Map<String, dynamic>;
@@ -138,9 +149,19 @@ class _AuthScreenState extends State<AuthScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Welcome back! Logged in as $role"),
-            backgroundColor: Colors.green,
+            content: Text(
+              "ACCESS GRANTED // LOGGED IN AS $role",
+              style: GoogleFonts.ibmPlexMono(
+                fontWeight: FontWeight.w800,
+                color: AppTheme.black,
+              ),
+            ),
+            backgroundColor: AppTheme.green,
             duration: const Duration(seconds: 2),
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(color: AppTheme.black, width: 2),
+              borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            ),
           ),
         );
         _navigateToDashboard(role, data);
@@ -226,9 +247,18 @@ class _AuthScreenState extends State<AuthScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text("Account created successfully as $_selectedSignUpRole!"),
-            backgroundColor: Colors.green,
+            content: Text(
+              "ACCOUNT REGISTERED // $_selectedSignUpRole",
+              style: GoogleFonts.ibmPlexMono(
+                fontWeight: FontWeight.w800,
+                color: AppTheme.surface,
+              ),
+            ),
+            backgroundColor: AppTheme.blue,
+            shape: RoundedRectangleBorder(
+              side: const BorderSide(color: AppTheme.black, width: 2),
+              borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            ),
           ),
         );
         _navigateToDashboard(_selectedSignUpRole, res['data']);
@@ -244,192 +274,242 @@ class _AuthScreenState extends State<AuthScreen> {
   Color _getRoleColor(String role) {
     switch (role) {
       case "User":
-        return const Color(0xFF4F46E5); // Indigo
+        return AppTheme.yellow;
       case "Delivery Agent":
-        return const Color(0xFF059669); // Emerald
+        return AppTheme.green;
       case "Restaurant":
-        return const Color(0xFFEA580C); // Orange
+        return AppTheme.orange;
       case "Dark Store":
-        return const Color(0xFF7C3AED); // Violet
+        return AppTheme.blue;
       default:
-        return const Color(0xFF4F46E5);
+        return AppTheme.yellow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
-              child: Card(
-                elevation: 4,
-                shadowColor: Colors.black.withOpacity(0.08),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  side: const BorderSide(color: Color(0xFFE2E8F0)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      if (kIsWeb) ...[
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: TextButton.icon(
-                            onPressed: () {
-                              if (Navigator.of(context).canPop()) {
-                                Navigator.of(context).pop();
-                              } else {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (_) => const WebLandingScreen(),
-                                  ),
-                                );
-                              }
-                            },
-                            icon:
-                                const Icon(Icons.arrow_back_rounded, size: 16),
-                            label: const Text("Back to BiteHub Home"),
-                            style: TextButton.styleFrom(
-                              foregroundColor: const Color(0xFF64748B),
-                              padding: EdgeInsets.zero,
+              child: BrutalistCard(
+                bgColor: AppTheme.surface,
+                padding: const EdgeInsets.all(28),
+                shadowOffset: const Offset(6, 6),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (kIsWeb) ...[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            } else {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (_) => const WebLandingScreen(),
+                                ),
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.arrow_back_rounded,
+                              size: 16, color: AppTheme.black),
+                          label: Text(
+                            "BACK TO PORTAL",
+                            style: GoogleFonts.ibmPlexMono(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                              color: AppTheme.black,
                             ),
                           ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                          ),
                         ),
-                        const SizedBox(height: 12),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    // Top Status Ticker Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const BrutalistBadge(
+                          label: "BITEHUB AUTH",
+                          bgColor: AppTheme.yellow,
+                        ),
+                        Text(
+                          "GATEWAY // V2.0",
+                          style: GoogleFonts.ibmPlexMono(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF666666),
+                          ),
+                        ),
                       ],
-                      // Brand Header
-                      Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(22),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF4F46E5)
-                                        .withOpacity(0.18),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(22),
-                                child: Image.asset(
-                                  'assets/images/logo.png',
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Image.asset(
-                                    'assets/images/logo.jpg',
-                                    fit: BoxFit.cover,
-                                    errorBuilder:
-                                        (context, error2, stackTrace2) =>
-                                            Container(
-                                      decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [
-                                            Color(0xFF6366F1),
-                                            Color(0xFF4F46E5)
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                        borderRadius: BorderRadius.circular(22),
-                                      ),
-                                      child: const Center(
-                                        child: Text(
-                                          "B",
-                                          style: TextStyle(
-                                            fontSize: 38,
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Brand Heading
+                    Text(
+                      "ACCESS PORTAL",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
+                        letterSpacing: -1.0,
+                        height: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      _isSignUp
+                          ? "INITIALIZE NEW ENTITY ACCOUNT"
+                          : "ENTER CREDENTIALS TO RESUME SESSION",
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF555555),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Brutalist Segment Switcher (Sign In vs Sign Up)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.bg,
+                        border: Border.all(
+                          color: AppTheme.black,
+                          width: AppTheme.borderWidth,
+                        ),
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.borderRadius),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isSignUp = false;
+                                  _errorMessage = null;
+                                });
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 11),
+                                decoration: BoxDecoration(
+                                  color: !_isSignUp
+                                      ? AppTheme.black
+                                      : Colors.transparent,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "SIGN IN",
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    color: !_isSignUp
+                                        ? AppTheme.yellow
+                                        : AppTheme.black,
+                                    letterSpacing: 0.8,
                                   ),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              "BiteHub",
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.w800,
-                                color: Color(0xFF0F172A),
-                                letterSpacing: -0.5,
+                          ),
+                          Container(
+                            width: AppTheme.borderWidth,
+                            height: 38,
+                            color: AppTheme.black,
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _isSignUp = true;
+                                  _errorMessage = null;
+                                });
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 11),
+                                decoration: BoxDecoration(
+                                  color: _isSignUp
+                                      ? AppTheme.black
+                                      : Colors.transparent,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "CREATE ACCOUNT",
+                                  style: GoogleFonts.spaceGrotesk(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    color: _isSignUp
+                                        ? AppTheme.yellow
+                                        : AppTheme.black,
+                                    letterSpacing: 0.8,
+                                  ),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              "Your cravings, our command.",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF6366F1),
-                                fontWeight: FontWeight.w600,
-                              ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Error Alert Banner
+                    if (_errorMessage != null) ...[
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: AppTheme.red,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.borderRadius),
+                          border: Border.all(
+                            color: AppTheme.black,
+                            width: AppTheme.borderWidth,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppTheme.black,
+                              offset: Offset(3, 3),
+                              blurRadius: 0,
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _isSignUp
-                                  ? "Create your account to get started"
-                                  : "Food & Grocery Multi-Vendor Platform",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF64748B),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.warning_amber_rounded,
+                                color: AppTheme.surface, size: 20),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                _errorMessage!.toUpperCase(),
+                                style: GoogleFonts.ibmPlexMono(
+                                  color: AppTheme.surface,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 20),
-
-                      // Error Alert Banner
-                      if (_errorMessage != null) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFEF2F2),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFFECACA)),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.error_outline_rounded,
-                                  color: Color(0xFFDC2626), size: 20),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  _errorMessage!,
-                                  style: const TextStyle(
-                                    color: Color(0xFFB91C1C),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
-
-                      // Form Body (Sign In or Sign Up)
-                      _isSignUp ? _buildSignUpView() : _buildSignInView(),
+                      const SizedBox(height: 18),
                     ],
-                  ),
+
+                    // Form Body (Sign In or Sign Up)
+                    _isSignUp ? _buildSignUpView() : _buildSignInView(),
+                  ],
                 ),
               ),
             ),
@@ -446,136 +526,131 @@ class _AuthScreenState extends State<AuthScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          "Mobile Number",
-          style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF334155)),
+        Text(
+          "MOBILE NUMBER",
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.black,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: _phoneController,
           keyboardType: TextInputType.phone,
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.black,
+          ),
           decoration: InputDecoration(
-            hintText: "Enter your registered mobile number",
+            hintText: "Enter 10-digit mobile number",
             prefixIcon: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text("🇮🇳 +91",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF334155),
-                          fontSize: 14)),
-                  SizedBox(width: 8),
-                  SizedBox(
-                      height: 18,
-                      child:
-                          VerticalDivider(width: 1, color: Color(0xFFCBD5E1))),
+                children: [
+                  Text(
+                    "🇮🇳 +91",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.black,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 2,
+                    height: 18,
+                    color: AppTheme.black,
+                  ),
                 ],
               ),
             ),
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFF4F46E5), width: 2)),
           ),
         ),
         const SizedBox(height: 16),
 
-        const Text(
-          "Password",
-          style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF334155)),
+        Text(
+          "PASSWORD",
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.black,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 6),
         TextField(
           controller: _passwordController,
           obscureText: _obscurePassword,
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.black,
+          ),
           decoration: InputDecoration(
-            hintText: "Enter your password",
-            prefixIcon: const Icon(Icons.lock_outline_rounded,
-                color: Color(0xFF64748B), size: 20),
+            hintText: "Enter password",
+            prefixIcon: const Icon(Icons.lock_rounded,
+                color: AppTheme.black, size: 20),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscurePassword
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: const Color(0xFF94A3B8),
+                color: AppTheme.black,
                 size: 20,
               ),
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
             ),
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide:
-                    const BorderSide(color: Color(0xFF4F46E5), width: 2)),
           ),
         ),
         const SizedBox(height: 18),
 
-        // Quick Demo Role Chips (Test any role with 1 tap)
+        // Quick Demo Role Chips
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
-            borderRadius: BorderRadius.circular(14),
+            color: AppTheme.bg,
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            border: Border.all(
+              color: AppTheme.black,
+              width: AppTheme.borderWidth,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                children: const [
-                  Icon(Icons.flash_on_rounded,
-                      size: 14, color: Color(0xFF6366F1)),
-                  SizedBox(width: 6),
+                children: [
+                  const Icon(Icons.bolt_rounded,
+                      size: 16, color: AppTheme.black),
+                  const SizedBox(width: 4),
                   Text(
-                    "Quick Fill Demo Login:",
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF475569)),
+                    "QUICK FILL DEMO CREDENTIALS:",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.black,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Wrap(
-                spacing: 6,
-                runSpacing: 6,
+                spacing: 8,
+                runSpacing: 8,
                 children: [
-                  _demoChip("👤 Customer", "9810000001", "Customer",
-                      const Color(0xFF4F46E5)),
-                  _demoChip("🛵 Agent", "9876500001", "Delivery Agent",
-                      const Color(0xFF059669)),
-                  _demoChip("🏪 Restaurant", "0800000001", "Restaurant",
-                      const Color(0xFFEA580C)),
-                  _demoChip("🏬 Dark Store", "9810099999", "Dark Store",
-                      const Color(0xFF7C3AED)),
+                  _demoChip("CUSTOMER", "9810000001", "Customer",
+                      AppTheme.yellow),
+                  _demoChip("AGENT", "9876500001", "Delivery Agent",
+                      AppTheme.green),
+                  _demoChip("RESTAURANT", "0800000001", "Restaurant",
+                      AppTheme.orange),
+                  _demoChip("DARK STORE", "9810099999", "Dark Store",
+                      AppTheme.blue),
                 ],
               ),
             ],
@@ -583,84 +658,58 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
         const SizedBox(height: 22),
 
-        // Sign In Action Button (No icons in button)
-        ElevatedButton(
-          onPressed: _isLoading ? null : _handleSignIn,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4F46E5),
-            foregroundColor: Colors.white,
-            elevation: 2,
-            shadowColor: const Color(0xFF4F46E5).withOpacity(0.4),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          child: _isLoading
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
+        // Sign In Action Button
+        _isLoading
+            ? Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppTheme.black,
+                  border: Border.all(
+                      color: AppTheme.black, width: AppTheme.borderWidth),
+                ),
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 22,
+                  height: 22,
                   child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2),
-                )
-              : const Text(
-                  "Sign In to BiteHub",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    color: AppTheme.yellow,
+                    strokeWidth: 2.5,
+                  ),
                 ),
-        ),
-        const SizedBox(height: 20),
-
-        // Create Account Action below Sign In button (No icons)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Don't have an account? ",
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-                fontWeight: FontWeight.w500,
+              )
+            : BrutalistButton(
+                text: "SIGN IN TO BITEHUB →",
+                fullWidth: true,
+                onPressed: _handleSignIn,
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _isSignUp = true;
-                  _errorMessage = null;
-                });
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF4F46E5),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              ),
-              child: const Text(
-                "Create Account",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
   Widget _demoChip(String label, String phone, String roleName, Color color) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
       onTap: () => _fillDemo(phone, roleName),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: color.withOpacity(0.25)),
+          color: color,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(color: AppTheme.black, width: 1.5),
+          boxShadow: const [
+            BoxShadow(
+              color: AppTheme.black,
+              offset: Offset(2, 2),
+              blurRadius: 0,
+            ),
+          ],
         ),
         child: Text(
           label,
-          style: TextStyle(
-              fontSize: 11, fontWeight: FontWeight.w600, color: color),
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 10.5,
+            fontWeight: FontWeight.w900,
+            color: color == AppTheme.blue ? AppTheme.surface : AppTheme.black,
+          ),
         ),
       ),
     );
@@ -670,18 +719,18 @@ class _AuthScreenState extends State<AuthScreen> {
   // 2. CREATE ACCOUNT VIEW (Asks for Role)
   // ==========================================
   Widget _buildSignUpView() {
-    final activeColor = _getRoleColor(_selectedSignUpRole);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Role Selection Header
-        const Text(
-          "I am joining BiteHub as:",
-          style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1E293B)),
+        Text(
+          "SELECT REGISTERED IDENTITY",
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.black,
+            letterSpacing: 0.5,
+          ),
         ),
         const SizedBox(height: 10),
 
@@ -689,191 +738,175 @@ class _AuthScreenState extends State<AuthScreen> {
         Row(
           children: [
             Expanded(
-                child:
-                    _roleCard("User", "👤", "Customer", "Order food & mart")),
+              child: _roleCard("User", Icons.fastfood_rounded, "CUSTOMER",
+                  "FOOD & MART"),
+            ),
             const SizedBox(width: 8),
             Expanded(
-                child: _roleCard(
-                    "Delivery Agent", "🛵", "Agent", "Deliver orders")),
+              child: _roleCard("Delivery Agent", Icons.electric_moped_rounded,
+                  "DELIVERY", "DISPATCH"),
+            ),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
             Expanded(
-                child:
-                    _roleCard("Restaurant", "🏪", "Restaurant", "Sell dishes")),
+              child: _roleCard("Restaurant", Icons.storefront_rounded,
+                  "RESTAURANT", "MENU & POS"),
+            ),
             const SizedBox(width: 8),
             Expanded(
-                child:
-                    _roleCard("Dark Store", "🏬", "Dark Store", "Grocery hub")),
+              child: _roleCard("Dark Store", Icons.warehouse_rounded,
+                  "DARK STORE", "GROCERY HUB"),
+            ),
           ],
         ),
         const SizedBox(height: 20),
 
-        const Divider(color: Color(0xFFE2E8F0)),
-        const SizedBox(height: 12),
+        Container(height: 2.5, color: AppTheme.black),
+        const SizedBox(height: 16),
 
         // Form Fields for Selected Role
         if (_selectedSignUpRole != "Dark Store") ...[
           Text(
             _selectedSignUpRole == "Restaurant"
-                ? "Restaurant Name *"
-                : "Full Name *",
-            style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF334155)),
+                ? "RESTAURANT NAME *"
+                : "FULL NAME *",
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.black,
+            ),
           ),
           const SizedBox(height: 6),
           TextField(
             controller: _signUpNameController,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
             decoration: InputDecoration(
               hintText: _selectedSignUpRole == "Restaurant"
                   ? "e.g. Royal Bistro"
                   : "e.g. Aarav Sharma",
-              prefixIcon: const Icon(Icons.person_outline_rounded,
-                  color: Color(0xFF64748B), size: 20),
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-              focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: activeColor, width: 2)),
+              prefixIcon: const Icon(Icons.person_rounded,
+                  color: AppTheme.black, size: 20),
             ),
           ),
           const SizedBox(height: 14),
         ],
 
         // Mobile Number
-        const Text("Mobile Number *",
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF334155))),
+        Text(
+          "MOBILE NUMBER *",
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.black,
+          ),
+        ),
         const SizedBox(height: 6),
         TextField(
           controller: _signUpPhoneController,
           keyboardType: TextInputType.phone,
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
           decoration: InputDecoration(
             hintText: "10-digit mobile number",
             prefixIcon: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text("🇮🇳 +91",
-                      style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF334155),
-                          fontSize: 14)),
-                  SizedBox(width: 8),
-                  SizedBox(
-                      height: 18,
-                      child:
-                          VerticalDivider(width: 1, color: Color(0xFFCBD5E1))),
+                children: [
+                  Text(
+                    "🇮🇳 +91",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.black,
+                      fontSize: 13,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(width: 2, height: 18, color: AppTheme.black),
                 ],
               ),
             ),
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: activeColor, width: 2)),
           ),
         ),
         const SizedBox(height: 14),
 
         // Create Password
-        const Text("Create Password *",
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF334155))),
+        Text(
+          "CREATE PASSWORD *",
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+            color: AppTheme.black,
+          ),
+        ),
         const SizedBox(height: 6),
         TextField(
           controller: _signUpPasswordController,
           obscureText: _obscureSignUpPassword,
+          style: GoogleFonts.ibmPlexMono(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
           decoration: InputDecoration(
             hintText: "Minimum 6 characters",
-            prefixIcon: const Icon(Icons.lock_outline_rounded,
-                color: Color(0xFF64748B), size: 20),
+            prefixIcon: const Icon(Icons.lock_rounded,
+                color: AppTheme.black, size: 20),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscureSignUpPassword
                     ? Icons.visibility_outlined
                     : Icons.visibility_off_outlined,
-                color: const Color(0xFF94A3B8),
+                color: AppTheme.black,
                 size: 20,
               ),
               onPressed: () => setState(
                   () => _obscureSignUpPassword = !_obscureSignUpPassword),
             ),
-            filled: true,
-            fillColor: const Color(0xFFF8FAFC),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: activeColor, width: 2)),
           ),
         ),
         const SizedBox(height: 14),
 
         // Delivery Agent Specific Fields
         if (_selectedSignUpRole == "Delivery Agent") ...[
-          const Text("Vehicle Number",
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155))),
+          Text(
+            "VEHICLE NUMBER",
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.black,
+            ),
+          ),
           const SizedBox(height: 6),
           TextField(
             controller: _vehicleNoController,
-            decoration: InputDecoration(
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: const InputDecoration(
               hintText: "e.g. KA-01-AB-1234",
-              prefixIcon: const Icon(Icons.two_wheeler_rounded,
-                  color: Color(0xFF64748B), size: 20),
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              prefixIcon: Icon(Icons.two_wheeler_rounded,
+                  color: AppTheme.black, size: 20),
             ),
           ),
           const SizedBox(height: 14),
           DropdownButtonFormField<String>(
             value: _vType,
-            decoration: InputDecoration(
-              labelText: "Vehicle Type",
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.black,
+            ),
+            decoration: const InputDecoration(
+              labelText: "VEHICLE TYPE",
             ),
             items: [
               "Motorcycle",
@@ -889,25 +922,25 @@ class _AuthScreenState extends State<AuthScreen> {
 
         // Restaurant Location
         if (_selectedSignUpRole == "Restaurant") ...[
-          const Text("Restaurant Location / Area *",
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155))),
+          Text(
+            "RESTAURANT LOCATION / AREA *",
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.black,
+            ),
+          ),
           const SizedBox(height: 6),
           TextField(
             controller: _areaController,
-            decoration: InputDecoration(
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: const InputDecoration(
               hintText: "e.g. Indiranagar, Bengaluru",
-              prefixIcon: const Icon(Icons.location_on_outlined,
-                  color: Color(0xFF64748B), size: 20),
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              prefixIcon: Icon(Icons.location_on_rounded,
+                  color: AppTheme.black, size: 20),
             ),
           ),
           const SizedBox(height: 14),
@@ -916,25 +949,25 @@ class _AuthScreenState extends State<AuthScreen> {
         // Customer & Dark Store Address
         if (_selectedSignUpRole == "User" ||
             _selectedSignUpRole == "Dark Store") ...[
-          const Text("Street Address",
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF334155))),
+          Text(
+            "STREET ADDRESS",
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.black,
+            ),
+          ),
           const SizedBox(height: 6),
           TextField(
             controller: _streetController,
-            decoration: InputDecoration(
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+            decoration: const InputDecoration(
               hintText: "e.g. 12th Main, Plot 42",
-              prefixIcon: const Icon(Icons.home_outlined,
-                  color: Color(0xFF64748B), size: 20),
-              filled: true,
-              fillColor: const Color(0xFFF8FAFC),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: Color(0xFFCBD5E1))),
+              prefixIcon:
+                  Icon(Icons.home_rounded, color: AppTheme.black, size: 20),
             ),
           ),
           const SizedBox(height: 14),
@@ -944,24 +977,23 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Area / City *",
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF334155))),
+                    Text(
+                      "AREA / CITY *",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.black,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _areaController,
-                      decoration: InputDecoration(
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: const InputDecoration(
                         hintText: "e.g. Koramangala",
-                        filled: true,
-                        fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 14),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide:
-                                const BorderSide(color: Color(0xFFCBD5E1))),
                       ),
                     ),
                   ],
@@ -972,25 +1004,24 @@ class _AuthScreenState extends State<AuthScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Pincode",
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF334155))),
+                    Text(
+                      "PINCODE",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.black,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _pincodeController,
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: const InputDecoration(
                         hintText: "e.g. 560034",
-                        filled: true,
-                        fillColor: const Color(0xFFF8FAFC),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 14),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide:
-                                const BorderSide(color: Color(0xFFCBD5E1))),
                       ),
                     ),
                   ],
@@ -1003,76 +1034,41 @@ class _AuthScreenState extends State<AuthScreen> {
 
         const SizedBox(height: 10),
 
-        // Sign Up Action Button (No icons in button)
-        ElevatedButton(
-          onPressed: _isLoading ? null : _handleSignUp,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: activeColor,
-            foregroundColor: Colors.white,
-            elevation: 2,
-            shadowColor: activeColor.withOpacity(0.4),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          ),
-          child: _isLoading
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
+        // Sign Up Action Button
+        _isLoading
+            ? Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppTheme.black,
+                  border: Border.all(
+                      color: AppTheme.black, width: AppTheme.borderWidth),
+                ),
+                alignment: Alignment.center,
+                child: const SizedBox(
+                  width: 22,
+                  height: 22,
                   child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2),
-                )
-              : Text(
-                  "Register as $_selectedSignUpRole",
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w700),
+                    color: AppTheme.yellow,
+                    strokeWidth: 2.5,
+                  ),
                 ),
-        ),
-        const SizedBox(height: 20),
-
-        // Switch back to Sign In (No icons in button)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "Already have an account? ",
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-                fontWeight: FontWeight.w500,
+              )
+            : BrutalistButton(
+                text: "REGISTER AS $_selectedSignUpRole →",
+                bgColor: AppTheme.black,
+                textColor: AppTheme.yellow,
+                fullWidth: true,
+                onPressed: _handleSignUp,
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _isSignUp = false;
-                  _errorMessage = null;
-                });
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: activeColor,
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-              ),
-              child: const Text(
-                "Sign In",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
 
-  Widget _roleCard(String roleKey, String icon, String title, String subtitle) {
+  Widget _roleCard(
+      String roleKey, IconData icon, String title, String subtitle) {
     final isSelected = _selectedSignUpRole == roleKey;
-    final color = _getRoleColor(roleKey);
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
+    return GestureDetector(
       onTap: () {
         setState(() {
           _selectedSignUpRole = roleKey;
@@ -1080,44 +1076,62 @@ class _AuthScreenState extends State<AuthScreen> {
         });
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.08) : const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(14),
+          color: isSelected ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
           border: Border.all(
-            color: isSelected ? color : const Color(0xFFE2E8F0),
-            width: isSelected ? 2 : 1,
+            color: AppTheme.black,
+            width: isSelected ? 3.0 : AppTheme.borderWidth,
           ),
+          boxShadow: isSelected
+              ? const [
+                  BoxShadow(
+                    color: AppTheme.black,
+                    offset: Offset(3, 3),
+                    blurRadius: 0,
+                  ),
+                ]
+              : null,
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(icon, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: isSelected ? color : const Color(0xFF1E293B),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, size: 20, color: AppTheme.black),
+                if (isSelected)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.black,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                  Text(
-                    subtitle,
-                    style:
-                        const TextStyle(fontSize: 10, color: Color(0xFF64748B)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                color: AppTheme.black,
               ),
             ),
-            if (isSelected)
-              Icon(Icons.check_circle_rounded, size: 16, color: color),
+            Text(
+              subtitle,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF555555),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),

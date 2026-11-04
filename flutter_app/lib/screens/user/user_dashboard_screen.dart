@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import '../../services/api_service.dart';
 import '../../services/cart_manager.dart';
 import '../../models/models.dart';
-import '../auth_screen.dart';
 import '../restaurant/restaurant_detail_screen.dart';
 import 'cart_checkout_screen.dart';
 import 'order_tracking_screen.dart';
@@ -36,7 +38,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   String _foodViewMode = "dishes"; // "dishes" or "restaurants"
   String _dishSearchQuery = "";
   String _activeDishCategory = "All";
-  String _activeDishVegFilter = "All";
+  final String _activeDishVegFilter = "All";
   String _restaurantSortFilter = "Sort ▾";
 
   // Groceries / Instamart State
@@ -954,17 +956,28 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   child: GestureDetector(
                     onTap: () => setState(() => _selectedIndex = 3),
                     child: Container(
-                      width: 34,
-                      height: 34,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFC7D2FE), width: 1.5),
+                        color: AppTheme.yellow,
+                        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                        border: Border.all(color: AppTheme.black, width: 2.0),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppTheme.black,
+                            offset: Offset(2, 2),
+                            blurRadius: 0,
+                          ),
+                        ],
                       ),
                       child: Center(
                         child: Text(
                           _userName.isNotEmpty ? _userName[0].toUpperCase() : "C",
-                          style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF4F46E5), fontSize: 14),
+                          style: GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.black,
+                            fontSize: 15,
+                          ),
                         ),
                       ),
                     ),
@@ -976,7 +989,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       body: Stack(
         children: [
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.black,
+                    strokeWidth: 3,
+                  ),
+                )
               : IndexedStack(
                   index: _selectedIndex,
                   children: [
@@ -1005,31 +1023,72 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (i) => setState(() => _selectedIndex = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.restaurant_outlined),
-            selectedIcon: Icon(Icons.restaurant_rounded),
-            label: "Bite",
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: AppTheme.surface,
+          border: Border(
+            top: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.bolt_outlined),
-            selectedIcon: Icon(Icons.bolt_rounded),
-            label: "Hub",
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildBrutalistTab(0, "FOOD", Icons.restaurant_rounded),
+                _buildBrutalistTab(1, "10-MIN", Icons.bolt_rounded),
+                _buildBrutalistTab(2, "ORDERS", Icons.receipt_long_rounded),
+                _buildBrutalistTab(3, "PROFILE", Icons.person_rounded),
+              ],
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.receipt_long_outlined),
-            selectedIcon: Icon(Icons.receipt_long_rounded),
-            label: "Orders",
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded),
-            selectedIcon: Icon(Icons.person_rounded),
-            label: "Profile",
-          ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBrutalistTab(int index, String label, IconData icon) {
+    final isSelected = _selectedIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedIndex = index),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 120),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.yellow : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: isSelected
+              ? Border.all(color: AppTheme.black, width: 2.0)
+              : Border.all(color: Colors.transparent, width: 2.0),
+          boxShadow: isSelected
+              ? const [
+                  BoxShadow(
+                    color: AppTheme.black,
+                    offset: Offset(2, 2),
+                    blurRadius: 0,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: AppTheme.black),
+            if (isSelected) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12,
+                  color: AppTheme.black,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -1195,7 +1254,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       onRefresh: _loadData,
       child: CustomScrollView(
         slivers: [
-          // 1. Search Bar (Screen 1)
+          // 1. Search Bar (Screen 1) - Brutalist 2.0
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -1204,31 +1263,39 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 4, offset: const Offset(0, 2)),
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                    boxShadow: const [
+                      BoxShadow(color: AppTheme.black, offset: Offset(3, 3), blurRadius: 0),
                     ],
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search_rounded, color: Color(0xFF4F46E5), size: 20),
+                      const Icon(Icons.search_rounded, color: AppTheme.black, size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          _dishSearchQuery.isNotEmpty ? _dishSearchQuery : "Search for restaurants, dishes...",
-                          style: TextStyle(
+                          _dishSearchQuery.isNotEmpty ? _dishSearchQuery : "SEARCH RESTAURANTS, DISHES...",
+                          style: GoogleFonts.spaceGrotesk(
                             fontSize: 13,
-                            color: _dishSearchQuery.isNotEmpty ? const Color(0xFF0F172A) : const Color(0xFF94A3B8),
-                            fontWeight: FontWeight.w500,
+                            color: _dishSearchQuery.isNotEmpty ? AppTheme.black : AppTheme.black.withValues(alpha: 0.5),
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
                           ),
                         ),
                       ),
                       if (_dishSearchQuery.isNotEmpty)
                         GestureDetector(
                           onTap: () => setState(() => _dishSearchQuery = ""),
-                          child: const Icon(Icons.close, size: 16, color: Color(0xFF94A3B8)),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.black,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                            child: const Icon(Icons.close, size: 14, color: AppTheme.yellow),
+                          ),
                         ),
                     ],
                   ),
@@ -1237,62 +1304,80 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ),
 
-          // 2. Hero Promo Banner (Screen 1)
+          // 2. Hero Promo Banner (Screen 1) - Brutalist 2.0
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
               child: Container(
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFF7ED), Color(0xFFFFEDD5)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFFED7AA)),
-                  boxShadow: [
-                    BoxShadow(color: const Color(0xFFEA580C).withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                  color: AppTheme.yellow,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                  boxShadow: const [
+                    BoxShadow(color: AppTheme.black, offset: Offset(4, 4), blurRadius: 0),
                   ],
                 ),
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Delicious food\nDelivered to you",
-                            style: TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              height: 1.25,
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.black,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                            child: Text(
+                              "⚡ LIGHTNING DISPATCH",
+                              style: GoogleFonts.ibmPlexMono(
+                                color: AppTheme.yellow,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                           ),
-                          SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           Text(
-                            "Great food, faster delivery",
-                            style: TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w500),
+                            "DELICIOUS FOOD\nDIRECT TO DOOR",
+                            style: GoogleFonts.spaceGrotesk(
+                              color: AppTheme.black,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                              height: 1.15,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            "Curated chef kitchens & instant deliveries",
+                            style: GoogleFonts.inter(
+                              color: AppTheme.black.withValues(alpha: 0.8),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(width: 12),
                     Container(
-                      width: 90,
-                      height: 90,
+                      width: 82,
+                      height: 82,
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 10, offset: const Offset(0, 4)),
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        border: Border.all(color: AppTheme.black, width: 2),
+                        boxShadow: const [
+                          BoxShadow(color: AppTheme.black, offset: Offset(3, 3), blurRadius: 0),
                         ],
                       ),
-                      child: ClipOval(
-                        child: Image.network(
-                          "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300&auto=format&fit=crop&q=80",
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => const Center(child: Text("🍛", style: TextStyle(fontSize: 40))),
-                        ),
+                      clipBehavior: Clip.antiAlias,
+                      child: Image.network(
+                        "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=300&auto=format&fit=crop&q=80",
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Center(child: Text("🍛", style: TextStyle(fontSize: 36))),
                       ),
                     ),
                   ],
@@ -1301,7 +1386,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ),
 
-          // 3. Category Circles Row (Screen 1)
+          // 3. Category Row (Screen 1) - Brutalist 2.0
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 14, bottom: 4),
@@ -1332,30 +1417,34 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
-                                color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
-                                shape: BoxShape.circle,
+                                color: isSelected ? AppTheme.yellow : AppTheme.surface,
+                                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                                 border: Border.all(
-                                  color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
-                                  width: isSelected ? 2 : 1,
+                                  color: AppTheme.black,
+                                  width: isSelected ? 2.5 : 2.0,
                                 ),
                                 boxShadow: [
-                                  BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                                  BoxShadow(
+                                    color: AppTheme.black,
+                                    offset: isSelected ? const Offset(2.5, 2.5) : const Offset(1.5, 1.5),
+                                    blurRadius: 0,
+                                  ),
                                 ],
                               ),
                               child: Center(
-                                child: Text(cat["icon"]!, style: const TextStyle(fontSize: 20)),
+                                child: Text(cat["icon"]!, style: const TextStyle(fontSize: 22)),
                               ),
                             ),
-                            const SizedBox(height: 5),
+                            const SizedBox(height: 6),
                             Text(
-                              cat["name"]!,
+                              cat["name"]!.toUpperCase(),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF475569),
+                              style: GoogleFonts.spaceGrotesk(
+                                fontSize: 10,
+                                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                                color: isSelected ? AppTheme.black : const Color(0xFF64748B),
                               ),
                             ),
                           ],
@@ -1384,13 +1473,13 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _foodViewMode == "dishes" ? "Dishes to Explore" : "All Restaurants",
-                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                        _foodViewMode == "dishes" ? "DISHES TO EXPLORE" : "ALL RESTAURANTS",
+                        style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w900, color: AppTheme.black),
                       ),
                       if (_foodViewMode == "dishes")
                         TextButton(
                           onPressed: () => setState(() => _foodViewMode = "restaurants"),
-                          child: const Text("View Restaurants", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
+                          child: Text("VIEW RESTAURANTS", style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w900, color: AppTheme.blue)),
                         ),
                     ],
                   ),
@@ -1409,10 +1498,10 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _foodViewMode == "dishes"
-                        ? "Dishes to Explore (${_filteredDishes.length})"
-                        : "Restaurants Delivering to You (${_filteredRestaurants.length})",
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                    (_foodViewMode == "dishes"
+                        ? "DISHES TO EXPLORE (${_filteredDishes.length})"
+                        : "RESTAURANTS DELIVERING (${_filteredRestaurants.length})").toUpperCase(),
+                    style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w900, color: AppTheme.black),
                   ),
                 ],
               ),
@@ -1461,7 +1550,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     ),
                   ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 130)),
         ],
       ),
     );
@@ -1475,17 +1564,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       builder: (context, _) {
         final currentQty = cartManager.getItemQuantity(dish.itemName);
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 14),
+        return BrutalistCard(
+          bgColor: AppTheme.surface,
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 8, offset: const Offset(0, 2)),
-            ],
-          ),
+          margin: const EdgeInsets.only(bottom: 12),
+          shadowOffset: const Offset(3.5, 3.5),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -1498,21 +1581,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     Row(
                       children: [
                         Container(
-                          width: 16,
-                          height: 16,
+                          width: 14,
+                          height: 14,
                           decoration: BoxDecoration(
-                            border: Border.all(color: dish.isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626), width: 1.5),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 7,
-                              height: 7,
-                              decoration: BoxDecoration(
-                                color: dish.isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+                            color: dish.isVeg ? AppTheme.green : AppTheme.red,
+                            border: Border.all(color: AppTheme.black, width: 1.5),
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                         if (dish.foodName != null && dish.foodName!.isNotEmpty) ...[
@@ -1520,12 +1594,16 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(6),
+                              color: AppTheme.yellow,
+                              border: Border.all(color: AppTheme.black, width: 1),
                             ),
                             child: Text(
-                              dish.foodName!,
-                              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+                              dish.foodName!.toUpperCase(),
+                              style: GoogleFonts.ibmPlexMono(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                                color: AppTheme.black,
+                              ),
                             ),
                           ),
                         ],
@@ -1536,7 +1614,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     // Dish Title
                     Text(
                       dish.itemName,
-                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0F172A)),
+                      style: GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15,
+                        color: AppTheme.black,
+                      ),
                     ),
                     const SizedBox(height: 4),
 
@@ -1545,28 +1627,36 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       children: [
                         Text(
                           "₹${dish.finalPrice.toStringAsFixed(0)}",
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Color(0xFF0F172A)),
+                          style: GoogleFonts.ibmPlexMono(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            color: AppTheme.black,
+                          ),
                         ),
                         if (dish.discount > 0) ...[
                           const SizedBox(width: 6),
                           Text(
                             "₹${dish.basePrice.toStringAsFixed(0)}",
-                            style: const TextStyle(
+                            style: GoogleFonts.ibmPlexMono(
                               decoration: TextDecoration.lineThrough,
-                              color: Color(0xFF94A3B8),
-                              fontSize: 12,
+                              color: const Color(0xFF888888),
+                              fontSize: 11,
                             ),
                           ),
                           const SizedBox(width: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFDCFCE7),
-                              borderRadius: BorderRadius.circular(4),
+                              color: AppTheme.yellow,
+                              border: Border.all(color: AppTheme.black, width: 1),
                             ),
                             child: Text(
                               "${dish.discount.toStringAsFixed(0)}% OFF",
-                              style: const TextStyle(color: Color(0xFF16A34A), fontSize: 10, fontWeight: FontWeight.w800),
+                              style: GoogleFonts.ibmPlexMono(
+                                color: AppTheme.black,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ],
@@ -1577,7 +1667,6 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     // Clickable Restaurant Source Link
                     InkWell(
                       onTap: () {
-                        // Find matching restaurant model
                         final match = _restaurants.firstWhere(
                           (r) => r.restId == dish.restId,
                           orElse: () => RestaurantModel(
@@ -1597,29 +1686,32 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           ),
                         );
                       },
-                      borderRadius: BorderRadius.circular(6),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "from ${dish.restaurantName ?? 'Restaurant'}",
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF4F46E5),
+                              "from ${dish.restaurantName ?? 'Restaurant'}".toUpperCase(),
+                              style: GoogleFonts.ibmPlexMono(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.black,
                               ),
                             ),
                             if (dish.restaurantRating != null) ...[
                               const SizedBox(width: 4),
                               Text(
-                                "• ⭐ ${dish.restaurantRating!.toStringAsFixed(1)}",
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                                "• ★ ${dish.restaurantRating!.toStringAsFixed(1)}",
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.black,
+                                ),
                               ),
                             ],
                             const SizedBox(width: 4),
-                            const Text("➔", style: TextStyle(fontSize: 10, color: Color(0xFF4F46E5))),
+                            const Text("➔", style: TextStyle(fontSize: 10, color: AppTheme.black)),
                           ],
                         ),
                       ),
@@ -1638,25 +1730,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     category: dish.foodName,
                     width: 96,
                     height: 86,
-                    borderRadius: 14,
+                    borderRadius: 2,
                   ),
                   const SizedBox(height: 8),
 
-                  // ADD Button or Stepper (Strictly NO icons in button!)
+                  // ADD Button or Stepper
                   if (currentQty == 0)
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF4F46E5),
-                        elevation: 1,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
-                        minimumSize: Size.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: const BorderSide(color: Color(0xFF4F46E5), width: 1.5),
-                        ),
-                      ),
-                      onPressed: () {
+                    GestureDetector(
+                      onTap: () {
                         _handleAddItem(
                           itemName: dish.itemName,
                           foodName: dish.foodName,
@@ -1668,13 +1749,36 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           type: "Restaurant",
                         );
                       },
-                      child: const Text("ADD", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12)),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.yellow,
+                          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                          border: Border.all(color: AppTheme.black, width: 2),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppTheme.black,
+                              offset: Offset(2, 2),
+                              blurRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          "ADD +",
+                          style: GoogleFonts.spaceGrotesk(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 11.5,
+                            color: AppTheme.black,
+                          ),
+                        ),
+                      ),
                     )
                   else
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF4F46E5),
-                        borderRadius: BorderRadius.circular(8),
+                        color: AppTheme.black,
+                        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                        border: Border.all(color: AppTheme.black, width: 2),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -1682,15 +1786,26 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           InkWell(
                             onTap: () => cartManager.decrementItem(dish.itemName),
                             child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              child: Text("—", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              child: Text(
+                                "—",
+                                style: TextStyle(
+                                  color: AppTheme.surface,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 6),
                             child: Text(
                               "$currentQty",
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                              style: GoogleFonts.ibmPlexMono(
+                                color: AppTheme.yellow,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 12.5,
+                              ),
                             ),
                           ),
                           InkWell(
@@ -1707,8 +1822,15 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                               );
                             },
                             child: const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              child: Text("+", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                              child: Text(
+                                "+",
+                                style: TextStyle(
+                                  color: AppTheme.yellow,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -1723,163 +1845,168 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     );
   }
 
-  // Screen 3: Restaurant Card (Side-by-side layout matching mockup)
+  // Screen 3: Restaurant Card
   Widget _buildRestaurantCard(RestaurantModel r) {
-    final eta = "${20 + (r.restId % 4) * 5}-${30 + (r.restId % 4) * 5} mins";
-    final dist = "${(1.2 + (r.restId % 4) * 0.8).toStringAsFixed(1)} km";
-    final costForTwo = "₹${250 + (r.restId % 5) * 50} for two";
+    final eta = "${20 + (r.restId % 4) * 5}-${30 + (r.restId % 4) * 5} MINS";
+    final dist = "${(1.2 + (r.restId % 4) * 0.8).toStringAsFixed(1)} KM";
+    final costForTwo = "₹${250 + (r.restId % 5) * 50} FOR TWO";
     final bannerPhoto = ItemImageHelper.getBannerForRestaurant(
       r.rName,
       restId: r.restId,
       imageUrl: r.imageUrl,
     );
-    final discount = (r.restId % 2 == 0) ? "20% OFF" : "Free Delivery";
+    final discount = (r.restId % 2 == 0) ? "20% OFF" : "FREE DELIVERY";
 
-    return Container(
+    return BrutalistCard(
+      bgColor: AppTheme.surface,
+      padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
-        ],
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => RestaurantDetailScreen(
-                restaurant: r,
-                userData: widget.userData,
-              ),
+      shadowOffset: const Offset(3.5, 3.5),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RestaurantDetailScreen(
+              restaurant: r,
+              userData: widget.userData,
             ),
-          );
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+        );
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left Image with Discount Badge
+          Stack(
             children: [
-              // Left Image with Discount Badge
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(14),
-                    child: AppCachedNetworkImage(
-                      imageUrl: bannerPhoto,
-                      width: 95,
-                      height: 95,
-                      fit: BoxFit.cover,
-                      placeholder: Container(
-                        width: 95,
-                        height: 95,
-                        color: const Color(0xFFF1F5F9),
-                        child: const Center(
-                          child: SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
-                          ),
-                        ),
-                      ),
-                      errorWidget: Container(
-                        width: 95,
-                        height: 95,
-                        color: const Color(0xFFEEF2FF),
-                        child: const Center(
-                          child: Icon(Icons.restaurant, color: Color(0xFF4F46E5)),
-                        ),
-                      ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: AppCachedNetworkImage(
+                  imageUrl: bannerPhoto,
+                  width: 95,
+                  height: 95,
+                  fit: BoxFit.cover,
+                  placeholder: Container(
+                    width: 95,
+                    height: 95,
+                    color: AppTheme.yellow,
+                    child: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black),
                     ),
                   ),
-                  Positioned(
-                    bottom: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF10B981),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        discount,
-                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
-                      ),
+                  errorWidget: Container(
+                    width: 95,
+                    height: 95,
+                    color: AppTheme.bg,
+                    child: const Center(
+                      child: Icon(Icons.restaurant, color: AppTheme.black),
                     ),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(width: 14),
-              // Right Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            r.rName,
-                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0F172A)),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const Icon(Icons.favorite_border_rounded, size: 18, color: Color(0xFF94A3B8)),
-                      ],
+              Positioned(
+                bottom: 4,
+                left: 4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: AppTheme.black, width: 1.5),
+                  ),
+                  child: Text(
+                    discount,
+                    style: GoogleFonts.ibmPlexMono(
+                      color: AppTheme.black,
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w900,
                     ),
-                    const SizedBox(height: 3),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.star_rounded, size: 12, color: Color(0xFFD97706)),
-                              const SizedBox(width: 2),
-                              Text(
-                                "${r.rRating.toStringAsFixed(1)} (2.1k)",
-                                style: const TextStyle(color: Color(0xFF92400E), fontSize: 10, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            "• ${r.rLocation}",
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "$eta • $dist",
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF475569), fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      costForTwo,
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ],
           ),
-        ),
+          const SizedBox(width: 14),
+          // Right Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        r.rName.toUpperCase(),
+                        style: GoogleFonts.spaceGrotesk(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14.5,
+                          color: AppTheme.black,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const Icon(Icons.favorite_border_rounded, size: 18, color: AppTheme.black),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppTheme.yellow,
+                        border: Border.all(color: AppTheme.black, width: 1),
+                      ),
+                      child: Text(
+                        "★ ${r.rRating.toStringAsFixed(1)}",
+                        style: GoogleFonts.ibmPlexMono(
+                          color: AppTheme.black,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        "• ${r.rLocation.toUpperCase()}",
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 11,
+                          color: const Color(0xFF666666),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "$eta • $dist",
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 11.5,
+                    color: AppTheme.black,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  costForTwo,
+                  style: GoogleFonts.inter(
+                    fontSize: 11,
+                    color: const Color(0xFF666666),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1890,17 +2017,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Top Restaurants",
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+              Text(
+                "TOP RESTAURANTS",
+                style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w900, color: AppTheme.black),
               ),
-              TextButton(
-                onPressed: () => setState(() => _foodViewMode = "restaurants"),
-                child: const Text("See all", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
+              GestureDetector(
+                onTap: () => setState(() => _foodViewMode = "restaurants"),
+                child: Text(
+                  "SEE ALL",
+                  style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w900, color: AppTheme.blue),
+                ),
               ),
             ],
           ),
@@ -1909,26 +2039,21 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           height: 195,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: _restaurants.take(6).length,
             itemBuilder: (ctx, i) {
               final r = _restaurants[i];
               final banner = ItemImageHelper.getBannerForRestaurant(r.rName);
-              final eta = "${20 + (r.restId % 4) * 5}-${30 + (r.restId % 4) * 5} mins";
+              final eta = "${20 + (r.restId % 4) * 5}-${30 + (r.restId % 4) * 5} MINS";
               final discount = (r.restId % 2 == 0) ? "20% OFF" : "10% OFF";
 
               return Container(
                 width: 175,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
-                  ],
-                ),
-                child: InkWell(
+                margin: const EdgeInsets.only(right: 12),
+                child: BrutalistCard(
+                  bgColor: AppTheme.surface,
+                  padding: EdgeInsets.zero,
+                  shadowOffset: const Offset(3, 3),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -1937,18 +2062,44 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       ),
                     );
                   },
-                  borderRadius: BorderRadius.circular(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                        child: Image.network(
-                          banner,
-                          height: 98,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(height: 98, color: const Color(0xFFEEF2FF)),
+                      Container(
+                        height: 98,
+                        decoration: const BoxDecoration(
+                          border: Border(bottom: BorderSide(color: AppTheme.black, width: 2)),
+                        ),
+                        child: Stack(
+                          children: [
+                            Image.network(
+                              banner,
+                              height: 98,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(height: 98, color: AppTheme.yellow),
+                            ),
+                            Positioned(
+                              bottom: 4,
+                              left: 4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.yellow,
+                                  borderRadius: BorderRadius.circular(2),
+                                  border: Border.all(color: AppTheme.black, width: 1.5),
+                                ),
+                                child: Text(
+                                  discount,
+                                  style: GoogleFonts.ibmPlexMono(
+                                    color: AppTheme.black,
+                                    fontSize: 8.5,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       Padding(
@@ -1957,40 +2108,22 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              r.rName,
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Color(0xFF0F172A)),
+                              r.rName.toUpperCase(),
+                              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 3),
                             Row(
                               children: [
-                                const Icon(Icons.star_rounded, size: 13, color: Color(0xFF16A34A)),
+                                const Icon(Icons.star_rounded, size: 14, color: AppTheme.black),
                                 const SizedBox(width: 2),
                                 Text(
                                   r.rRating.toStringAsFixed(1),
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF16A34A)),
+                                  style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w900, color: AppTheme.black),
                                 ),
                                 const SizedBox(width: 4),
-                                Text("• $eta", style: const TextStyle(fontSize: 10, color: Color(0xFF64748B))),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Text("Free delivery", style: TextStyle(fontSize: 10, color: Color(0xFF64748B))),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFDCFCE7),
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
-                                  child: Text(
-                                    discount,
-                                    style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF16A34A)),
-                                  ),
-                                ),
+                                Text("• $eta", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: Colors.black54)),
                               ],
                             ),
                           ],
@@ -2040,17 +2173,29 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+          color: isSelected ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(
+            color: AppTheme.black,
+            width: isSelected ? 2.5 : AppTheme.borderWidth,
+          ),
+          boxShadow: isSelected
+              ? const [
+                  BoxShadow(
+                    color: AppTheme.black,
+                    offset: Offset(2, 2),
+                    blurRadius: 0,
+                  ),
+                ]
+              : null,
         ),
         child: Center(
           child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isSelected ? Colors.white : const Color(0xFF334155),
+            title.toUpperCase(),
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.black,
             ),
           ),
         ),
@@ -2080,104 +2225,99 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       onRefresh: _loadData,
       child: CustomScrollView(
         slivers: [
-          // 1. Instamart Hub Header Banner (Screen 2 & 12)
+          // 1. Instamart Hub Header Banner (Brutalism 2.0)
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [const Color(0xFF1E293B), const Color(0xFF0F172A)]
-                      : [const Color(0xFF0F172A), const Color(0xFF1E293B)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                color: AppTheme.yellow,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                boxShadow: const [
+                  BoxShadow(color: AppTheme.black, offset: Offset(3, 3), blurRadius: 0),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF10B981),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              "⚡ 10-15 mins",
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 11),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            "instamart",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          // Dark Mode Toggle (Screen 12)
-                          IconButton(
-                            icon: Icon(
-                              _isInstamartDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
-                            tooltip: "Toggle Dark/Light Mode",
-                            onPressed: () => setState(() => _isInstamartDarkMode = !_isInstamartDarkMode),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                          const SizedBox(width: 10),
-                          // Switch Hub Link
-                          InkWell(
-                            onTap: _showStorePickerBottomSheet,
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                "Switch Hub",
-                                style: TextStyle(color: Color(0xFF38BDF8), fontSize: 11, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.black,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: const Icon(Icons.bolt_rounded, color: AppTheme.yellow, size: 20),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Dark Store #${currentStore.storeId} • ${currentStore.dsArea ?? 'Indiranagar'}",
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.w500),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "⚡ 10-MIN EXPRESS",
+                              style: GoogleFonts.ibmPlexMono(
+                                color: AppTheme.black,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 10,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "INSTAMART",
+                              style: GoogleFonts.spaceGrotesk(
+                                color: AppTheme.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "HUB #${currentStore.storeId} • ${(currentStore.dsArea ?? 'Indiranagar').toUpperCase()}",
+                          style: GoogleFonts.ibmPlexMono(
+                            color: AppTheme.black.withValues(alpha: 0.8),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: _showStorePickerBottomSheet,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surface,
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(color: AppTheme.black, width: 1.5),
+                        boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5))],
+                      ),
+                      child: Text(
+                        "SWITCH ▾",
+                        style: GoogleFonts.spaceGrotesk(
+                          color: AppTheme.black,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
 
-          // 2. Instamart Search Bar (Screen 2 & 12)
+          // 2. Instamart Search Bar (Brutalism 2.0)
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
               child: GestureDetector(
                 onTap: () {
                   _searchQueryController.clear();
@@ -2186,28 +2326,41 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: borderColor),
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                    boxShadow: const [
+                      BoxShadow(color: AppTheme.black, offset: Offset(3, 3), blurRadius: 0),
+                    ],
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search_rounded, color: Color(0xFF10B981), size: 20),
+                      const Icon(Icons.search_rounded, color: AppTheme.black, size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          _grocerySearchQuery.isNotEmpty ? _grocerySearchQuery : "Search for milk, bread, chips, eggs...",
-                          style: TextStyle(
+                          _grocerySearchQuery.isNotEmpty
+                              ? _grocerySearchQuery
+                              : "SEARCH MILK, BREAD, CHIPS, EGGS...",
+                          style: GoogleFonts.spaceGrotesk(
                             fontSize: 13,
-                            color: _grocerySearchQuery.isNotEmpty ? textColor : subtextColor,
-                            fontWeight: FontWeight.w500,
+                            color: _grocerySearchQuery.isNotEmpty ? AppTheme.black : AppTheme.black.withValues(alpha: 0.5),
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.3,
                           ),
                         ),
                       ),
                       if (_grocerySearchQuery.isNotEmpty)
                         GestureDetector(
                           onTap: () => setState(() => _grocerySearchQuery = ""),
-                          child: Icon(Icons.close, size: 16, color: subtextColor),
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.black,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                            child: const Icon(Icons.close, size: 14, color: AppTheme.yellow),
+                          ),
                         ),
                     ],
                   ),
@@ -2216,32 +2369,51 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ),
 
-          // 3. Mint Promo Discount Card (Screen 2 & 12)
+          // 3. Mint Promo Discount Card (Screen 2 & 12) - Brutalist 2.0
           SliverToBoxAdapter(
             child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              margin: const EdgeInsets.fromLTRB(16, 4, 16, 10),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF064E3B).withValues(alpha: 0.3) : const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFA7F3D0)),
+                color: AppTheme.yellow,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                boxShadow: const [
+                  BoxShadow(color: AppTheme.black, offset: Offset(3, 3), blurRadius: 0),
+                ],
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Text("🎁", style: TextStyle(fontSize: 18)),
-                  SizedBox(width: 10),
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.black,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: const Text("⚡", style: TextStyle(fontSize: 16)),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "₹50 OFF on your first 3 Instamart orders",
-                          style: TextStyle(color: Color(0xFF065F46), fontWeight: FontWeight.w800, fontSize: 12),
+                          "₹50 OFF ON FIRST 3 ORDERS",
+                          style: GoogleFonts.spaceGrotesk(
+                            color: AppTheme.black,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                            letterSpacing: 0.3,
+                          ),
                         ),
-                        SizedBox(height: 1),
+                        const SizedBox(height: 2),
                         Text(
-                          "Use code INSTA50",
-                          style: TextStyle(color: Color(0xFF047857), fontSize: 11, fontWeight: FontWeight.w600),
+                          "USE CODE INSTA50 AT CHECKOUT",
+                          style: GoogleFonts.ibmPlexMono(
+                            color: AppTheme.black.withValues(alpha: 0.8),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ],
                     ),
@@ -2251,29 +2423,32 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ),
 
-          // 4. Shop by Category (Screen 2 & 12)
+          // 4. Shop by Category (Screen 2 & 12) - Brutalist 2.0
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Shop by Category",
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: textColor),
+                        "SHOP BY CATEGORY",
+                        style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w900, color: textColor),
                       ),
-                      TextButton(
-                        onPressed: () => setState(() => _activeGroceryCategory = "All"),
-                        child: const Text("See all", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF10B981))),
+                      GestureDetector(
+                        onTap: () => setState(() => _activeGroceryCategory = "All"),
+                        child: Text(
+                          "SEE ALL",
+                          style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w900, color: AppTheme.blue),
+                        ),
                       ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  height: 90,
+                  height: 94,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -2289,33 +2464,37 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                           child: Column(
                             children: [
                               Container(
-                                width: 54,
-                                height: 54,
+                                width: 52,
+                                height: 52,
                                 decoration: BoxDecoration(
-                                  color: isSelected ? const Color(0xFF10B981) : cardBg,
-                                  shape: BoxShape.circle,
+                                  color: isSelected ? AppTheme.yellow : AppTheme.surface,
+                                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFF10B981) : borderColor,
-                                    width: isSelected ? 2 : 1,
+                                    color: AppTheme.black,
+                                    width: isSelected ? 2.5 : 1.8,
                                   ),
                                   boxShadow: [
-                                    BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2)),
+                                    BoxShadow(
+                                      color: AppTheme.black,
+                                      offset: isSelected ? const Offset(2.5, 2.5) : const Offset(1.5, 1.5),
+                                      blurRadius: 0,
+                                    ),
                                   ],
                                 ),
                                 child: Center(
-                                  child: Text(cat["icon"]!, style: const TextStyle(fontSize: 24)),
+                                  child: Text(cat["icon"]!, style: const TextStyle(fontSize: 22)),
                                 ),
                               ),
-                              const SizedBox(height: 5),
+                              const SizedBox(height: 6),
                               Text(
-                                cat["label"]!,
+                                cat["label"]!.toUpperCase(),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 10.5,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                  color: isSelected ? const Color(0xFF10B981) : subtextColor,
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontSize: 10,
+                                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                                  color: isSelected ? AppTheme.black : subtextColor,
                                 ),
                               ),
                             ],
@@ -2329,30 +2508,30 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             ),
           ),
 
-          // 5. Specially for you (Horizontal Product Row - Screen 2)
+          // 5. Specially for you (Trending Essentials - Standardized Component)
           if (_allGroceries.isNotEmpty) ...[
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
                 child: Text(
-                  "Specially for you",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: textColor),
+                  "TRENDING ESSENTIALS",
+                  style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w900, color: textColor),
                 ),
               ),
             ),
             SliverToBoxAdapter(
               child: SizedBox(
-                height: 230,
+                height: 275,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  itemCount: _allGroceries.take(6).length,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _allGroceries.take(8).length,
                   itemBuilder: (ctx, i) {
                     final g = _allGroceries[i];
                     return Container(
-                      width: 150,
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      child: _buildInstamartProductCard(g, currentStore, isCompact: true),
+                      width: 165,
+                      margin: const EdgeInsets.only(right: 12),
+                      child: _buildInstamartProductCard(g, currentStore),
                     );
                   },
                 ),
@@ -2363,22 +2542,23 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           // 6. Section Title & Items Count
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _activeGroceryCategory == "All"
-                        ? "All Essentials (${_filteredGroceries.length})"
-                        : "$_activeGroceryCategory (${_filteredGroceries.length})",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: textColor),
+                    (_activeGroceryCategory == "All"
+                            ? "ALL ESSENTIALS (${_filteredGroceries.length})"
+                            : "$_activeGroceryCategory (${_filteredGroceries.length})")
+                        .toUpperCase(),
+                    style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w900, color: textColor),
                   ),
                 ],
               ),
             ),
           ),
 
-          // 7. 2-Column Instamart Product Grid (Screen 2 & 12)
+          // 7. Responsive Product Grid (Content-Driven Height, Zero Stretching)
           if (_filteredGroceries.isEmpty)
             SliverToBoxAdapter(
               child: Padding(
@@ -2386,45 +2566,55 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 child: Center(
                   child: Text(
                     "No grocery items found matching your criteria.",
-                    style: TextStyle(color: subtextColor),
+                    style: GoogleFonts.inter(color: subtextColor),
                   ),
                 ),
               ),
             )
           else
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.63,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (ctx, i) {
-                    final g = _filteredGroceries[i];
-                    return _buildInstamartProductCard(g, currentStore);
-                  },
-                  childCount: _filteredGroceries.length,
-                ),
-              ),
+            SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.crossAxisExtent;
+                int crossAxisCount = 2;
+                if (width >= 1200) {
+                  crossAxisCount = 5;
+                } else if (width >= 900) {
+                  crossAxisCount = 4;
+                } else if (width >= 600) {
+                  crossAxisCount = 3;
+                } else {
+                  crossAxisCount = 2;
+                }
+
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      mainAxisExtent: 265, // Content-driven fixed card height! Never stretches vertically.
+                    ),
+                    delegate: SliverChildBuilderDelegate(
+                      (ctx, i) {
+                        final g = _filteredGroceries[i];
+                        return _buildInstamartProductCard(g, currentStore);
+                      },
+                      childCount: _filteredGroceries.length,
+                    ),
+                  ),
+                );
+              },
             ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          const SliverToBoxAdapter(child: SizedBox(height: 130)),
         ],
       ),
     );
   }
 
-  // Instamart Product Card (Screen 2 & Screen 12)
-  Widget _buildInstamartProductCard(GroceryItemModel g, DarkStoreModel store, {bool isCompact = false}) {
-    final isDark = _isInstamartDarkMode;
-    final cardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-    final subtextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
-    final borderColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
-
+  // Unified Standardized Instamart Product Card - Brutalism 2.0
+  Widget _buildInstamartProductCard(GroceryItemModel g, DarkStoreModel store) {
     final weight = _parseWeight(g.itemName);
     final mrp = (g.price * 1.18).roundToDouble();
     final discountPercent = ((mrp - g.price) / mrp * 100).round();
@@ -2434,183 +2624,258 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       builder: (context, _) {
         final currentQty = cartManager.getItemQuantity(g.itemName);
 
-        return Container(
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03), blurRadius: 6, offset: const Offset(0, 2)),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
+        return BrutalistCard(
+          bgColor: AppTheme.surface,
+          padding: EdgeInsets.zero,
+          shadowOffset: const Offset(3, 3),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Product Image with 12-Min Fast Delivery Tag
-              Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: isCompact ? 100 : 116,
-                    color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-                    child: Center(
-                      child: ItemImageWidget(
-                        imageUrl: g.imageUrl,
-                        itemName: g.itemName,
-                        isGrocery: true,
-                        width: isCompact ? 75 : 90,
-                        height: isCompact ? 75 : 90,
-                        borderRadius: 10,
-                        fit: BoxFit.contain,
+              // 1. Product Image Section (Fixed, proportional height)
+              Container(
+                height: 112,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: AppTheme.bg,
+                  border: Border(bottom: BorderSide(color: AppTheme.black, width: 2)),
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ItemImageWidget(
+                          imageUrl: g.imageUrl,
+                          itemName: g.itemName,
+                          isGrocery: true,
+                          width: 80,
+                          height: 80,
+                          borderRadius: 2,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: 6,
-                    left: 6,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.75),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        "⚡ 12 MINS",
-                        style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                    Positioned(
+                      bottom: 5,
+                      left: 5,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.yellow,
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: AppTheme.black, width: 1.5),
+                        ),
+                        child: Text(
+                          "⚡ 10-MIN",
+                          style: GoogleFonts.ibmPlexMono(
+                            color: AppTheme.black,
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                    if (discountPercent > 0)
+                      Positioned(
+                        top: 5,
+                        right: 5,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.green,
+                            borderRadius: BorderRadius.circular(2),
+                            border: Border.all(color: AppTheme.black, width: 1.5),
+                          ),
+                          child: Text(
+                            "$discountPercent% OFF",
+                            style: GoogleFonts.ibmPlexMono(
+                              color: AppTheme.black,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
 
-              // Product Info & Price
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Pack size
-                      Text(
-                        weight,
-                        style: TextStyle(fontSize: 10.5, color: subtextColor, fontWeight: FontWeight.w600),
+              // 2. Product Info & Pricing & Action Section
+              Padding(
+                padding: const EdgeInsets.fromLTRB(9, 8, 9, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Quantity / Weight
+                    Text(
+                      weight.toUpperCase(),
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9.5,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.w800,
                       ),
-                      const SizedBox(height: 2),
+                    ),
+                    const SizedBox(height: 2),
 
-                      // Product Title
-                      Text(
+                    // Product Title (2-line clamped with fixed 32px height)
+                    SizedBox(
+                      height: 32,
+                      child: Text(
                         g.itemName,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: textColor, height: 1.2),
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          color: AppTheme.black,
+                          height: 1.15,
+                        ),
                       ),
-                      const Spacer(),
+                    ),
+                    const SizedBox(height: 6),
 
-                      // Price & Discount Row
-                      Row(
-                        children: [
-                          Text(
-                            "₹${g.price.toStringAsFixed(0)}",
-                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: textColor),
+                    // Pricing Section (Prominent current price + MRP strikethrough)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          "₹${g.price.toStringAsFixed(0)}",
+                          style: GoogleFonts.ibmPlexMono(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            color: AppTheme.black,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "₹${mrp.toStringAsFixed(0)}",
-                            style: const TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: Color(0xFF94A3B8),
-                              fontSize: 11,
-                            ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "₹${mrp.toStringAsFixed(0)}",
+                          style: GoogleFonts.ibmPlexMono(
+                            decoration: TextDecoration.lineThrough,
+                            color: const Color(0xFF888888),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
                           ),
-                          if (discountPercent > 0) ...[
-                            const SizedBox(width: 4),
-                            Text(
-                              "$discountPercent% OFF",
-                              style: const TextStyle(color: Color(0xFF10B981), fontSize: 9.5, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 6),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
 
-                      // Instamart Green ADD Stepper (Screen 2 & 12)
-                      SizedBox(
-                        width: double.infinity,
-                        height: 30,
-                        child: currentQty == 0
-                            ? OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  backgroundColor: cardBg,
-                                  foregroundColor: const Color(0xFF10B981),
-                                  side: const BorderSide(color: Color(0xFF10B981), width: 1.5),
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    // Action Stepper Button (Directly beneath pricing, consistent 32px height)
+                    SizedBox(
+                      width: double.infinity,
+                      height: 32,
+                      child: currentQty == 0
+                          ? GestureDetector(
+                              onTap: g.availableCount > 0
+                                  ? () {
+                                      _handleAddItem(
+                                        itemName: g.itemName,
+                                        price: g.price,
+                                        isVeg: true,
+                                        imageUrl: g.imageUrl,
+                                        storeId: store.storeId,
+                                        storeArea: store.dsArea,
+                                        type: "Grocery",
+                                      );
+                                    }
+                                  : null,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: g.availableCount > 0 ? AppTheme.yellow : const Color(0xFFE2E8F0),
+                                  borderRadius: BorderRadius.circular(2),
+                                  border: Border.all(color: AppTheme.black, width: 2),
+                                  boxShadow: g.availableCount > 0
+                                      ? const [
+                                          BoxShadow(
+                                            color: AppTheme.black,
+                                            offset: Offset(2, 2),
+                                            blurRadius: 0,
+                                          ),
+                                        ]
+                                      : null,
                                 ),
-                                onPressed: g.availableCount > 0
-                                    ? () {
-                                        _handleAddItem(
-                                          itemName: g.itemName,
-                                          price: g.price,
-                                          isVeg: true,
-                                          imageUrl: g.imageUrl,
-                                          storeId: store.storeId,
-                                          storeArea: store.dsArea,
-                                          type: "Grocery",
-                                        );
-                                      }
-                                    : null,
+                                alignment: Alignment.center,
                                 child: Text(
-                                  g.availableCount > 0 ? "ADD" : "OUT OF STOCK",
-                                  style: TextStyle(
+                                  g.availableCount > 0 ? "ADD +" : "OUT OF STOCK",
+                                  style: GoogleFonts.spaceGrotesk(
+                                    color: AppTheme.black,
                                     fontWeight: FontWeight.w900,
-                                    fontSize: g.availableCount > 0 ? 11 : 9,
-                                    color: g.availableCount > 0 ? const Color(0xFF10B981) : Colors.red,
+                                    fontSize: 11,
+                                    letterSpacing: 0.5,
                                   ),
                                 ),
-                              )
-                            : Container(
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    InkWell(
-                                      onTap: () => cartManager.decrementItem(g.itemName),
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                        child: Text("—", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                                      ),
-                                    ),
-                                    Text(
-                                      "$currentQty",
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        _handleAddItem(
-                                          itemName: g.itemName,
-                                          price: g.price,
-                                          isVeg: true,
-                                          imageUrl: g.imageUrl,
-                                          storeId: store.storeId,
-                                          storeArea: store.dsArea,
-                                          type: "Grocery",
-                                        );
-                                      },
-                                      child: const Padding(
-                                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                        child: Text("+", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
-                      ),
-                    ],
-                  ),
+                            )
+                          : Container(
+                              decoration: BoxDecoration(
+                                color: AppTheme.black,
+                                borderRadius: BorderRadius.circular(2),
+                                border: Border.all(color: AppTheme.black, width: 2),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: AppTheme.black,
+                                    offset: Offset(2, 2),
+                                    blurRadius: 0,
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () => cartManager.decrementItem(g.itemName),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      child: Text(
+                                        "—",
+                                        style: TextStyle(
+                                          color: AppTheme.surface,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    "$currentQty",
+                                    style: GoogleFonts.ibmPlexMono(
+                                      color: AppTheme.yellow,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      _handleAddItem(
+                                        itemName: g.itemName,
+                                        price: g.price,
+                                        isVeg: true,
+                                        imageUrl: g.imageUrl,
+                                        storeId: store.storeId,
+                                        storeArea: store.dsArea,
+                                        type: "Grocery",
+                                      );
+                                    },
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      child: Text(
+                                        "+",
+                                        style: TextStyle(
+                                          color: AppTheme.yellow,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -2657,19 +2922,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   onTap: () => setState(() => _orderFilter = pill),
                   child: Container(
                     margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: isSel ? const Color(0xFF4F46E5) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: isSel ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                      color: isSel ? AppTheme.yellow : AppTheme.surface,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: AppTheme.black, width: 2),
+                      boxShadow: isSel ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))] : null,
                     ),
                     child: Center(
                       child: Text(
-                        pill,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isSel ? Colors.white : const Color(0xFF64748B),
+                        pill.toUpperCase(),
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.black,
                         ),
                       ),
                     ),
@@ -2691,17 +2957,19 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     const SizedBox(height: 12),
                     Text(
                       _orderFilter == "All" ? "No orders placed yet." : "No $_orderFilter orders.",
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+                      style: GoogleFonts.spaceGrotesk(fontSize: 15, fontWeight: FontWeight.w900, color: AppTheme.black),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        backgroundColor: AppTheme.yellow,
+                        foregroundColor: AppTheme.black,
+                        side: const BorderSide(color: AppTheme.black, width: 2),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                        elevation: 0,
                       ),
                       onPressed: () => setState(() => _selectedIndex = 0),
-                      child: const Text("Order Delicious Food"),
+                      child: Text("ORDER DELICIOUS FOOD", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900)),
                     ),
                   ],
                 ),
@@ -2718,11 +2986,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 margin: const EdgeInsets.only(bottom: 14),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                  boxShadow: const [
+                    BoxShadow(color: AppTheme.black, offset: Offset(3.5, 3.5), blurRadius: 0),
                   ],
                 ),
                 child: Column(
@@ -2732,18 +3000,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
+                        Container(
+                          width: 70,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(color: AppTheme.black, width: 2),
+                          ),
+                          clipBehavior: Clip.antiAlias,
                           child: Image.network(
                             bannerPhoto,
-                            width: 70,
-                            height: 70,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => Container(
-                              width: 70,
-                              height: 70,
-                              color: const Color(0xFFEEF2FF),
-                              child: const Icon(Icons.fastfood, color: Color(0xFF4F46E5)),
+                              color: AppTheme.yellow,
+                              child: const Icon(Icons.fastfood, color: AppTheme.black),
                             ),
                           ),
                         ),
@@ -2757,8 +3027,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      ord.restName ?? (ord.orderType == "Restaurant" ? "Food Delivery" : "Instamart"),
-                                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0F172A)),
+                                      (ord.restName ?? (ord.orderType == "Restaurant" ? "Food Delivery" : "Instamart")).toUpperCase(),
+                                      style: GoogleFonts.spaceGrotesk(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 14,
+                                        color: AppTheme.black,
+                                      ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -2767,48 +3041,59 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
                                       color: isCancelled
-                                          ? const Color(0xFFFEE2E2)
+                                          ? AppTheme.red
                                           : isDelivered
-                                              ? const Color(0xFFD1FAE5)
-                                              : const Color(0xFFFEF3C7),
-                                      borderRadius: BorderRadius.circular(6),
+                                              ? AppTheme.green
+                                              : AppTheme.yellow,
+                                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                      border: Border.all(color: AppTheme.black, width: 1.5),
                                     ),
                                     child: Text(
-                                      isPlaced ? "Placed" : ord.orderStatus,
-                                      style: TextStyle(
-                                        fontSize: 10.5,
-                                        fontWeight: FontWeight.bold,
-                                        color: isCancelled
-                                            ? const Color(0xFFDC2626)
-                                            : isDelivered
-                                                ? const Color(0xFF16A34A)
-                                                : const Color(0xFFD97706),
+                                      (isPlaced ? "Placed" : ord.orderStatus).toUpperCase(),
+                                      style: GoogleFonts.ibmPlexMono(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppTheme.black,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 3),
+                              const SizedBox(height: 4),
                               Text(
-                                "Order #${ord.orderId} • ${ord.orderDate ?? '16 Oct 2026'}",
-                                style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                                "ORDER #${ord.orderId} • ${ord.orderDate ?? '16 Oct 2026'}",
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontSize: 10.5,
+                                  color: AppTheme.black.withValues(alpha: 0.6),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 "₹${ord.totalAmount.toStringAsFixed(2)}",
-                                style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF0F172A), fontSize: 14),
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontWeight: FontWeight.w900,
+                                  color: AppTheme.black,
+                                  fontSize: 15,
+                                ),
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 "Items • ${ord.deliveryAddr != null && ord.deliveryAddr!.contains('•') ? ord.deliveryAddr!.split('•').first.trim() : 'Home'}",
-                                style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                                style: GoogleFonts.inter(
+                                  color: AppTheme.black.withValues(alpha: 0.7),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const Divider(height: 20),
+                    const SizedBox(height: 12),
+                    Container(height: 1.5, color: AppTheme.black),
+                    const SizedBox(height: 12),
                     // Action Buttons Row (Screen 8)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -2816,32 +3101,38 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                         if (!isDelivered && !isCancelled) ...[
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFFDC2626),
-                              side: const BorderSide(color: Color(0xFFFCA5A5)),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              foregroundColor: AppTheme.black,
+                              backgroundColor: AppTheme.surface,
+                              side: const BorderSide(color: AppTheme.black, width: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               minimumSize: Size.zero,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                             ),
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  title: const Text("Cancel Order?", style: TextStyle(fontWeight: FontWeight.bold)),
-                                  content: Text("Are you sure you want to cancel Order #${ord.orderId}?"),
+                                  backgroundColor: AppTheme.bg,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                                    side: const BorderSide(color: AppTheme.black, width: 2.5),
+                                  ),
+                                  title: Text("CANCEL ORDER?", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, color: AppTheme.black)),
+                                  content: Text("Are you sure you want to cancel Order #${ord.orderId}?", style: GoogleFonts.inter(color: AppTheme.black)),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx, false),
-                                      child: const Text("Keep Order", style: TextStyle(color: Color(0xFF64748B))),
+                                      child: Text("KEEP ORDER", style: GoogleFonts.spaceGrotesk(color: AppTheme.black, fontWeight: FontWeight.bold)),
                                     ),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFDC2626),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        backgroundColor: AppTheme.red,
+                                        foregroundColor: AppTheme.black,
+                                        side: const BorderSide(color: AppTheme.black, width: 2),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                                       ),
                                       onPressed: () => Navigator.pop(ctx, true),
-                                      child: const Text("Cancel Order"),
+                                      child: Text("CANCEL ORDER", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900)),
                                     ),
                                   ],
                                 ),
@@ -2855,7 +3146,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text("Order #${ord.orderId} cancelled."),
-                                          backgroundColor: const Color(0xFFDC2626),
+                                          backgroundColor: AppTheme.red,
                                         ),
                                       );
                                     }
@@ -2864,16 +3155,18 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 } catch (_) {}
                               }
                             },
-                            child: const Text("Cancel", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            child: Text("CANCEL", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.red)),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4F46E5),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                              backgroundColor: AppTheme.yellow,
+                              foregroundColor: AppTheme.black,
+                              side: const BorderSide(color: AppTheme.black, width: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               minimumSize: Size.zero,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                             ),
                             onPressed: () {
                               Navigator.push(
@@ -2886,28 +3179,31 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 ),
                               );
                             },
-                            child: const Text("Track Order", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            child: Text("TRACK ORDER", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11)),
                           ),
                         ] else ...[
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF4F46E5),
-                              side: const BorderSide(color: Color(0xFF818CF8)),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                              foregroundColor: AppTheme.black,
+                              backgroundColor: AppTheme.surface,
+                              side: const BorderSide(color: AppTheme.black, width: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               minimumSize: Size.zero,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                             ),
                             onPressed: () => setState(() => _selectedIndex = 0),
-                            child: const Text("Reorder", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            child: Text("REORDER", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11)),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF4F46E5),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+                              backgroundColor: AppTheme.black,
+                              foregroundColor: AppTheme.yellow,
+                              side: const BorderSide(color: AppTheme.black, width: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               minimumSize: Size.zero,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                             ),
                             onPressed: () {
                               Navigator.push(
@@ -2920,7 +3216,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                                 ),
                               );
                             },
-                            child: const Text("View Details", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            child: Text("VIEW DETAILS", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11)),
                           ),
                         ],
                       ],
@@ -2929,7 +3225,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 ),
               );
             }),
-          const SizedBox(height: 80),
+          const SizedBox(height: 130),
         ],
       ),
     );
@@ -2955,7 +3251,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         children: [
           // Filter Pills Header (All, Ongoing, Delivered, Cancelled, ⭐ Most Ordered)
           SizedBox(
-            height: 36,
+            height: 38,
             child: ListView(
               scrollDirection: Axis.horizontal,
               children: ["All", "Ongoing", "Delivered", "Cancelled", "⭐ Most Ordered"].map((pill) {
@@ -2964,19 +3260,26 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   onTap: () => setState(() => _orderFilter = pill),
                   child: Container(
                     margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSel ? const Color(0xFF4F46E5) : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: isSel ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                      color: isSel ? AppTheme.yellow : AppTheme.surface,
+                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      border: Border.all(color: AppTheme.black, width: isSel ? 2.5 : 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.black,
+                          offset: isSel ? const Offset(2.5, 2.5) : const Offset(1.5, 1.5),
+                          blurRadius: 0,
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(
-                        pill,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isSel ? Colors.white : const Color(0xFF64748B),
+                        pill.toUpperCase(),
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.black,
                         ),
                       ),
                     ),
@@ -2995,55 +3298,53 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(20),
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEEF2FF),
-                        shape: BoxShape.circle,
+                      decoration: BoxDecoration(
+                        color: AppTheme.yellow,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                        border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+                        boxShadow: const [
+                          BoxShadow(color: AppTheme.black, offset: Offset(4, 4), blurRadius: 0),
+                        ],
                       ),
                       child: const Text("⭐", style: TextStyle(fontSize: 42)),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      "No Order History Yet",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                    Text(
+                      "NO ORDER HISTORY YET",
+                      style: GoogleFonts.spaceGrotesk(fontSize: 18, fontWeight: FontWeight.w900, color: AppTheme.black),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       "Your most ordered dishes, groceries, and favourite restaurants will appear here once you place orders.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                      style: GoogleFonts.inter(fontSize: 12.5, color: AppTheme.black.withValues(alpha: 0.7)),
                     ),
                     const SizedBox(height: 22),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
+                        backgroundColor: AppTheme.yellow,
+                        foregroundColor: AppTheme.black,
+                        side: const BorderSide(color: AppTheme.black, width: 2),
                         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                       ),
                       onPressed: () => setState(() => _orderFilter = "All"),
-                      child: const Text("View All Orders", style: TextStyle(fontWeight: FontWeight.bold)),
+                      child: Text("VIEW ALL ORDERS", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900)),
                     ),
                   ],
                 ),
               ),
             )
           else ...[
-          // Hero Highlights Card
+          // Hero Highlights Card - Brutalist 2.0
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF4F46E5), Color(0xFF6366F1), Color(0xFF818CF8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
+              color: AppTheme.yellow,
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+              boxShadow: const [
+                BoxShadow(color: AppTheme.black, offset: Offset(4, 4), blurRadius: 0),
               ],
             ),
             child: Column(
@@ -3054,24 +3355,24 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
+                        color: AppTheme.black,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                       ),
-                      child: const Text("⭐", style: TextStyle(fontSize: 22)),
+                      child: const Text("⭐", style: TextStyle(fontSize: 20)),
                     ),
                     const SizedBox(width: 12),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "What You Order Most",
-                            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                            "WHAT YOU ORDER MOST",
+                            style: GoogleFonts.spaceGrotesk(color: AppTheme.black, fontSize: 16, fontWeight: FontWeight.w900),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
                             "Your personal favorites across food, groceries & restaurants",
-                            style: TextStyle(color: Color(0xFFE0E7FF), fontSize: 11.5),
+                            style: GoogleFonts.inter(color: AppTheme.black.withValues(alpha: 0.8), fontSize: 11),
                           ),
                         ],
                       ),
@@ -3083,17 +3384,18 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 2),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _statCol("Dishes", "${dishes.length}", "🍕"),
-                      Container(width: 1, height: 24, color: Colors.white.withValues(alpha: 0.2)),
-                      _statCol("Groceries", "${groceries.length}", "🥦"),
-                      Container(width: 1, height: 24, color: Colors.white.withValues(alpha: 0.2)),
-                      _statCol("Restaurants", "${restaurants.length}", "🏪"),
+                      _statCol("DISHES", "${dishes.length}", "🍕"),
+                      Container(width: 1.5, height: 24, color: AppTheme.black),
+                      _statCol("GROCERIES", "${groceries.length}", "🥦"),
+                      Container(width: 1.5, height: 24, color: AppTheme.black),
+                      _statCol("STORES", "${restaurants.length}", "🏪"),
                     ],
                   ),
                 ),
@@ -3122,9 +3424,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             _sectionHeader("Top Ordered Food Dishes", "Dishes you keep coming back to", "🍔"),
             const SizedBox(height: 10),
             if (dishes.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: Text("No dish orders yet. Start exploring!", style: TextStyle(color: Color(0xFF94A3B8)))),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: Text("No dish orders yet. Start exploring!", style: GoogleFonts.inter(color: AppTheme.black.withValues(alpha: 0.6)))),
               )
             else
               ...dishes.map((d) => _buildMostOrderedDishCard(d)),
@@ -3136,9 +3438,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             _sectionHeader("Top Ordered Groceries", "Daily staples from 10-Min Dark Store", "🥦"),
             const SizedBox(height: 10),
             if (groceries.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: Text("No grocery orders yet. Check Instamart!", style: TextStyle(color: Color(0xFF94A3B8)))),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: Text("No grocery orders yet. Check Instamart!", style: GoogleFonts.inter(color: AppTheme.black.withValues(alpha: 0.6)))),
               )
             else
               ...groceries.map((g) => _buildMostOrderedGroceryCard(g)),
@@ -3150,9 +3452,9 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             _sectionHeader("Most Ordered Restaurants", "Your highest-visited dining partners", "🏪"),
             const SizedBox(height: 10),
             if (restaurants.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: Text("No restaurant orders recorded yet.", style: TextStyle(color: Color(0xFF94A3B8)))),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: Text("No restaurant orders recorded yet.", style: GoogleFonts.inter(color: AppTheme.black.withValues(alpha: 0.6)))),
               )
             else
               ...restaurants.map((r) => _buildMostOrderedRestaurantCard(r)),
@@ -3160,7 +3462,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           ],
           ],
 
-          const SizedBox(height: 80),
+          const SizedBox(height: 130),
         ],
       ),
     );
@@ -3176,14 +3478,14 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
             const SizedBox(width: 4),
             Text(
               count,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15),
+              style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontWeight: FontWeight.w900, fontSize: 15),
             ),
           ],
         ),
         const SizedBox(height: 1),
         Text(
           label,
-          style: const TextStyle(color: Color(0xFFE0E7FF), fontSize: 10, fontWeight: FontWeight.w600),
+          style: GoogleFonts.spaceGrotesk(color: AppTheme.black.withValues(alpha: 0.7), fontSize: 9.5, fontWeight: FontWeight.w800),
         ),
       ],
     );
@@ -3197,17 +3499,24 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSel ? const Color(0xFF0F172A) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSel ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0)),
+          color: isSel ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+          border: Border.all(color: AppTheme.black, width: isSel ? 2.5 : 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.black,
+              offset: isSel ? const Offset(2, 2) : const Offset(1, 1),
+              blurRadius: 0,
+            ),
+          ],
         ),
         child: Center(
           child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isSel ? Colors.white : const Color(0xFF475569),
+            title.toUpperCase(),
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              color: AppTheme.black,
             ),
           ),
         ),
@@ -3218,18 +3527,26 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
   Widget _sectionHeader(String title, String subtitle, String icon) {
     return Row(
       children: [
-        Text(icon, style: const TextStyle(fontSize: 18)),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppTheme.yellow,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            border: Border.all(color: AppTheme.black, width: 1.5),
+          ),
+          child: Text(icon, style: const TextStyle(fontSize: 16)),
+        ),
         const SizedBox(width: 8),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Color(0xFF0F172A)),
+              title.toUpperCase(),
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 14, color: AppTheme.black),
             ),
             Text(
               subtitle,
-              style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              style: GoogleFonts.inter(fontSize: 11, color: AppTheme.black.withValues(alpha: 0.6)),
             ),
           ],
         ),
@@ -3255,11 +3572,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+        boxShadow: const [
+          BoxShadow(color: AppTheme.black, offset: Offset(3.5, 3.5), blurRadius: 0),
         ],
       ),
       child: Row(
@@ -3267,18 +3584,20 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           // Thumbnail with veg indicator badge
           Stack(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                ),
+                clipBehavior: Clip.antiAlias,
                 child: Image.network(
                   imgUrl,
-                  width: 76,
-                  height: 76,
                   fit: BoxFit.cover,
                   errorBuilder: (_, __, ___) => Container(
-                    width: 76,
-                    height: 76,
-                    color: const Color(0xFFEEF2FF),
-                    child: const Icon(Icons.fastfood, color: Color(0xFF4F46E5)),
+                    color: AppTheme.yellow,
+                    child: const Icon(Icons.fastfood, color: AppTheme.black),
                   ),
                 ),
               ),
@@ -3290,15 +3609,15 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   height: 14,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(color: isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626), width: 1.5),
-                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: isVeg ? AppTheme.green : AppTheme.red, width: 1.5),
+                    borderRadius: BorderRadius.circular(2),
                   ),
                   child: Center(
                     child: Container(
                       width: 6,
                       height: 6,
                       decoration: BoxDecoration(
-                        color: isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                        color: isVeg ? AppTheme.green : AppTheme.red,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -3317,32 +3636,33 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 1.2),
                   ),
                   child: Text(
-                    "🔥 Ordered $count times",
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFFB45309)),
+                    "🔥 ORDERED $count TIMES",
+                    style: GoogleFonts.ibmPlexMono(fontSize: 9.5, fontWeight: FontWeight.w800, color: AppTheme.black),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
+                  name.toUpperCase(),
+                  style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13.5, color: AppTheme.black),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   "from $restName",
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                  style: GoogleFonts.inter(fontSize: 11, color: AppTheme.black.withValues(alpha: 0.6), fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   "₹${price.toStringAsFixed(0)}",
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A)),
+                  style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 14, color: AppTheme.black),
                 ),
               ],
             ),
@@ -3351,11 +3671,13 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           // Quick Reorder button
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5),
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.yellow,
+              foregroundColor: AppTheme.black,
+              side: const BorderSide(color: AppTheme.black, width: 2),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               minimumSize: Size.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
             ),
             onPressed: () {
               _handleAddItem(
@@ -3371,11 +3693,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("Added '$name' to your basket"),
-                  backgroundColor: const Color(0xFF10B981),
+                  backgroundColor: AppTheme.green,
                   duration: const Duration(seconds: 2),
                   action: SnackBarAction(
                     label: "VIEW CART",
-                    textColor: Colors.white,
+                    textColor: AppTheme.black,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -3386,7 +3708,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 ),
               );
             },
-            child: const Text("Reorder", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            child: Text("REORDER", style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -3409,27 +3731,29 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+        boxShadow: const [
+          BoxShadow(color: AppTheme.black, offset: Offset(3.5, 3.5), blurRadius: 0),
         ],
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
+          Container(
+            width: 76,
+            height: 76,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+              border: Border.all(color: AppTheme.black, width: 2),
+            ),
+            clipBehavior: Clip.antiAlias,
             child: Image.network(
               imgUrl,
-              width: 76,
-              height: 76,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => Container(
-                width: 76,
-                height: 76,
-                color: const Color(0xFFECFDF5),
-                child: const Icon(Icons.bolt, color: Color(0xFF10B981)),
+                color: AppTheme.yellow,
+                child: const Icon(Icons.bolt, color: AppTheme.black),
               ),
             ),
           ),
@@ -3441,32 +3765,33 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 1.2),
                   ),
                   child: Text(
-                    "⚡ Ordered $count times",
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF047857)),
+                    "⚡ ORDERED $count TIMES",
+                    style: GoogleFonts.ibmPlexMono(fontSize: 9.5, fontWeight: FontWeight.w800, color: AppTheme.black),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  name,
-                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
+                  name.toUpperCase(),
+                  style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13.5, color: AppTheme.black),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   "10-min Dark Store • $storeArea",
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                  style: GoogleFonts.inter(fontSize: 11, color: AppTheme.black.withValues(alpha: 0.6), fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   "₹${price.toStringAsFixed(0)}",
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A)),
+                  style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 14, color: AppTheme.black),
                 ),
               ],
             ),
@@ -3474,11 +3799,13 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           const SizedBox(width: 8),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF10B981),
-              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.yellow,
+              foregroundColor: AppTheme.black,
+              side: const BorderSide(color: AppTheme.black, width: 2),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               minimumSize: Size.zero,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
             ),
             onPressed: () {
               _handleAddItem(
@@ -3493,11 +3820,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text("Added '$name' to your basket"),
-                  backgroundColor: const Color(0xFF10B981),
+                  backgroundColor: AppTheme.green,
                   duration: const Duration(seconds: 2),
                   action: SnackBarAction(
                     label: "VIEW CART",
-                    textColor: Colors.white,
+                    textColor: AppTheme.black,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -3508,7 +3835,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                 ),
               );
             },
-            child: const Text("Add +", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            child: Text("ADD +", style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w900)),
           ),
         ],
       ),
@@ -3534,11 +3861,11 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+        boxShadow: const [
+          BoxShadow(color: AppTheme.black, offset: Offset(3.5, 3.5), blurRadius: 0),
         ],
       ),
       child: Column(
@@ -3547,8 +3874,12 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
           // Banner Image with stats badge overlay
           Stack(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              Container(
+                height: 120,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: AppTheme.black, width: 2)),
+                ),
                 child: AppCachedNetworkImage(
                   imageUrl: banner,
                   height: 120,
@@ -3557,61 +3888,63 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                   placeholder: Container(
                     height: 120,
                     width: double.infinity,
-                    color: const Color(0xFFF1F5F9),
+                    color: AppTheme.yellow,
                     child: const Center(
                       child: SizedBox(
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black),
                       ),
                     ),
                   ),
                   errorWidget: Container(
                     height: 120,
                     width: double.infinity,
-                    color: const Color(0xFFEEF2FF),
-                    child: const Center(child: Icon(Icons.restaurant, color: Color(0xFF4F46E5), size: 36)),
+                    color: AppTheme.yellow,
+                    child: const Center(child: Icon(Icons.restaurant, color: AppTheme.black, size: 36)),
                   ),
                 ),
               ),
               Positioned(
-                top: 10,
-                right: 10,
+                top: 8,
+                right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.75),
-                    borderRadius: BorderRadius.circular(20),
+                    color: AppTheme.black,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text("⭐ ", style: TextStyle(fontSize: 11)),
+                      const Text("⭐ ", style: TextStyle(fontSize: 10)),
                       Text(
-                        "$orderCount Orders Placed",
-                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                        "$orderCount ORDERS PLACED",
+                        style: GoogleFonts.ibmPlexMono(color: AppTheme.yellow, fontSize: 10, fontWeight: FontWeight.w800),
                       ),
                     ],
                   ),
                 ),
               ),
               Positioned(
-                bottom: 10,
-                left: 10,
+                bottom: 8,
+                left: 8,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.star, color: Colors.white, size: 12),
+                      const Icon(Icons.star, color: AppTheme.black, size: 12),
                       const SizedBox(width: 3),
                       Text(
                         rating.toStringAsFixed(1),
-                        style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontSize: 11, fontWeight: FontWeight.w900),
                       ),
                     ],
                   ),
@@ -3629,26 +3962,28 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0F172A)),
+                        name.toUpperCase(),
+                        style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 15, color: AppTheme.black),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        "$location • Total Spent: ₹${totalSpent.toStringAsFixed(0)}",
-                        style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                        "$location • SPENT: ₹${totalSpent.toStringAsFixed(0)}",
+                        style: GoogleFonts.ibmPlexMono(fontSize: 11, color: AppTheme.black.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppTheme.black,
+                    foregroundColor: AppTheme.yellow,
+                    side: const BorderSide(color: AppTheme.black, width: 2),
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     minimumSize: Size.zero,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                   ),
                   onPressed: () {
                     final match = _restaurants.firstWhere(
@@ -3670,7 +4005,7 @@ class _UserDashboardScreenState extends State<UserDashboardScreen> {
                       ),
                     );
                   },
-                  child: const Text("View Menu", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  child: Text("VIEW MENU", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11)),
                 ),
               ],
             ),

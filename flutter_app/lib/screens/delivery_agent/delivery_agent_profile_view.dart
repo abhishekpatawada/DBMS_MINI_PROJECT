@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import '../../services/api_service.dart';
 import '../auth_screen.dart';
 import '../../widgets/server_config_dialog.dart';
@@ -62,37 +65,67 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("Edit Rider Profile", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          backgroundColor: AppTheme.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            side: const BorderSide(color: AppTheme.black, width: AppTheme.borderWidth),
+          ),
+          title: Text(
+            "EDIT RIDER PROFILE",
+            style: GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+              letterSpacing: 0.5,
+              color: AppTheme.black,
+            ),
+          ),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                TextField(
+                BrutalistTextField(
                   controller: nameCtrl,
-                  decoration: const InputDecoration(labelText: "Full Name", prefixIcon: Icon(Icons.person_outline)),
+                  label: "FULL NAME",
+                  prefixIcon: Icons.person_outline,
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                BrutalistTextField(
                   controller: phoneCtrl,
+                  label: "PHONE NUMBER",
+                  prefixIcon: Icons.phone_outlined,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: "Phone Number", prefixIcon: Icon(Icons.phone_outlined)),
                 ),
                 const SizedBox(height: 12),
-                TextField(
+                BrutalistTextField(
                   controller: vehicleCtrl,
-                  decoration: const InputDecoration(labelText: "Vehicle Plate Number", prefixIcon: Icon(Icons.pin_outlined)),
+                  label: "VEHICLE PLATE NUMBER",
+                  prefixIcon: Icons.pin_outlined,
                 ),
                 const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: selectedVType,
-                  decoration: const InputDecoration(labelText: "Vehicle Type", prefixIcon: Icon(Icons.two_wheeler_outlined)),
-                  items: ["Motorcycle", "Scooter", "Electric Scooter", "Bicycle"].map((t) {
-                    return DropdownMenuItem(value: t, child: Text(t));
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) setDialogState(() => selectedVType = val);
-                  },
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    border: Border.all(color: AppTheme.black, width: 2),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedVType,
+                      isExpanded: true,
+                      items: ["Motorcycle", "Scooter", "Electric Scooter", "Bicycle"].map((t) {
+                        return DropdownMenuItem(
+                          value: t,
+                          child: Text(
+                            t.toUpperCase(),
+                            style: GoogleFonts.spaceGrotesk(fontSize: 13, fontWeight: FontWeight.w800, color: AppTheme.black),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) setDialogState(() => selectedVType = val);
+                      },
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -100,14 +133,16 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text("Cancel", style: TextStyle(color: Color(0xFF64748B))),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              child: Text(
+                "CANCEL",
+                style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, color: AppTheme.black),
               ),
+            ),
+            BrutalistButton(
+              text: "SAVE CHANGES",
+              bgColor: AppTheme.yellow,
+              textColor: AppTheme.black,
+              height: 40,
               onPressed: () async {
                 final newName = nameCtrl.text.trim();
                 final newPhone = phoneCtrl.text.trim();
@@ -139,15 +174,21 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
                 if (mounted) {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Rider profile updated successfully!"),
-                      backgroundColor: Color(0xFF10B981),
+                    SnackBar(
+                      content: const Text(
+                        "Rider profile updated successfully!",
+                        style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black),
+                      ),
+                      backgroundColor: AppTheme.yellow,
                       behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                        side: const BorderSide(color: AppTheme.black, width: 2),
+                      ),
                     ),
                   );
                 }
               },
-              child: const Text("Save Changes"),
             ),
           ],
         ),
@@ -220,21 +261,35 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF0F172A)),
-          onPressed: () => Navigator.pop(context),
+        shape: const Border(
+          bottom: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth),
         ),
-        title: const Text(
-          "Rider Profile & Settings",
-          style: TextStyle(
-            fontSize: 18,
+        leading: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                border: Border.all(color: AppTheme.black, width: 2),
+                boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)],
+              ),
+              child: const Icon(Icons.arrow_back_rounded, color: AppTheme.black, size: 18),
+            ),
+          ),
+        ),
+        title: Text(
+          "RIDER PROFILE & SETTINGS",
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 16,
             fontWeight: FontWeight.w900,
-            color: Color(0xFF0F172A),
+            letterSpacing: 0.5,
+            color: AppTheme.black,
           ),
         ),
       ),
@@ -270,21 +325,14 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
           const SizedBox(height: 24),
 
           // 6. LOGOUT BUTTON
-          SizedBox(
-            width: double.infinity,
+          BrutalistButton(
+            text: "LOG OUT OF DELIVERY PARTNER APP",
+            icon: Icons.logout_rounded,
+            bgColor: AppTheme.red,
+            textColor: AppTheme.surface,
+            fullWidth: true,
             height: 48,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
-              label: const Text(
-                "Log Out of Delivery Partner App",
-                style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFFEF4444), width: 1.2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: _logout,
-            ),
+            onPressed: _logout,
           ),
 
           const SizedBox(height: 32),
@@ -296,16 +344,9 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
 
   Widget _buildBottomNav() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: const Color(0xFFE2E8F0).withValues(alpha: 0.8))),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(top: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: SafeArea(
@@ -316,32 +357,36 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
             GestureDetector(
               onTap: widget.onNavigateToDeliveries ?? () => Navigator.pop(context),
               behavior: HitTestBehavior.opaque,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 22, vertical: 6),
-                    child: Icon(Icons.directions_bike_rounded, size: 24, color: Color(0xFF64748B)),
-                  ),
-                  SizedBox(height: 4),
-                  Text("Deliveries", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Row(
+                  children: [
+                    const Icon(Icons.directions_bike_rounded, size: 20, color: AppTheme.black),
+                    const SizedBox(width: 6),
+                    Text(
+                      "DELIVERIES",
+                      style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w800, color: AppTheme.black),
+                    ),
+                  ],
+                ),
               ),
             ),
             // Earnings
             GestureDetector(
               onTap: widget.onNavigateToEarnings ?? () => Navigator.pop(context),
               behavior: HitTestBehavior.opaque,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 22, vertical: 6),
-                    child: Icon(Icons.account_balance_wallet_outlined, size: 24, color: Color(0xFF64748B)),
-                  ),
-                  SizedBox(height: 4),
-                  Text("Earnings", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF64748B))),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_balance_wallet_outlined, size: 20, color: AppTheme.black),
+                    const SizedBox(width: 6),
+                    Text(
+                      "EARNINGS",
+                      style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w800, color: AppTheme.black),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -351,38 +396,30 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   }
 
   Widget _buildProfileCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         children: [
           Row(
             children: [
-              // Blue Circle Avatar with Initial
+              // Brutalist Avatar
               Container(
-                width: 60,
-                height: 60,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E3A8A),
-                  shape: BoxShape.circle,
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: AppTheme.yellow,
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                  boxShadow: const [
+                    BoxShadow(color: AppTheme.black, offset: Offset(2.5, 2.5), blurRadius: 0),
+                  ],
                 ),
                 child: Center(
                   child: Text(
                     _agentName.isNotEmpty ? _agentName[0].toUpperCase() : "K",
-                    style: const TextStyle(
+                    style: GoogleFonts.spaceGrotesk(
                       fontSize: 26,
-                      color: Colors.white,
+                      color: AppTheme.black,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -397,51 +434,51 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
                       children: [
                         Flexible(
                           child: Text(
-                            _agentName,
-                            style: const TextStyle(
-                              fontSize: 18,
+                            _agentName.toUpperCase(),
+                            style: GoogleFonts.spaceGrotesk(
+                              fontSize: 17,
                               fontWeight: FontWeight.w900,
-                              color: Color(0xFF0F172A),
+                              color: AppTheme.black,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(Icons.verified, color: Color(0xFF10B981), size: 18),
+                        const Icon(Icons.verified, color: AppTheme.black, size: 18),
                       ],
                     ),
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF64748B)),
+                        const Icon(Icons.phone_outlined, size: 14, color: AppTheme.black),
                         const SizedBox(width: 4),
                         Text(
                           _agentPhone,
-                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w500),
+                          style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7),
-                            borderRadius: BorderRadius.circular(6),
+                            color: AppTheme.yellow,
+                            border: Border.all(color: AppTheme.black, width: 1.5),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.star, color: Color(0xFFD97706), size: 13),
+                              const Icon(Icons.star, color: AppTheme.black, size: 13),
                               const SizedBox(width: 4),
                               Text(
-                                "$_rating Rating",
-                                style: const TextStyle(
-                                  color: Color(0xFFD97706),
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
+                                "$_rating RATING",
+                                style: GoogleFonts.ibmPlexMono(
+                                  color: AppTheme.black,
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 10,
                                 ),
                               ),
                             ],
@@ -451,15 +488,15 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(6),
+                            color: AppTheme.surface,
+                            border: Border.all(color: AppTheme.black, width: 1.5),
                           ),
                           child: Text(
                             "ID: #$_agentId",
-                            style: const TextStyle(
-                              color: Color(0xFF475569),
-                              fontWeight: FontWeight.bold,
-                              fontSize: 11,
+                            style: GoogleFonts.ibmPlexMono(
+                              color: AppTheme.black,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 10,
                             ),
                           ),
                         ),
@@ -472,7 +509,7 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
           ),
 
           const SizedBox(height: 16),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
           const SizedBox(height: 12),
 
           // Vehicle info row with Edit button
@@ -484,30 +521,38 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
                   const Text("🛵", style: TextStyle(fontSize: 16)),
                   const SizedBox(width: 6),
                   Text(
-                    "$_vType • $_vehicleNo",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      color: Color(0xFF334155),
+                    "$_vType • $_vehicleNo".toUpperCase(),
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                      color: AppTheme.black,
                     ),
                   ),
                 ],
               ),
               GestureDetector(
                 onTap: _showEditProfileDialog,
-                child: Row(
-                  children: const [
-                    Icon(Icons.edit_outlined, size: 15, color: Color(0xFF4F46E5)),
-                    SizedBox(width: 4),
-                    Text(
-                      "Edit",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                        color: Color(0xFF4F46E5),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.yellow,
+                    border: Border.all(color: AppTheme.black, width: 1.5),
+                    boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.edit_outlined, size: 14, color: AppTheme.black),
+                      const SizedBox(width: 4),
+                      Text(
+                        "EDIT",
+                        style: GoogleFonts.spaceGrotesk(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 11,
+                          color: AppTheme.black,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -518,25 +563,18 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   }
 
   Widget _buildDutyStatusCard() {
-    return Container(
+    return BrutalistCard(
+      bgColor: _isOnline ? AppTheme.yellow : AppTheme.surface,
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: _isOnline ? const Color(0xFFECFDF5) : const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: _isOnline ? const Color(0xFF10B981) : const Color(0xFFE2E8F0),
-          width: 1.2,
-        ),
-      ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _isOnline ? const Color(0xFF10B981) : Colors.grey.shade400,
-              shape: BoxShape.circle,
+              color: AppTheme.black,
+              border: Border.all(color: AppTheme.black, width: 1.5),
             ),
-            child: const Icon(Icons.sensors_rounded, color: Colors.white, size: 20),
+            child: Icon(Icons.sensors_rounded, color: _isOnline ? AppTheme.yellow : AppTheme.surface, size: 20),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -544,19 +582,21 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _isOnline ? "Online & Ready for Deliveries" : "Offline (On Break)",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: _isOnline ? const Color(0xFF065F46) : const Color(0xFF64748B),
+                  _isOnline ? "ONLINE & READY FOR DISPATCH" : "OFFLINE (ON BREAK)",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                    color: AppTheme.black,
+                    letterSpacing: 0.3,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _isOnline ? "You are receiving nearby order dispatches" : "Orders will not be dispatched to you",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _isOnline ? const Color(0xFF047857) : Colors.grey,
+                  _isOnline ? "RECEIVING TELEMETRY ORDER ROUTING" : "ORDERS TEMPORARILY PAUSED",
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 10,
+                    color: const Color(0xFF64748B),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -564,15 +604,24 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
           ),
           Switch(
             value: _isOnline,
-            activeColor: const Color(0xFF10B981),
+            activeColor: AppTheme.black,
+            activeTrackColor: AppTheme.surface,
+            inactiveTrackColor: const Color(0xFFCCCCCC),
             onChanged: (val) {
               setState(() => _isOnline = val);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(val ? "You are now ONLINE and ready for orders" : "You are now OFFLINE"),
-                  backgroundColor: val ? const Color(0xFF10B981) : Colors.grey.shade800,
+                  content: Text(
+                    val ? "You are now ONLINE and ready for orders" : "You are now OFFLINE",
+                    style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black),
+                  ),
+                  backgroundColor: AppTheme.yellow,
                   duration: const Duration(seconds: 1),
                   behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    side: const BorderSide(color: AppTheme.black, width: 2),
+                  ),
                 ),
               );
             },
@@ -583,80 +632,83 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   }
 
   Widget _buildFinancialCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2FF),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.yellow,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.account_balance, color: Color(0xFF4F46E5), size: 20),
+              child: const Icon(Icons.account_balance, color: AppTheme.black, size: 18),
             ),
-            title: const Text("HDFC Bank (Direct Deposit)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
+            title: Text(
+              "HDFC BANK (DIRECT DEPOSIT)",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
             subtitle: Row(
               children: [
-                const Text("A/C: •••• •••• 8912 • ", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                Text("A/C: •••• •••• 8912 • ", style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B))),
                 Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(color: AppTheme.green, border: Border.all(color: AppTheme.black, width: 1)),
+                  child: Text("ACTIVE", style: GoogleFonts.ibmPlexMono(fontSize: 9, color: AppTheme.black, fontWeight: FontWeight.w900)),
                 ),
-                const SizedBox(width: 4),
-                const Text("Active", style: TextStyle(fontSize: 12, color: Color(0xFF10B981), fontWeight: FontWeight.bold)),
               ],
             ),
-            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+            trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.black),
             onTap: _showEditPayoutDialog,
           ),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF3C7),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.surface,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.bolt_rounded, color: Color(0xFFF59E0B), size: 20),
+              child: const Icon(Icons.bolt_rounded, color: AppTheme.black, size: 18),
             ),
-            title: const Text("Linked Instant UPI", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: Text("$_agentPhone@okaxis", style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+            title: Text(
+              "LINKED INSTANT UPI",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text("$_agentPhone@okaxis", style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B))),
+            trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.black),
             onTap: _showEditPayoutDialog,
           ),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.yellow,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.receipt_long_rounded, color: Color(0xFF10B981), size: 20),
+              child: const Icon(Icons.receipt_long_rounded, color: AppTheme.black, size: 18),
             ),
-            title: const Text("Tax & TDS Statements (Form 16A)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: const Text("Download FY 2025-26 Summary", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+            title: Text(
+              "TAX & TDS STATEMENTS (FORM 16A)",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text("Download FY 2025-26 Summary", style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B))),
+            trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.black),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Form 16A Statement downloaded to Downloads"),
-                  backgroundColor: Color(0xFF10B981),
+                SnackBar(
+                  content: const Text(
+                    "Form 16A Statement downloaded to Downloads",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black),
+                  ),
+                  backgroundColor: AppTheme.yellow,
                   behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    side: const BorderSide(color: AppTheme.black, width: 2),
+                  ),
                 ),
               );
             },
@@ -667,19 +719,8 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   }
 
   Widget _buildRouteSettingsCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           // Loud Order Alerts & Voice
@@ -687,40 +728,48 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2FF),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.yellow,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.volume_up_rounded, color: Color(0xFF4F46E5), size: 20),
+              child: const Icon(Icons.volume_up_rounded, color: AppTheme.black, size: 18),
             ),
-            title: const Text("Loud Order Alerts & Voice", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: const Text("Play loud chime when new order arrives", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+            title: Text(
+              "LOUD ORDER ALERTS & CHIMES",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text("High-gain alert when new order arrives", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B))),
             trailing: Switch(
               value: _audioAlerts,
-              activeColor: const Color(0xFF4F46E5),
+              activeColor: AppTheme.black,
+              activeTrackColor: AppTheme.yellow,
               onChanged: (val) => setState(() => _audioAlerts = val),
             ),
           ),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
 
           // Auto-Accept Nearby Orders
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.green,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.radar_rounded, color: Color(0xFF10B981), size: 20),
+              child: const Icon(Icons.radar_rounded, color: AppTheme.black, size: 18),
             ),
-            title: const Text("Auto-Accept Nearby Orders", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: const Text("Automatically accept high-priority orders within 2 km", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+            title: Text(
+              "AUTO-ACCEPT NEARBY DISPATCHES",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text("Automatically accept high-priority orders within 2 km", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B))),
             trailing: Switch(
               value: _autoAcceptOrders,
-              activeColor: const Color(0xFF10B981),
+              activeColor: AppTheme.black,
+              activeTrackColor: AppTheme.green,
               onChanged: (val) => setState(() => _autoAcceptOrders = val),
             ),
           ),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
 
           // Max Delivery Radius Slider
           Padding(
@@ -734,30 +783,40 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF3C7),
-                            borderRadius: BorderRadius.circular(10),
+                            color: AppTheme.surface,
+                            border: Border.all(color: AppTheme.black, width: 1.5),
                           ),
-                          child: const Icon(Icons.location_on_outlined, color: Color(0xFFF59E0B), size: 20),
+                          child: const Icon(Icons.location_on_outlined, color: AppTheme.black, size: 18),
                         ),
-                        const SizedBox(width: 12),
-                        const Text("Max Delivery Radius", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
+                        const SizedBox(width: 10),
+                        Text(
+                          "MAX DELIVERY RADIUS",
+                          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+                        ),
                       ],
                     ),
-                    Text(
-                      "${_deliveryRadiusKm.toStringAsFixed(1)} km",
-                      style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF4F46E5), fontSize: 15),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppTheme.yellow,
+                        border: Border.all(color: AppTheme.black, width: 1.5),
+                      ),
+                      child: Text(
+                        "${_deliveryRadiusKm.toStringAsFixed(1)} KM",
+                        style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, color: AppTheme.black, fontSize: 13),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 SliderTheme(
                   data: SliderTheme.of(context).copyWith(
-                    activeTrackColor: const Color(0xFF4F46E5),
-                    inactiveTrackColor: const Color(0xFFE2E8F0),
-                    thumbColor: const Color(0xFF4F46E5),
-                    overlayColor: const Color(0xFF4F46E5).withValues(alpha: 0.15),
+                    activeTrackColor: AppTheme.black,
+                    inactiveTrackColor: const Color(0xFFDDDDDD),
+                    thumbColor: AppTheme.black,
+                    overlayColor: AppTheme.yellow.withValues(alpha: 0.3),
                   ),
                   child: Slider(
                     value: _deliveryRadiusKm,
@@ -771,36 +830,45 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text("1 km", style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
-                      Text("5 km", style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
-                      Text("10 km", style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
-                      Text("15 km", style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
+                    children: [
+                      Text("1 KM", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B))),
+                      Text("5 KM", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B))),
+                      Text("10 KM", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B))),
+                      Text("15 KM", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B))),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
 
           // Preferred Navigation
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.surface,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.navigation_outlined, color: Color(0xFF2563EB), size: 20),
+              child: const Icon(Icons.navigation_outlined, color: AppTheme.black, size: 18),
             ),
-            title: const Text("Default Navigation App", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: Text(_preferredNavigation, style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+            title: Text(
+              "DEFAULT NAVIGATION APP",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text(_preferredNavigation, style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B))),
             trailing: DropdownButton<String>(
               value: _preferredNavigation,
               underline: const SizedBox(),
               items: ["Google Maps", "Apple Maps", "In-App Navigation"].map((n) {
-                return DropdownMenuItem(value: n, child: Text(n, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)));
+                return DropdownMenuItem(
+                  value: n,
+                  child: Text(
+                    n.toUpperCase(),
+                    style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.w800, color: AppTheme.black),
+                  ),
+                );
               }).toList(),
               onChanged: (val) {
                 if (val != null) setState(() => _preferredNavigation = val);
@@ -813,54 +881,59 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   }
 
   Widget _buildSupportCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFEEF2FF),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.yellow,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.wifi_tethering, color: Color(0xFF4F46E5), size: 20),
+              child: const Icon(Icons.wifi_tethering, color: AppTheme.black, size: 18),
             ),
-            title: const Text("Server Host Network", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: Text("Connected to: ${ApiService.baseUrl.replaceAll('http://', '').replaceAll('/api', '')}", style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF94A3B8)),
+            title: Text(
+              "SERVER HOST NETWORK",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text(
+              "Connected to: ${ApiService.baseUrl.replaceAll('http://', '').replaceAll('/api', '')}",
+              style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B)),
+            ),
+            trailing: const Icon(Icons.chevron_right_rounded, color: AppTheme.black),
             onTap: () => ServerConfigDialog.show(context, onSaved: () => setState(() {})),
           ),
-          const Divider(height: 1),
+          const Divider(color: AppTheme.black, thickness: 1.5, height: 1),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFFECFDF5),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.green,
+                border: Border.all(color: AppTheme.black, width: 1.5),
               ),
-              child: const Icon(Icons.support_agent_rounded, color: Color(0xFF10B981), size: 20),
+              child: const Icon(Icons.support_agent_rounded, color: AppTheme.black, size: 18),
             ),
-            title: const Text("24x7 Partner Support Helpline", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-            subtitle: const Text("Toll-free 1800-248-3482", style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-            trailing: const Icon(Icons.call_rounded, color: Color(0xFF10B981), size: 20),
+            title: Text(
+              "24x7 PARTNER SUPPORT HELPLINE",
+              style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
+            subtitle: Text("Toll-free 1800-248-3482", style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B))),
+            trailing: const Icon(Icons.call_rounded, color: AppTheme.black, size: 20),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Calling BiteHub Partner Support 1800-248-3482..."),
-                  backgroundColor: Color(0xFF10B981),
+                SnackBar(
+                  content: const Text(
+                    "Calling BiteHub Partner Support 1800-248-3482...",
+                    style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black),
+                  ),
+                  backgroundColor: AppTheme.yellow,
                   behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    side: const BorderSide(color: AppTheme.black, width: 2),
+                  ),
                 ),
               );
             },
@@ -873,14 +946,24 @@ class _DeliveryAgentProfileViewState extends State<DeliveryAgentProfileView> {
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
-      child: Text(
-        title.toUpperCase(),
-        style: const TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 0.8,
-          color: Color(0xFF64748B),
-        ),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 14,
+            color: AppTheme.black,
+            margin: const EdgeInsets.only(right: 8),
+          ),
+          Text(
+            title.toUpperCase(),
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.8,
+              color: AppTheme.black,
+            ),
+          ),
+        ],
       ),
     );
   }

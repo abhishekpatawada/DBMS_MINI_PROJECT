@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import '../../services/api_service.dart';
 import '../../models/models.dart';
 import '../auth_screen.dart';
@@ -825,7 +828,7 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
         final isLargeScreen = constraints.maxWidth >= 850;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF8FAFC),
+          backgroundColor: AppTheme.bg,
           body: isLargeScreen ? _buildDesktopLayout() : _buildMobileLayout(),
         );
       },
@@ -849,7 +852,7 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               // Page View
               Expanded(
                 child: _isLoading
-                    ? const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)))
+                    ? const Center(child: CircularProgressIndicator(color: AppTheme.black))
                     : _buildCurrentView(),
               ),
             ],
@@ -866,7 +869,7 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
         _buildTopBar(isLargeScreen: false),
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)))
+              ? const Center(child: CircularProgressIndicator(color: AppTheme.black))
               : _buildCurrentView(),
         ),
         _buildMobileBottomNav(),
@@ -874,54 +877,70 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     );
   }
 
-  // SIDEBAR COMPONENT
+  // SIDEBAR COMPONENT - Brutalism 2.0
   Widget _buildSidebar() {
     return Container(
-      width: 220,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(right: BorderSide(color: const Color(0xFFE2E8F0))),
+      width: 230,
+      decoration: const BoxDecoration(
+        color: AppTheme.bg,
+        border: Border(right: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Logo Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
             child: Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
+                    color: AppTheme.black,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                    boxShadow: const [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
+                        color: AppTheme.yellow,
+                        offset: Offset(2.5, 2.5),
+                        blurRadius: 0,
                       ),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(
-                      'assets/images/logo.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_rounded, color: Color(0xFF4F46E5), size: 22),
+                  child: Center(
+                    child: Text(
+                      "B",
+                      style: GoogleFonts.spaceGrotesk(
+                        color: AppTheme.yellow,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Text(
-                  "BiteHub",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF0F172A),
-                    letterSpacing: -0.5,
-                  ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "BITEHUB",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    Text(
+                      "KITCHEN PORTAL",
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.black.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -934,13 +953,13 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               children: [
-                _buildSidebarItem(0, Icons.dashboard_outlined, "Dashboard"),
-                _buildSidebarItem(1, Icons.restaurant_menu_rounded, "Menu Management"),
-                _buildSidebarItem(2, Icons.receipt_long_outlined, "Orders"),
-                _buildSidebarItem(3, Icons.account_balance_wallet_outlined, "Payouts"),
-                _buildSidebarItem(4, Icons.bar_chart_rounded, "Analytics"),
-                _buildSidebarItem(5, Icons.people_outline_rounded, "Customers"),
-                _buildSidebarItem(6, Icons.settings_outlined, "Settings"),
+                _buildSidebarItem(0, Icons.dashboard_outlined, "DASHBOARD"),
+                _buildSidebarItem(1, Icons.restaurant_menu_rounded, "MENU MGMT"),
+                _buildSidebarItem(2, Icons.receipt_long_outlined, "LIVE ORDERS"),
+                _buildSidebarItem(3, Icons.account_balance_wallet_outlined, "PAYOUTS"),
+                _buildSidebarItem(4, Icons.bar_chart_rounded, "ANALYTICS"),
+                _buildSidebarItem(5, Icons.people_outline_rounded, "CUSTOMERS"),
+                _buildSidebarItem(6, Icons.settings_outlined, "SETTINGS"),
               ],
             ),
           ),
@@ -953,25 +972,41 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     final isSelected = _selectedNavIndex == index;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        dense: true,
-        tileColor: isSelected ? const Color(0xFFEEF2FF) : Colors.transparent,
-        leading: Icon(
-          icon,
-          size: 20,
-          color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
-        ),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedNavIndex = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.yellow : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+            border: Border.all(
+              color: isSelected ? AppTheme.black : Colors.transparent,
+              width: isSelected ? 2 : 0,
+            ),
+            boxShadow: isSelected
+                ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)]
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: AppTheme.black,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                  color: AppTheme.black,
+                ),
+              ),
+            ],
           ),
         ),
-        onTap: () => setState(() => _selectedNavIndex = index),
       ),
     );
   }
@@ -980,9 +1015,9 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   Widget _buildTopBar({required bool isLargeScreen}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: const Color(0xFFE2E8F0))),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(bottom: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth)),
       ),
       child: SafeArea(
         bottom: false,
@@ -990,19 +1025,17 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
           children: [
             // Restaurant Thumbnail Image
             Container(
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: AppTheme.black, width: 2),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&auto=format&fit=crop&q=60",
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.restaurant, color: Color(0xFF4F46E5)),
-                ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.network(
+                "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&auto=format&fit=crop&q=60",
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(color: AppTheme.yellow, child: const Icon(Icons.restaurant, color: AppTheme.black)),
               ),
             ),
             const SizedBox(width: 12),
@@ -1017,11 +1050,11 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                     children: [
                       Flexible(
                         child: Text(
-                          _restName,
-                          style: const TextStyle(
+                          _restName.toUpperCase(),
+                          style: GoogleFonts.spaceGrotesk(
                             fontSize: 16,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF0F172A),
+                            color: AppTheme.black,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1030,15 +1063,16 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(4),
+                          color: AppTheme.yellow,
+                          borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                          border: Border.all(color: AppTheme.black, width: 1.5),
                         ),
-                        child: const Text(
+                        child: Text(
                           "RESTAURANT",
-                          style: TextStyle(
+                          style: GoogleFonts.ibmPlexMono(
                             fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF64748B),
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.black,
                             letterSpacing: 0.5,
                           ),
                         ),
@@ -1129,23 +1163,23 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     );
   }
 
-  // BOTTOM NAVIGATION FOR MOBILE
+  // BOTTOM NAVIGATION FOR MOBILE - Brutalism 2.0
   Widget _buildMobileBottomNav() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: const Color(0xFFE2E8F0))),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(top: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildMobileNavItem(0, Icons.dashboard_outlined, "Dashboard"),
-            _buildMobileNavItem(1, Icons.restaurant_menu_rounded, "Menu"),
-            _buildMobileNavItem(2, Icons.receipt_long_outlined, "Orders"),
-            _buildMobileNavItem(3, Icons.account_balance_wallet_outlined, "Payouts"),
-            _buildMobileNavItem(6, Icons.settings_outlined, "Settings"),
+            _buildMobileNavItem(0, Icons.dashboard_outlined, "DASHBOARD"),
+            _buildMobileNavItem(1, Icons.restaurant_menu_rounded, "MENU"),
+            _buildMobileNavItem(2, Icons.receipt_long_outlined, "ORDERS"),
+            _buildMobileNavItem(3, Icons.account_balance_wallet_outlined, "PAYOUTS"),
+            _buildMobileNavItem(6, Icons.settings_outlined, "SETTINGS"),
           ],
         ),
       ),
@@ -1157,20 +1191,35 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedNavIndex = index),
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 22, color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B)),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
-            ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.yellow : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(
+            color: isSelected ? AppTheme.black : Colors.transparent,
+            width: isSelected ? 1.5 : 0,
           ),
-        ],
+          boxShadow: isSelected
+              ? const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)]
+              : null,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20, color: AppTheme.black),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                color: AppTheme.black,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1203,46 +1252,55 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        // Title Row
+        // Title Row - Brutalism 2.0
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
-                  "Revenue overview",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                  "REVENUE OVERVIEW",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
+                    letterSpacing: -0.5,
+                  ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
-                  "Track your sales, orders and payouts",
-                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                  "SALES, ORDERS & DIRECT SETTLEMENT TELEMETRY",
+                  style: GoogleFonts.ibmPlexMono(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF64748B),
+                  ),
                 ),
               ],
             ),
             // Date picker pill (interactive)
-            InkWell(
+            GestureDetector(
               onTap: () => _pickDashboardDate(context),
-              borderRadius: BorderRadius.circular(10),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                  boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)],
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today_outlined, size: 14, color: Color(0xFF64748B)),
+                    const Icon(Icons.calendar_today_outlined, size: 14, color: AppTheme.black),
                     const SizedBox(width: 8),
                     Text(
-                      "${_getMonthName(_selectedDate.month)} ${_selectedDate.day}, ${_selectedDate.year}",
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A)),
+                      "${_getMonthName(_selectedDate.month).toUpperCase()} ${_selectedDate.day}, ${_selectedDate.year}",
+                      style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w900, color: AppTheme.black),
                     ),
                     const SizedBox(width: 4),
-                    const Icon(Icons.keyboard_arrow_down, size: 16, color: Color(0xFF64748B)),
+                    const Icon(Icons.keyboard_arrow_down, size: 16, color: AppTheme.black),
                   ],
                 ),
               ),
@@ -1708,19 +1766,23 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     return GestureDetector(
       onTap: () => setState(() => _revenueTimeFilter = label),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: const Duration(milliseconds: 100),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+          color: isSelected ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(color: AppTheme.black, width: 2),
+          boxShadow: isSelected
+              ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)]
+              : null,
         ),
         child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xFF475569),
+          label.toUpperCase(),
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
+            color: AppTheme.black,
+            letterSpacing: 0.5,
           ),
         ),
       ),
@@ -1737,20 +1799,8 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
     Color? badgeColor,
     String? ratingText,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1758,18 +1808,23 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
+                  color: AppTheme.yellow,
+                  border: Border.all(color: AppTheme.black, width: 1.5),
                 ),
-                child: Icon(icon, color: iconColor, size: 16),
+                child: Icon(icon, color: AppTheme.black, size: 15),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  title,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                  title.toUpperCase(),
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
+                    letterSpacing: 0.5,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1777,7 +1832,12 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: AppTheme.black,
+              letterSpacing: -0.5,
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1785,7 +1845,7 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               Flexible(
                 child: Text(
                   subtext,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B), fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1793,24 +1853,24 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.green,
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
                   child: Text(
-                    badgeText,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor ?? const Color(0xFF10B981)),
+                    badgeText.toUpperCase(),
+                    style: GoogleFonts.ibmPlexMono(fontSize: 9, fontWeight: FontWeight.w900, color: AppTheme.black),
                   ),
                 ),
               if (ratingText != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.yellow,
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
                   child: Text(
-                    ratingText,
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
+                    ratingText.toUpperCase(),
+                    style: GoogleFonts.ibmPlexMono(fontSize: 9, fontWeight: FontWeight.w900, color: AppTheme.black),
                   ),
                 ),
             ],
@@ -1821,13 +1881,8 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   }
 
   Widget _buildRevenueChartCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return BrutalistCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1835,12 +1890,24 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                children: const [
-                  Icon(Icons.bar_chart_rounded, color: Color(0xFF4F46E5), size: 20),
-                  SizedBox(width: 8),
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: AppTheme.yellow,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                    ),
+                    child: const Icon(Icons.bar_chart_rounded, color: AppTheme.black, size: 16),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    "Revenue & Orders Trend",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                    "REVENUE & ORDERS TREND",
+                    style: GoogleFonts.spaceGrotesk(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      color: AppTheme.black,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ],
               ),
@@ -1853,17 +1920,21 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                     child: GestureDetector(
                       onTap: () => setState(() => _chartFrequency = freq),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: isSel ? const Color(0xFF4F46E5) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
+                          color: isSel ? AppTheme.yellow : AppTheme.surface,
+                          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                          border: Border.all(color: AppTheme.black, width: 1.5),
+                          boxShadow: isSel
+                              ? const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)]
+                              : null,
                         ),
                         child: Text(
-                          freq,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: isSel ? Colors.white : const Color(0xFF64748B),
+                          freq.toUpperCase(),
+                          style: GoogleFonts.spaceGrotesk(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.black,
                           ),
                         ),
                       ),
@@ -1876,14 +1947,14 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
           const SizedBox(height: 12),
           // Legend
           Row(
-            children: const [
-              Icon(Icons.circle, color: Color(0xFF4F46E5), size: 8),
-              SizedBox(width: 4),
-              Text("Sales (₹)", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
-              SizedBox(width: 14),
-              Icon(Icons.circle, color: Color(0xFF94A3B8), size: 8),
-              SizedBox(width: 4),
-              Text("Orders", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+            children: [
+              Container(width: 10, height: 10, decoration: BoxDecoration(color: AppTheme.yellow, border: Border.all(color: AppTheme.black, width: 1))),
+              const SizedBox(width: 4),
+              Text("SALES (₹)", style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.black)),
+              const SizedBox(width: 14),
+              Container(width: 10, height: 10, decoration: BoxDecoration(color: AppTheme.surface, border: Border.all(color: AppTheme.black, width: 1))),
+              const SizedBox(width: 4),
+              Text("ORDERS", style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.black)),
             ],
           ),
           const SizedBox(height: 24),
@@ -1897,9 +1968,9 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                 return Container(
                   height: 140,
                   alignment: Alignment.center,
-                  child: const Text(
-                    "No sales recorded yet. Daily revenue trends will appear here once orders arrive.",
-                    style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  child: Text(
+                    "NO SALES RECORDED YET // DAILY REVENUE TELEMETRY PENDING",
+                    style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B), fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 );
@@ -1922,7 +1993,7 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
 
                     return _buildChartBar(
                       date: shortDate,
-                      orders: "$ordersCount orders",
+                      orders: "$ordersCount ord",
                       amount: rev >= 1000 ? "₹${(rev / 1000).toStringAsFixed(1)}k" : "₹${rev.toStringAsFixed(0)}",
                       ratio: ratio,
                       isPeak: isPeak,
@@ -1942,19 +2013,30 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          Text(amount, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isPeak ? const Color(0xFF10B981) : const Color(0xFF4F46E5))),
+          Text(
+            amount,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              color: isPeak ? AppTheme.black : const Color(0xFF64748B),
+            ),
+          ),
           const SizedBox(height: 6),
           Container(
             height: 110 * ratio,
             width: 32,
             decoration: BoxDecoration(
-              color: isPeak ? const Color(0xFF10B981) : const Color(0xFF6366F1),
-              borderRadius: BorderRadius.circular(6),
+              color: isPeak ? AppTheme.yellow : AppTheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+              border: Border.all(color: AppTheme.black, width: 2),
+              boxShadow: isPeak
+                  ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)]
+                  : null,
             ),
           ),
           const SizedBox(height: 8),
-          Text(date, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
-          Text(orders, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+          Text(date, style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.black)),
+          Text(orders, style: GoogleFonts.ibmPlexMono(fontSize: 9, color: const Color(0xFF64748B))),
         ],
       ),
     );
@@ -1963,13 +2045,8 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   Widget _buildLiveOrdersPreviewCard() {
     final activeOrders = _incomingOrders.where((o) => o.orderStatus != "Delivered").take(3).toList();
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return BrutalistCard(
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1981,71 +2058,95 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: AppTheme.green, border: Border.all(color: AppTheme.black, width: 1)),
                   ),
                   const SizedBox(width: 8),
-                  const Text("Live Orders", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                  Text(
+                    "LIVE ORDERS",
+                    style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w900, color: AppTheme.black, letterSpacing: 0.5),
+                  ),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(6)),
-                    child: Text("${_incomingOrders.where((o) => o.orderStatus != 'Delivered').length} Active", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF10B981))),
+                    decoration: BoxDecoration(
+                      color: AppTheme.yellow,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                    ),
+                    child: Text(
+                      "${_incomingOrders.where((o) => o.orderStatus != 'Delivered').length} ACTIVE",
+                      style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w900, color: AppTheme.black),
+                    ),
                   ),
                 ],
               ),
               GestureDetector(
                 onTap: () => setState(() => _selectedNavIndex = 2), // Go to Orders
-                child: const Text("View all →", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
+                child: Text(
+                  "VIEW ALL →",
+                  style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w900, color: AppTheme.black),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 16),
           ...activeOrders.map((ord) {
-            Color statusBg = const Color(0xFFFEF3C7);
-            Color statusText = const Color(0xFFD97706);
+            Color statusBg = AppTheme.yellow;
+            Color statusText = AppTheme.black;
             if (ord.orderStatus == "Preparing") {
-              statusBg = const Color(0xFFEEF2FF);
-              statusText = const Color(0xFF4F46E5);
+              statusBg = AppTheme.blue;
+              statusText = AppTheme.surface;
             } else if (ord.orderStatus == "Ready") {
-              statusBg = const Color(0xFFE0F2FE);
-              statusText = const Color(0xFF0284C7);
+              statusBg = AppTheme.green;
+              statusText = AppTheme.black;
             }
 
             return Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                color: AppTheme.bg,
+                border: Border.all(color: AppTheme.black, width: 1.5),
+                boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)],
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.person_outline_rounded, size: 20, color: Color(0xFF64748B)),
-                  const SizedBox(width: 10),
+                  const Icon(Icons.person_outline_rounded, size: 18, color: AppTheme.black),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            Text("#${ord.orderId}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A))),
+                            Text(
+                              "#${ord.orderId}",
+                              style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 12, color: AppTheme.black),
+                            ),
                             const SizedBox(width: 6),
-                            Text("₹${ord.totalAmount.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A))),
+                            Text(
+                              "₹${ord.totalAmount.toStringAsFixed(2)}",
+                              style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 12, color: AppTheme.black),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 2),
                         Text(
                           "${ord.userName ?? 'Customer'} • ${ord.orderDate ?? 'Just now'}",
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                          style: GoogleFonts.spaceGrotesk(fontSize: 10.5, color: const Color(0xFF64748B)),
                         ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(6)),
-                    child: Text(ord.orderStatus, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusText)),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: statusBg,
+                      border: Border.all(color: AppTheme.black, width: 1),
+                    ),
+                    child: Text(
+                      ord.orderStatus.toUpperCase(),
+                      style: GoogleFonts.ibmPlexMono(fontSize: 9.5, fontWeight: FontWeight.w900, color: statusText),
+                    ),
                   ),
                 ],
               ),
@@ -2242,53 +2343,44 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   Widget _buildDishListItem(RestaurantItemModel dish) {
     final isAvailable = _itemAvailability[dish.itemName] ?? true;
 
-    return Container(
+    return BrutalistCard(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      shadowOffset: const Offset(2.5, 2.5),
       child: Row(
         children: [
           // Food Image with Veg Indicator
           Stack(
             children: [
-              ItemImageWidget(
-                imageUrl: dish.imageUrl,
-                itemName: dish.itemName,
-                category: dish.foodName,
-                width: 68,
-                height: 68,
-                borderRadius: 12,
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppTheme.black, width: 2),
+                ),
+                child: ItemImageWidget(
+                  imageUrl: dish.imageUrl,
+                  itemName: dish.itemName,
+                  category: dish.foodName,
+                  width: 68,
+                  height: 68,
+                  borderRadius: 0,
+                ),
               ),
               Positioned(
                 top: 4,
                 left: 4,
                 child: Container(
-                  padding: const EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4),
-                    ],
+                    color: AppTheme.surface,
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
-                  child: Text(dish.isVeg ? "🟢" : "🔴", style: const TextStyle(fontSize: 10)),
+                  child: Text(dish.isVeg ? "🟢" : "🔴", style: const TextStyle(fontSize: 9)),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
 
           // Dish Details (Title, Category, Price, Discount)
           Expanded(
@@ -2296,37 +2388,37 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  dish.itemName,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF0F172A)),
+                  dish.itemName.toUpperCase(),
+                  style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 14, color: AppTheme.black),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  dish.foodName ?? "Main Course",
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  (dish.foodName ?? "Main Course").toUpperCase(),
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B), fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     Text(
                       "₹${dish.finalPrice.toStringAsFixed(2)}",
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Color(0xFF0F172A)),
+                      style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 14, color: AppTheme.black),
                     ),
                     if (dish.discount > 0) ...[
                       const SizedBox(width: 6),
                       Text(
                         "₹${dish.basePrice.toStringAsFixed(2)}",
-                        style: const TextStyle(decoration: TextDecoration.lineThrough, color: Color(0xFF94A3B8), fontSize: 12),
+                        style: GoogleFonts.ibmPlexMono(decoration: TextDecoration.lineThrough, color: const Color(0xFF94A3B8), fontSize: 11),
                       ),
                       const SizedBox(width: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFECFDF5),
-                          borderRadius: BorderRadius.circular(4),
+                          color: AppTheme.yellow,
+                          border: Border.all(color: AppTheme.black, width: 1),
                         ),
                         child: Text(
                           "${dish.discount.toStringAsFixed(0)}% OFF",
-                          style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 10),
+                          style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontWeight: FontWeight.w900, fontSize: 9.5),
                         ),
                       ),
                     ],
@@ -2341,35 +2433,41 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: isAvailable ? const Color(0xFFECFDF5) : const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(8),
+                  color: isAvailable ? AppTheme.yellow : AppTheme.surface,
+                  border: Border.all(color: AppTheme.black, width: 1.5),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      isAvailable ? "Available" : "Sold Out",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: isAvailable ? const Color(0xFF10B981) : const Color(0xFF64748B),
+                      isAvailable ? "IN STOCK" : "SOLD OUT",
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
                       ),
                     ),
                     const SizedBox(width: 4),
                     Transform.scale(
-                      scale: 0.8,
+                      scale: 0.75,
                       child: Switch(
                         value: isAvailable,
-                        activeColor: const Color(0xFF10B981),
+                        activeColor: AppTheme.black,
+                        activeTrackColor: AppTheme.surface,
                         onChanged: (val) {
                           setState(() => _itemAvailability[dish.itemName] = val);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text("${dish.itemName} is now ${val ? 'Available' : 'Sold Out'}"),
+                              content: Text("${dish.itemName} is now ${val ? 'Available' : 'Sold Out'}", style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black)),
+                              backgroundColor: AppTheme.yellow,
                               duration: const Duration(seconds: 1),
                               behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                                side: const BorderSide(color: AppTheme.black, width: 2),
+                              ),
                             ),
                           );
                         },
@@ -2378,16 +2476,29 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 6),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, color: Color(0xFF2563EB), size: 20),
-                tooltip: "Edit Dish",
-                onPressed: () => _showAddEditDishDialog(existingItem: dish),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () => _showAddEditDishDialog(existingItem: dish),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    border: Border.all(color: AppTheme.black, width: 1.5),
+                  ),
+                  child: const Icon(Icons.edit_outlined, color: AppTheme.black, size: 16),
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 20),
-                tooltip: "Delete Dish",
-                onPressed: () => _deleteDish(dish.itemName),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () => _deleteDish(dish.itemName),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    border: Border.all(color: AppTheme.black, width: 1.5),
+                  ),
+                  child: const Icon(Icons.delete_outline_rounded, color: AppTheme.red, size: 16),
+                ),
               ),
             ],
           ),
@@ -2534,38 +2645,26 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
   }
 
   Widget _buildLiveOrderCard(OrderModel ord) {
-    Color statusBg = const Color(0xFFFEF3C7);
-    Color statusText = const Color(0xFFD97706);
+    Color statusBg = AppTheme.yellow;
+    Color statusText = AppTheme.black;
 
     if (ord.orderStatus == "Preparing") {
-      statusBg = const Color(0xFFEEF2FF);
-      statusText = const Color(0xFF4F46E5);
+      statusBg = AppTheme.blue;
+      statusText = AppTheme.surface;
     } else if (ord.orderStatus == "Ready") {
-      statusBg = const Color(0xFFE0F2FE);
-      statusText = const Color(0xFF0284C7);
+      statusBg = AppTheme.orange;
+      statusText = AppTheme.surface;
     } else if (ord.orderStatus == "Delivered") {
-      statusBg = const Color(0xFFECFDF5);
-      statusText = const Color(0xFF10B981);
+      statusBg = AppTheme.green;
+      statusText = AppTheme.black;
     } else if (ord.orderStatus == "Cancelled") {
-      statusBg = const Color(0xFFFEE2E2);
-      statusText = const Color(0xFFDC2626);
+      statusBg = AppTheme.red;
+      statusText = AppTheme.surface;
     }
 
-    return Container(
+    return BrutalistCard(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -2577,15 +2676,19 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                 children: [
                   Text(
                     "#${ord.orderId}",
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Color(0xFF0F172A)),
+                    style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 17, color: AppTheme.black),
                   ),
                   const SizedBox(width: 10),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(6)),
+                    decoration: BoxDecoration(
+                      color: statusBg,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                      boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)],
+                    ),
                     child: Text(
-                      ord.orderStatus,
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusText),
+                      ord.orderStatus.toUpperCase(),
+                      style: GoogleFonts.ibmPlexMono(fontSize: 10.5, fontWeight: FontWeight.w900, color: statusText),
                     ),
                   ),
                 ],
@@ -2593,59 +2696,69 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               Row(
                 children: [
                   Text(
-                    ord.orderDate ?? "2 mins ago",
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+                    ord.orderDate ?? "2 MINS AGO",
+                    style: GoogleFonts.ibmPlexMono(fontSize: 10.5, color: const Color(0xFF64748B), fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Text(
                     "₹${ord.totalAmount.toStringAsFixed(2)}",
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0F172A)),
+                    style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 16, color: AppTheme.black),
                   ),
                 ],
               ),
             ],
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           // Customer and Address
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              InkWell(
+              GestureDetector(
                 onTap: () => _showCallDialog(context, ord.userName ?? "Customer", ord.userPhone ?? "9810000100"),
-                borderRadius: BorderRadius.circular(6),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
-                      const SizedBox(width: 6),
-                      Text(
-                        "${ord.userName ?? 'Customer'} • ${ord.userPhone ?? '9810000100'}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF334155)),
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_outline_rounded, size: 16, color: AppTheme.black),
+                    const SizedBox(width: 6),
+                    Text(
+                      "${ord.userName ?? 'Customer'} • ${ord.userPhone ?? '9810000100'}",
+                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.black),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        color: AppTheme.green,
+                        border: Border.all(color: AppTheme.black, width: 1),
                       ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.phone_in_talk_outlined, size: 13, color: Color(0xFF4F46E5)),
-                    ],
-                  ),
+                      child: const Icon(Icons.phone, size: 10, color: AppTheme.black),
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                "Payment: ${ord.paymentMethod ?? 'UPI'}",
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  border: Border.all(color: AppTheme.black, width: 1),
+                ),
+                child: Text(
+                  "${ord.paymentMethod ?? 'UPI'} // PAID",
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.bold, color: AppTheme.black),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFFEF4444)),
+              const Icon(Icons.location_on_outlined, size: 16, color: AppTheme.red),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   ord.deliveryAddress.isNotEmpty ? ord.deliveryAddress : "14 MG Road, Indiranagar, Karnataka - 560038",
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                  style: GoogleFonts.spaceGrotesk(fontSize: 11.5, color: const Color(0xFF4A4A4A), fontWeight: FontWeight.w600),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -2656,54 +2769,60 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
 
           // Dishes in Order Container
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: AppTheme.bg,
+              border: Border.all(color: AppTheme.black, width: 1.5),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                    Container(
+                      decoration: BoxDecoration(border: Border.all(color: AppTheme.black, width: 1.5)),
                       child: Image.network(
                         "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=100&auto=format&fit=crop&q=60",
-                        width: 44,
-                        height: 44,
+                        width: 40,
+                        height: 40,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.restaurant, color: Color(0xFF4F46E5)),
+                        errorBuilder: (_, __, ___) => Container(color: AppTheme.yellow, width: 40, height: 40, child: const Icon(Icons.restaurant, color: AppTheme.black)),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           ord.orderId == 206 ? "Chicken Biryani + 2 more items" : "Paneer Butter Masala",
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A)),
+                          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.black),
                         ),
                         Text(
                           ord.orderId == 206 ? "3 items • ₹1,260.00" : "1x ₹252.00",
-                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                          style: GoogleFonts.ibmPlexMono(fontSize: 11, color: const Color(0xFF64748B)),
                         ),
                       ],
                     ),
                   ],
                 ),
-                TextButton(
-                  onPressed: () => _showOrderItemsDialog(context, ord),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        ord.orderId == 206 ? "View items (3)" : "View items (1)",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF4F46E5)),
-                      ),
-                      const Icon(Icons.chevron_right, size: 16, color: Color(0xFF4F46E5)),
-                    ],
+                GestureDetector(
+                  onTap: () => _showOrderItemsDialog(context, ord),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          ord.orderId == 206 ? "ITEMS (3)" : "ITEMS (1)",
+                          style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black),
+                        ),
+                        const Icon(Icons.chevron_right, size: 14, color: AppTheme.black),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -2723,9 +2842,9 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                   const SizedBox(width: 6),
                   Text(
                     ord.agentName != null
-                        ? "${ord.agentName} • ${ord.agentVehicle ?? 'KA-08'} ★ ${ord.agentRating ?? 5.0}"
-                        : "Assign Courier ⌄",
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
+                        ? "${ord.agentName} • ${ord.agentVehicle ?? 'KA-08'} ★ ${ord.agentRating ?? 5.0}".toUpperCase()
+                        : "ASSIGN COURIER ⌄",
+                    style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.black),
                   ),
                   if (ord.agentPhone != null) ...[
                     const SizedBox(width: 8),
@@ -2733,8 +2852,8 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
                       onTap: () => _showCallDialog(context, ord.agentName ?? "Courier", ord.agentPhone ?? "9810000100"),
                       child: Container(
                         padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(color: Color(0xFFECFDF5), shape: BoxShape.circle),
-                        child: const Icon(Icons.call, size: 14, color: Color(0xFF10B981)),
+                        decoration: BoxDecoration(color: AppTheme.green, border: Border.all(color: AppTheme.black, width: 1)),
+                        child: const Icon(Icons.call, size: 12, color: AppTheme.black),
                       ),
                     ),
                   ],
@@ -2745,54 +2864,58 @@ class _RestaurantDashboardScreenState extends State<RestaurantDashboardScreen> {
               Row(
                 children: [
                   if (ord.orderStatus == "Placed") ...[
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFFEF4444),
-                        side: const BorderSide(color: Color(0xFFEF4444)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      ),
+                    BrutalistButton(
+                      text: "REJECT",
+                      bgColor: AppTheme.surface,
+                      textColor: AppTheme.red,
+                      borderColor: AppTheme.red,
+                      height: 38,
+                      fontSize: 11,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       onPressed: () => _updateOrderStatus(ord.orderId, "Cancelled"),
-                      child: const Text("Reject", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
                     const SizedBox(width: 8),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
+                    BrutalistButton(
+                      text: "START PREP",
+                      bgColor: AppTheme.yellow,
+                      textColor: AppTheme.black,
+                      height: 38,
+                      fontSize: 11,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       onPressed: () => _updateOrderStatus(ord.orderId, "Preparing"),
-                      child: const Text("Start Preparing", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
                   ] else if (ord.orderStatus == "Preparing") ...[
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
+                    BrutalistButton(
+                      text: "READY FOR DISPATCH",
+                      bgColor: AppTheme.blue,
+                      textColor: AppTheme.surface,
+                      height: 38,
+                      fontSize: 11,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       onPressed: () => _updateOrderStatus(ord.orderId, "Ready"),
-                      child: const Text("Ready for Dispatch", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                     ),
                   ] else if (ord.orderStatus == "Ready") ...[
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.moped, size: 16, color: Colors.white),
-                      label: const Text("Handed to Courier", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      ),
+                    BrutalistButton(
+                      text: "HANDED TO COURIER",
+                      icon: Icons.moped,
+                      bgColor: AppTheme.green,
+                      textColor: AppTheme.black,
+                      height: 38,
+                      fontSize: 11,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       onPressed: () => _updateOrderStatus(ord.orderId, "Delivered"),
                     ),
                   ] else ...[
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(8)),
-                      child: const Text("Completed", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF10B981))),
+                      decoration: BoxDecoration(
+                        color: AppTheme.green,
+                        border: Border.all(color: AppTheme.black, width: 1.5),
+                      ),
+                      child: Text(
+                        "COMPLETED",
+                        style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black),
+                      ),
                     ),
                   ],
                 ],

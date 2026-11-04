@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/models.dart';
 import '../../services/api_service.dart';
 import '../../services/cart_manager.dart';
 import '../../utils/item_image_helper.dart';
 import '../../widgets/floating_cart_bar.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 
 class RestaurantDetailScreen extends StatefulWidget {
   final RestaurantModel restaurant;
@@ -26,7 +29,12 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   String _selectedCategory = "Popular";
   bool _showSearchField = false;
 
-  final List<String> _categories = ["Popular", "Biryani", "Starters", "Main Course"];
+  final List<String> _categories = [
+    "Popular",
+    "Biryani",
+    "Starters",
+    "Main Course"
+  ];
 
   @override
   void initState() {
@@ -37,7 +45,8 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   Future<void> _loadMenu() async {
     setState(() => _isLoading = true);
     try {
-      final items = await ApiService.getRestaurantMenu(widget.restaurant.restId);
+      final items =
+          await ApiService.getRestaurantMenu(widget.restaurant.restId);
       if (mounted) {
         setState(() {
           _menuItems = items;
@@ -52,8 +61,12 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   List<RestaurantItemModel> get _filteredDishes {
     return _menuItems.where((dish) {
       if (_searchQuery.isNotEmpty) {
-        final matches = dish.itemName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            (dish.foodName ?? "").toLowerCase().contains(_searchQuery.toLowerCase());
+        final matches = dish.itemName
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()) ||
+            (dish.foodName ?? "")
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase());
         if (!matches) return false;
       }
 
@@ -74,22 +87,36 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text("Replace cart items?"),
+          backgroundColor: AppTheme.bg,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            side: const BorderSide(color: AppTheme.black, width: 3),
+          ),
+          title: Text(
+            "REPLACE CART ITEMS?",
+            style: GoogleFonts.spaceGrotesk(
+              fontWeight: FontWeight.w900,
+              color: AppTheme.black,
+            ),
+          ),
           content: Text(
-            "Your cart already has items from ${cartManager.activeRestName ?? 'another vendor'}. Would you like to clear it and start fresh with ${widget.restaurant.rName}?",
+            "Your cart already has items from ${cartManager.activeRestName ?? 'another vendor'}. Clear it and start fresh with ${widget.restaurant.rName}?",
+            style: GoogleFonts.inter(fontSize: 13),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text("Cancel"),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              child: Text(
+                "CANCEL",
+                style: GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.black,
+                ),
               ),
+            ),
+            BrutalistButton.yellow(
+              text: "DISCARD & ADD",
+              height: 38,
               onPressed: () {
                 cartManager.clear();
                 cartManager.addItem(
@@ -104,7 +131,6 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                 );
                 Navigator.pop(ctx);
               },
-              child: const Text("Discard & Add"),
             ),
           ],
         ),
@@ -126,37 +152,50 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final r = widget.restaurant;
-    final eta = "${25 + (r.restId % 3) * 5}-${35 + (r.restId % 3) * 5} mins";
-    final dist = "${(1.8 + (r.restId % 3) * 0.4).toStringAsFixed(1)} km";
-    final costForTwo = "₹${350 + (r.restId % 4) * 50} for two";
+    final eta = "${25 + (r.restId % 3) * 5}-${35 + (r.restId % 3) * 5} MINS";
+    final dist = "${(1.8 + (r.restId % 3) * 0.4).toStringAsFixed(1)} KM";
+    final costForTwo = "₹${350 + (r.restId % 4) * 50} FOR TWO";
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          r.rName,
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A)),
+          r.rName.toUpperCase(),
+          style: GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            color: AppTheme.black,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.favorite_border_rounded, color: Color(0xFF0F172A)),
+            icon: const Icon(Icons.favorite_border_rounded,
+                color: AppTheme.black),
             tooltip: "Favorite",
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Added to favorites!"), duration: Duration(seconds: 1)),
+                SnackBar(
+                  content: Text(
+                    "ADDED TO FAVORITES ★",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.black,
+                    ),
+                  ),
+                  backgroundColor: AppTheme.yellow,
+                ),
               );
             },
           ),
           IconButton(
-            icon: const Icon(Icons.search_rounded, color: Color(0xFF0F172A)),
+            icon: const Icon(Icons.search_rounded, color: AppTheme.black),
             tooltip: "Search dishes",
-            onPressed: () => setState(() => _showSearchField = !_showSearchField),
+            onPressed: () =>
+                setState(() => _showSearchField = !_showSearchField),
           ),
           const SizedBox(width: 6),
         ],
@@ -164,7 +203,12 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
       body: Stack(
         children: [
           _isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.black,
+                    strokeWidth: 3,
+                  ),
+                )
               : CustomScrollView(
                   slivers: [
                     // Search bar when toggled
@@ -174,45 +218,49 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                           child: TextField(
                             autofocus: true,
-                            onChanged: (val) => setState(() => _searchQuery = val),
+                            onChanged: (val) =>
+                                setState(() => _searchQuery = val),
+                            style: GoogleFonts.ibmPlexMono(fontSize: 13),
                             decoration: InputDecoration(
                               hintText: "Search in ${r.rName}...",
-                              prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF64748B)),
+                              prefixIcon: const Icon(Icons.search_rounded,
+                                  size: 20, color: AppTheme.black),
                               suffixIcon: IconButton(
-                                icon: const Icon(Icons.close, size: 18),
+                                icon: const Icon(Icons.close_rounded,
+                                    size: 18, color: AppTheme.black),
                                 onPressed: () => setState(() {
                                   _showSearchField = false;
                                   _searchQuery = "";
                                 }),
                               ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2E8F0))),
                             ),
                           ),
                         ),
                       ),
 
-                    // Restaurant Header Card (Screen 4)
+                    // Restaurant Header Card
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFFF1F5F9)),
-                            boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 3)),
-                            ],
-                          ),
+                        child: BrutalistCard(
+                          bgColor: AppTheme.surface,
+                          padding: EdgeInsets.zero,
+                          shadowOffset: const Offset(4, 4),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Top Restaurant Banner
-                              ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                              Container(
+                                height: 140,
+                                width: double.infinity,
+                                decoration: const BoxDecoration(
+                                  border: Border(
+                                    bottom: BorderSide(
+                                      color: AppTheme.black,
+                                      width: AppTheme.borderWidth,
+                                    ),
+                                  ),
+                                ),
                                 child: AppCachedNetworkImage(
                                   imageUrl: ItemImageHelper.getBannerForRestaurant(
                                     r.rName,
@@ -223,22 +271,20 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                                   width: double.infinity,
                                   fit: BoxFit.cover,
                                   placeholder: Container(
-                                    height: 140,
-                                    width: double.infinity,
-                                    color: const Color(0xFFF1F5F9),
+                                    color: AppTheme.yellow,
                                     child: const Center(
-                                      child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF4F46E5)),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: AppTheme.black,
                                       ),
                                     ),
                                   ),
                                   errorWidget: Container(
-                                    height: 140,
-                                    width: double.infinity,
-                                    color: const Color(0xFFEEF2FF),
-                                    child: const Center(child: Icon(Icons.restaurant, color: Color(0xFF4F46E5), size: 36)),
+                                    color: AppTheme.bg,
+                                    child: const Center(
+                                      child: Icon(Icons.restaurant,
+                                          color: AppTheme.black, size: 36),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -248,79 +294,110 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                r.rName,
-                                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                                                r.rName.toUpperCase(),
+                                                style:
+                                                    GoogleFonts.spaceGrotesk(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: AppTheme.black,
+                                                ),
                                               ),
-                                              const SizedBox(height: 3),
+                                              const SizedBox(height: 2),
                                               Text(
-                                                r.rLocation,
-                                                style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                                r.rLocation.toUpperCase(),
+                                                style:
+                                                    GoogleFonts.ibmPlexMono(
+                                                  fontSize: 11,
+                                                  color:
+                                                      const Color(0xFF666666),
+                                                  fontWeight: FontWeight.w600,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
-                                        // Yellow rating pill: ★ 5.0 (2.1k) (Screen 4)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFFEF3C7),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              const Icon(Icons.star_rounded, size: 14, color: Color(0xFFD97706)),
-                                              const SizedBox(width: 3),
-                                              Text(
-                                                "${r.rRating.toStringAsFixed(1)} (2.1k)",
-                                                style: const TextStyle(color: Color(0xFF92400E), fontWeight: FontWeight.bold, fontSize: 11),
-                                              ),
-                                            ],
-                                          ),
+                                        // Rating badge
+                                        BrutalistBadge(
+                                          label:
+                                              "★ ${r.rRating.toStringAsFixed(1)} (2.1K)",
+                                          bgColor: AppTheme.yellow,
                                         ),
                                       ],
                                     ),
                                     const SizedBox(height: 14),
+                                    Container(
+                                        height: 2.0, color: AppTheme.black),
+                                    const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        _metaItem(Icons.timer_outlined, eta, "Delivery"),
-                                        const SizedBox(width: 16),
-                                        _metaItem(Icons.location_on_outlined, dist, "Distance"),
-                                        const SizedBox(width: 16),
-                                        _metaItem(Icons.payments_outlined, costForTwo, "Cost for two"),
+                                        _metaItem(Icons.timer_outlined, eta,
+                                            "DELIVERY"),
+                                        const SizedBox(width: 14),
+                                        _metaItem(
+                                            Icons.location_on_outlined,
+                                            dist,
+                                            "DISTANCE"),
+                                        const SizedBox(width: 14),
+                                        _metaItem(Icons.payments_outlined,
+                                            costForTwo, "COST FOR TWO"),
                                       ],
                                     ),
                                     const SizedBox(height: 14),
-                                    // Promo offer banner (Screen 4)
+
+                                    // Promo Offer Banner
                                     Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFFFFBEB),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: const Color(0xFFFDE68A)),
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Text("🎉", style: TextStyle(fontSize: 14)),
-                                    SizedBox(width: 8),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.yellow,
+                                        borderRadius: BorderRadius.circular(
+                                            AppTheme.borderRadius),
+                                        border: Border.all(
+                                            color: AppTheme.black, width: 2),
+                                      ),
+                                      child: Row(
                                         children: [
-                                          Text(
-                                            "Flat 20% OFF on all items",
-                                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF92400E)),
-                                          ),
-                                          Text(
-                                            "Use code FEAST20 at checkout",
-                                            style: TextStyle(fontSize: 10.5, color: Color(0xFFB45309)),
+                                          const Text("⚡",
+                                              style: TextStyle(fontSize: 16)),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "FLAT 20% OFF ON ALL ITEMS",
+                                                  style:
+                                                      GoogleFonts.spaceGrotesk(
+                                                    fontSize: 12,
+                                                    fontWeight:
+                                                        FontWeight.w900,
+                                                    color: AppTheme.black,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "USE COUPON: FEAST20 AT CHECKOUT",
+                                                  style:
+                                                      GoogleFonts.ibmPlexMono(
+                                                    fontSize: 10,
+                                                    fontWeight:
+                                                        FontWeight.w700,
+                                                    color:
+                                                        const Color(0xFF444444),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -331,13 +408,10 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                             ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
 
-                    // Category Pills Row (Popular, Biryani, Starters, Main Course - Screen 4)
+                    // Category Pills Row
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -345,28 +419,48 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
-                              height: 36,
+                              height: 38,
                               child: ListView(
                                 scrollDirection: Axis.horizontal,
                                 children: _categories.map((cat) {
                                   final isSel = _selectedCategory == cat;
                                   return GestureDetector(
-                                    onTap: () => setState(() => _selectedCategory = cat),
+                                    onTap: () => setState(
+                                        () => _selectedCategory = cat),
                                     child: Container(
                                       margin: const EdgeInsets.only(right: 8),
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14, vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: isSel ? const Color(0xFF4F46E5) : Colors.white,
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(color: isSel ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+                                        color: isSel
+                                            ? AppTheme.yellow
+                                            : AppTheme.surface,
+                                        borderRadius: BorderRadius.circular(
+                                            AppTheme.borderRadius),
+                                        border: Border.all(
+                                          color: AppTheme.black,
+                                          width: isSel
+                                              ? 2.5
+                                              : AppTheme.borderWidth,
+                                        ),
+                                        boxShadow: isSel
+                                            ? const [
+                                                BoxShadow(
+                                                  color: AppTheme.black,
+                                                  offset: Offset(2.5, 2.5),
+                                                  blurRadius: 0,
+                                                ),
+                                              ]
+                                            : null,
                                       ),
                                       child: Center(
                                         child: Text(
-                                          cat,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: isSel ? Colors.white : const Color(0xFF64748B),
+                                          cat.toUpperCase(),
+                                          style: GoogleFonts.spaceGrotesk(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w900,
+                                            color: AppTheme.black,
+                                            letterSpacing: 0.5,
                                           ),
                                         ),
                                       ),
@@ -376,23 +470,28 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                               ),
                             ),
                             const SizedBox(height: 18),
-                            // Section Title
-                            Text(
-                              "$_selectedCategory Items",
-                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                            BrutalistSectionHeader(
+                              title: "$_selectedCategory Menu",
+                              tag: "${_filteredDishes.length} DISHES",
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 12),
                           ],
                         ),
                       ),
                     ),
 
-                    // Menu Items List (Screen 4)
+                    // Menu Items List
                     if (_filteredDishes.isEmpty)
-                      const SliverFillRemaining(
+                      SliverFillRemaining(
                         hasScrollBody: false,
                         child: Center(
-                          child: Text("No dishes match your filter.", style: TextStyle(color: Colors.grey)),
+                          child: Text(
+                            "NO DISHES MATCH YOUR FILTER.",
+                            style: GoogleFonts.ibmPlexMono(
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF666666),
+                            ),
+                          ),
                         ),
                       )
                     else
@@ -409,12 +508,11 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                         ),
                       ),
 
-                    // Spacing for floating cart bar
-                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 130)),
                   ],
                 ),
 
-          // Floating Cart Bar at the bottom
+          // Floating Cart Bar
           Positioned(
             left: 0,
             right: 0,
@@ -429,37 +527,45 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
   Widget _metaItem(IconData icon, String title, String subtitle) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: const Color(0xFF64748B)),
+        Icon(icon, size: 14, color: AppTheme.black),
         const SizedBox(width: 4),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
-            Text(subtitle, style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+            Text(
+              title,
+              style: GoogleFonts.ibmPlexMono(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                color: AppTheme.black,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 9.5,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF666666),
+              ),
+            ),
           ],
         ),
       ],
     );
   }
 
-  // Dish Card with Overlaid ADD Stepper on Right Image (Screen 4)
+  // Dish Card with Overlaid ADD Stepper on Right Image
   Widget _buildDishCard(RestaurantItemModel dish) {
     return AnimatedBuilder(
       animation: cartManager,
       builder: (context, _) {
         final currentQty = cartManager.getItemQuantity(dish.itemName);
 
-        return Container(
-          margin: const EdgeInsets.only(bottom: 14),
+        return BrutalistCard(
+          bgColor: AppTheme.surface,
           padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 6, offset: const Offset(0, 2)),
-            ],
-          ),
+          margin: const EdgeInsets.only(bottom: 12),
+          shadowOffset: const Offset(3.5, 3.5),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -475,27 +581,21 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                           width: 14,
                           height: 14,
                           decoration: BoxDecoration(
-                            border: Border.all(color: dish.isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626), width: 1.5),
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          child: Center(
-                            child: Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: dish.isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
+                            color: dish.isVeg
+                                ? AppTheme.green
+                                : AppTheme.red,
+                            border: Border.all(
+                                color: AppTheme.black, width: 1.5),
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
                         const SizedBox(width: 6),
                         Text(
                           dish.isVeg ? "VEG" : "NON-VEG",
-                          style: TextStyle(
+                          style: GoogleFonts.ibmPlexMono(
                             fontSize: 9.5,
-                            fontWeight: FontWeight.bold,
-                            color: dish.isVeg ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                            fontWeight: FontWeight.w800,
+                            color: AppTheme.black,
                           ),
                         ),
                       ],
@@ -503,14 +603,21 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                     const SizedBox(height: 4),
                     Text(
                       dish.itemName,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
+                      ),
                     ),
                     if (dish.foodName != null && dish.foodName!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
                         child: Text(
                           dish.foodName!,
-                          style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                          style: GoogleFonts.inter(
+                            fontSize: 11.5,
+                            color: const Color(0xFF555555),
+                          ),
                         ),
                       ),
                     const SizedBox(height: 8),
@@ -518,18 +625,39 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
                       children: [
                         Text(
                           "₹${dish.finalPrice.toStringAsFixed(2)}",
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Color(0xFF0F172A)),
+                          style: GoogleFonts.ibmPlexMono(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            color: AppTheme.black,
+                          ),
                         ),
                         if (dish.discount > 0) ...[
                           const SizedBox(width: 6),
                           Text(
                             "₹${dish.basePrice.toStringAsFixed(2)}",
-                            style: const TextStyle(decoration: TextDecoration.lineThrough, color: Color(0xFF94A3B8), fontSize: 11),
+                            style: GoogleFonts.ibmPlexMono(
+                              decoration: TextDecoration.lineThrough,
+                              color: const Color(0xFF888888),
+                              fontSize: 11,
+                            ),
                           ),
                           const SizedBox(width: 6),
-                          Text(
-                            "${dish.discount.toStringAsFixed(0)}% OFF",
-                            style: const TextStyle(color: Color(0xFF16A34A), fontWeight: FontWeight.bold, fontSize: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: AppTheme.yellow,
+                              border: Border.all(
+                                  color: AppTheme.black, width: 1),
+                            ),
+                            child: Text(
+                              "${dish.discount.toStringAsFixed(0)}% OFF",
+                              style: GoogleFonts.ibmPlexMono(
+                                color: AppTheme.black,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 9.5,
+                              ),
+                            ),
                           ),
                         ],
                       ],
@@ -539,79 +667,104 @@ class _RestaurantDetailScreenState extends State<RestaurantDetailScreen> {
               ),
               const SizedBox(width: 14),
 
-              // Dish Image with Overlaid ADD Button at bottom (Screen 4)
+              // Dish Image with Overlaid Stepper
               SizedBox(
                 width: 95,
                 height: 105,
                 child: Stack(
                   alignment: Alignment.topCenter,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: ItemImageWidget(
-                        imageUrl: dish.imageUrl,
-                        itemName: dish.itemName,
-                        category: dish.foodName,
-                        width: 95,
-                        height: 90,
-                        fit: BoxFit.cover,
-                      ),
+                    ItemImageWidget(
+                      imageUrl: dish.imageUrl,
+                      itemName: dish.itemName,
+                      category: dish.foodName,
+                      width: 95,
+                      height: 85,
+                      fit: BoxFit.cover,
                     ),
-                    // Overlaid ADD / Stepper button at bottom edge
                     Positioned(
                       bottom: 0,
                       child: currentQty == 0
-                          ? Container(
-                              height: 30,
-                              width: 72,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: const Color(0xFF16A34A), width: 1.5),
-                                boxShadow: [
-                                  BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4, offset: const Offset(0, 2)),
-                                ],
-                              ),
-                              child: InkWell(
-                                onTap: () => _handleAddItem(dish),
-                                borderRadius: BorderRadius.circular(8),
-                                child: const Center(
+                          ? GestureDetector(
+                              onTap: () => _handleAddItem(dish),
+                              child: Container(
+                                height: 28,
+                                width: 72,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.yellow,
+                                  borderRadius: BorderRadius.circular(
+                                      AppTheme.borderRadius),
+                                  border: Border.all(
+                                      color: AppTheme.black, width: 2),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppTheme.black,
+                                      offset: Offset(1.5, 1.5),
+                                      blurRadius: 0,
+                                    ),
+                                  ],
+                                ),
+                                child: Center(
                                   child: Text(
-                                    "ADD",
-                                    style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF16A34A), fontSize: 12),
+                                    "ADD +",
+                                    style: GoogleFonts.spaceGrotesk(
+                                      fontWeight: FontWeight.w900,
+                                      color: AppTheme.black,
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 ),
                               ),
                             )
                           : Container(
-                              height: 30,
+                              height: 28,
                               width: 76,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF16A34A),
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(color: const Color(0xFF16A34A).withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2)),
-                                ],
+                                color: AppTheme.black,
+                                borderRadius: BorderRadius.circular(
+                                    AppTheme.borderRadius),
+                                border: Border.all(
+                                    color: AppTheme.black, width: 2),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   InkWell(
-                                    onTap: () => cartManager.decrementItem(dish.itemName),
+                                    onTap: () => cartManager
+                                        .decrementItem(dish.itemName),
                                     child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      child: Text("—", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 4, vertical: 2),
+                                      child: Text(
+                                        "—",
+                                        style: TextStyle(
+                                            color: AppTheme.surface,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 12),
+                                      ),
                                     ),
                                   ),
                                   Text(
                                     "$currentQty",
-                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                    style: GoogleFonts.ibmPlexMono(
+                                      color: AppTheme.yellow,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 11.5,
+                                    ),
                                   ),
                                   InkWell(
                                     onTap: () => _handleAddItem(dish),
                                     child: const Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      child: Text("+", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 4, vertical: 2),
+                                      child: Text(
+                                        "+",
+                                        style: TextStyle(
+                                            color: AppTheme.yellow,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 13),
+                                      ),
                                     ),
                                   ),
                                 ],

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import '../../services/api_service.dart';
 import '../../models/models.dart';
 import '../auth_screen.dart';
@@ -886,7 +889,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
         final isLargeScreen = constraints.maxWidth >= 850;
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF8FAFC),
+          backgroundColor: AppTheme.bg,
           body: isLargeScreen ? _buildDesktopLayout() : _buildMobileLayout(),
         );
       },
@@ -910,7 +913,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               // Page View
               Expanded(
                 child: _isLoading
-                    ? const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)))
+                    ? const Center(child: CircularProgressIndicator(color: AppTheme.black))
                     : _buildCurrentView(),
               ),
             ],
@@ -927,7 +930,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
         _buildTopBar(isLargeScreen: false),
         Expanded(
           child: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFF4F46E5)))
+              ? const Center(child: CircularProgressIndicator(color: AppTheme.black))
               : _buildCurrentView(),
         ),
         _buildMobileBottomNav(),
@@ -938,57 +941,70 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
   // SIDEBAR COMPONENT
   Widget _buildSidebar() {
     return Container(
-      width: 220,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(right: BorderSide(color: const Color(0xFFE2E8F0))),
+      width: 230,
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(right: BorderSide(color: AppTheme.black, width: 2.5)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Logo Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
             child: Row(
               children: [
                 Container(
-                  width: 36,
-                  height: 36,
+                  width: 38,
+                  height: 38,
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: AppTheme.black, width: 2.5),
+                    boxShadow: const [
+                      BoxShadow(color: AppTheme.black, offset: Offset(2.5, 2.5)),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+                  child: Center(
                     child: Image.asset(
                       'assets/images/logo.png',
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.flash_on_rounded, color: Color(0xFF4F46E5), size: 22),
+                      width: 24,
+                      height: 24,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.flash_on_rounded, color: AppTheme.black, size: 22),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Text(
-                  "BiteHub",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF0F172A),
-                    letterSpacing: -0.5,
-                  ),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "BITEHUB",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    Text(
+                      "DARK STORE HUB",
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.blue,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 8),
+          Container(height: 2.5, color: AppTheme.black),
+          const SizedBox(height: 12),
 
           // Nav Items
           Expanded(
@@ -1008,19 +1024,21 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
           // Bottom Store Status badge in Sidebar
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: const Color(0xFFE2E8F0))),
+            decoration: const BoxDecoration(
+              color: AppTheme.bg,
+              border: Border(top: BorderSide(color: AppTheme.black, width: 2.5)),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
-                    borderRadius: BorderRadius.circular(8),
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: AppTheme.black, width: 2),
                   ),
-                  child: const Icon(Icons.storefront, color: Color(0xFFD97706), size: 18),
+                  child: const Icon(Icons.storefront, color: AppTheme.black, size: 18),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -1029,15 +1047,15 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        _storeArea,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF0F172A)),
+                        _storeArea.toUpperCase(),
+                        style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: 11, color: AppTheme.black),
                         overflow: TextOverflow.ellipsis,
                       ),
                       Row(
                         children: [
-                          Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
+                          Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppTheme.green, shape: BoxShape.circle)),
                           const SizedBox(width: 4),
-                          const Text("Online", style: TextStyle(fontSize: 10, color: Color(0xFF10B981), fontWeight: FontWeight.bold)),
+                          Text("ONLINE", style: GoogleFonts.ibmPlexMono(fontSize: 10, color: AppTheme.black, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ],
@@ -1055,25 +1073,39 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
     final isSelected = _selectedNavIndex == index;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        dense: true,
-        tileColor: isSelected ? const Color(0xFFEEF2FF) : Colors.transparent,
-        leading: Icon(
-          icon,
-          size: 20,
-          color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
-        ),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-            color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: InkWell(
+        onTap: () => setState(() => _selectedNavIndex = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppTheme.yellow : Colors.transparent,
+            borderRadius: BorderRadius.circular(2),
+            border: Border.all(color: isSelected ? AppTheme.black : Colors.transparent, width: 2),
+            boxShadow: isSelected
+                ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))]
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isSelected ? AppTheme.black : Colors.black54,
+              ),
+              const SizedBox(width: 10),
+              Text(
+                label.toUpperCase(),
+                style: GoogleFonts.spaceGrotesk(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                  color: isSelected ? AppTheme.black : Colors.black87,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
           ),
         ),
-        onTap: () => setState(() => _selectedNavIndex = index),
       ),
     );
   }
@@ -1082,9 +1114,9 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
   Widget _buildTopBar({required bool isLargeScreen}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: const Color(0xFFE2E8F0))),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(bottom: BorderSide(color: AppTheme.black, width: 2.5)),
       ),
       child: SafeArea(
         bottom: false,
@@ -1095,11 +1127,12 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFFFEF3C7),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                color: AppTheme.yellow,
+                borderRadius: BorderRadius.circular(2),
+                border: Border.all(color: AppTheme.black, width: 2),
+                boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))],
               ),
-              child: const Icon(Icons.warehouse_rounded, color: Color(0xFFD97706), size: 22),
+              child: const Icon(Icons.warehouse_rounded, color: AppTheme.black, size: 22),
             ),
             const SizedBox(width: 12),
 
@@ -1109,11 +1142,12 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                 children: [
                   Flexible(
                     child: Text(
-                      "Dark Store Hub #$_storeId ($_storeArea)",
-                      style: const TextStyle(
-                        fontSize: 16,
+                      "HUB #$_storeId [$_storeArea]".toUpperCase(),
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 15,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF0F172A),
+                        color: AppTheme.black,
+                        letterSpacing: -0.3,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1122,8 +1156,9 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECFDF5),
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppTheme.green,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: AppTheme.black, width: 1.5),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1131,12 +1166,12 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                         Container(
                           width: 6,
                           height: 6,
-                          decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
+                          decoration: const BoxDecoration(color: AppTheme.black, shape: BoxShape.circle),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
-                          "Live",
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF10B981)),
+                        Text(
+                          "LIVE",
+                          style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w900, color: AppTheme.black),
                         ),
                       ],
                     ),
@@ -1147,7 +1182,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
 
             // Actions on right
             IconButton(
-              icon: const Icon(Icons.refresh_rounded, size: 22, color: Color(0xFF64748B)),
+              icon: const Icon(Icons.refresh_rounded, size: 22, color: AppTheme.black),
               tooltip: "Refresh Hub Data",
               onPressed: _loadData,
             ),
@@ -1155,7 +1190,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               alignment: Alignment.center,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined, size: 22, color: Color(0xFF64748B)),
+                  icon: const Icon(Icons.notifications_outlined, size: 22, color: AppTheme.black),
                   tooltip: "Notifications",
                   onPressed: () => _showNotificationsDialog(context),
                 ),
@@ -1165,7 +1200,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                   child: Container(
                     width: 7,
                     height: 7,
-                    decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
+                    decoration: const BoxDecoration(color: AppTheme.red, shape: BoxShape.circle),
                   ),
                 ),
               ],
@@ -1178,14 +1213,16 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               child: Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEEF2FF),
-                  shape: BoxShape.circle,
+                decoration: BoxDecoration(
+                  color: AppTheme.blue,
+                  borderRadius: BorderRadius.circular(2),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                  boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))],
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     "A",
-                    style: TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF4F46E5), fontSize: 15),
+                    style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 16),
                   ),
                 ),
               ),
@@ -1199,20 +1236,20 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
   // BOTTOM NAVIGATION FOR MOBILE
   Widget _buildMobileBottomNav() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: const Color(0xFFE2E8F0))),
+      decoration: const BoxDecoration(
+        color: AppTheme.surface,
+        border: Border(top: BorderSide(color: AppTheme.black, width: 2.5)),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: SafeArea(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildMobileNavItem(0, Icons.dashboard_outlined, "Dashboard"),
-            _buildMobileNavItem(1, Icons.inventory_2_outlined, "Inventory"),
-            _buildMobileNavItem(2, Icons.shopping_bag_outlined, "Orders"),
-            _buildMobileNavItem(3, Icons.account_balance_wallet_outlined, "Payouts"),
-            _buildMobileNavItem(5, Icons.settings_outlined, "Settings"),
+            _buildMobileNavItem(0, Icons.dashboard_outlined, "DASHBOARD"),
+            _buildMobileNavItem(1, Icons.inventory_2_outlined, "INVENTORY"),
+            _buildMobileNavItem(2, Icons.shopping_bag_outlined, "ORDERS"),
+            _buildMobileNavItem(3, Icons.account_balance_wallet_outlined, "PAYOUTS"),
+            _buildMobileNavItem(5, Icons.settings_outlined, "SETTINGS"),
           ],
         ),
       ),
@@ -1224,20 +1261,28 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedNavIndex = index),
       behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 22, color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B)),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-              color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFF64748B),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.yellow : Colors.transparent,
+          borderRadius: BorderRadius.circular(2),
+          border: Border.all(color: isSelected ? AppTheme.black : Colors.transparent, width: 1.5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20, color: AppTheme.black),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                color: AppTheme.black,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1430,20 +1475,20 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
     final isSelected = _revenueTimeFilter == label;
     return GestureDetector(
       onTap: () => setState(() => _revenueTimeFilter = label),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0)),
+          color: isSelected ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(2),
+          border: Border.all(color: AppTheme.black, width: 2),
+          boxShadow: isSelected ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))] : null,
         ),
         child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xFF475569),
+          label.toUpperCase(),
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
+            color: AppTheme.black,
           ),
         ),
       ),
@@ -1460,20 +1505,8 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
     Color? badgeColor,
     String? ratingText,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1481,18 +1514,19 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
+                  color: AppTheme.yellow,
+                  borderRadius: BorderRadius.circular(2),
+                  border: Border.all(color: AppTheme.black, width: 1.5),
                 ),
-                child: Icon(icon, color: iconColor, size: 16),
+                child: Icon(icon, color: AppTheme.black, size: 16),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  title,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                  title.toUpperCase(),
+                  style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.black87),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1500,7 +1534,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
           ),
           Text(
             value,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+            style: GoogleFonts.ibmPlexMono(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.black),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1508,7 +1542,7 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               Flexible(
                 child: Text(
                   subtext,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, color: Colors.black54),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1516,24 +1550,26 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFECFDF5),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.green,
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
                   child: Text(
-                    badgeText,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor ?? const Color(0xFF10B981)),
+                    badgeText.toUpperCase(),
+                    style: GoogleFonts.ibmPlexMono(fontSize: 9, fontWeight: FontWeight.w900, color: AppTheme.black),
                   ),
                 ),
               if (ratingText != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
-                    borderRadius: BorderRadius.circular(6),
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: AppTheme.black, width: 1.5),
                   ),
                   child: Text(
-                    ratingText,
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
+                    ratingText.toUpperCase(),
+                    style: GoogleFonts.ibmPlexMono(fontSize: 9, fontWeight: FontWeight.w900, color: AppTheme.black),
                   ),
                 ),
             ],
@@ -1554,13 +1590,8 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
       {"date": "Oct 16", "height": 1.00, "orders": 3, "isPeak": true},
     ];
 
-    return Container(
+    return BrutalistCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1568,38 +1599,39 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
-                children: const [
-                  Icon(Icons.bar_chart_rounded, color: Color(0xFF4F46E5), size: 20),
-                  SizedBox(width: 8),
+                children: [
+                  const Icon(Icons.bar_chart_rounded, color: AppTheme.black, size: 22),
+                  const SizedBox(width: 8),
                   Text(
-                    "Revenue & Orders Timeline",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                    "REVENUE & ORDERS TIMELINE",
+                    style: GoogleFonts.spaceGrotesk(fontSize: 14, fontWeight: FontWeight.w900, color: AppTheme.black),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
-                  borderRadius: BorderRadius.circular(6),
+                  color: AppTheme.yellow,
+                  borderRadius: BorderRadius.circular(2),
+                  border: Border.all(color: AppTheme.black, width: 1.5),
                 ),
-                child: const Text(
-                  "Peak Day: ₹275",
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF10B981)),
+                child: Text(
+                  "PEAK: ₹275",
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w900, color: AppTheme.black),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Row(
-            children: const [
-              Icon(Icons.circle, color: Color(0xFF4F46E5), size: 8),
-              SizedBox(width: 4),
-              Text("Sales (₹)", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
-              SizedBox(width: 14),
-              Icon(Icons.trending_up, color: Color(0xFF10B981), size: 14),
-              SizedBox(width: 4),
-              Text("Orders", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+            children: [
+              Container(width: 10, height: 10, color: AppTheme.yellow),
+              const SizedBox(width: 6),
+              Text("Peak Sales", style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.black)),
+              const SizedBox(width: 14),
+              Container(width: 10, height: 10, color: AppTheme.black),
+              const SizedBox(width: 6),
+              Text("Normal Days", style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w700, color: AppTheme.black)),
             ],
           ),
           const SizedBox(height: 24),
@@ -1620,12 +1652,17 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                         height: 100 * ratio,
                         width: 28,
                         decoration: BoxDecoration(
-                          color: isPeak ? const Color(0xFF4F46E5) : const Color(0xFF818CF8),
-                          borderRadius: BorderRadius.circular(6),
+                          color: isPeak ? AppTheme.yellow : AppTheme.surface,
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: AppTheme.black, width: 2),
+                          boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))],
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Text(date, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                      Text(
+                        date.toUpperCase(),
+                        style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w800, color: AppTheme.black),
+                      ),
                     ],
                   ),
                 );
@@ -2309,24 +2346,22 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
     final isAvailable = _itemStatusMap[item.itemName] ?? true;
     final isLowStock = item.availableCount < 15;
 
-    String categoryName = "Dairy & Bread";
-    Color catBg = const Color(0xFFEFF6FF);
-    Color catText = const Color(0xFF2563EB);
+    String categoryName = "DAIRY & BREAD";
+    Color catBg = AppTheme.yellow;
 
     if (item.itemName.contains("Atta") || item.itemName.contains("Dal")) {
-      categoryName = "Atta & Dals";
-      catBg = const Color(0xFFEEF2FF);
-      catText = const Color(0xFF4F46E5);
+      categoryName = "ATTA & DALS";
+      catBg = const Color(0xFFE0E7FF);
     } else if (item.itemName.contains("Banana") || item.itemName.contains("Tomato") || item.itemName.contains("Onion") || item.itemName.contains("Potato")) {
-      categoryName = "Fruits & Veg";
-      catBg = const Color(0xFFECFDF5);
-      catText = const Color(0xFF10B981);
+      categoryName = "FRUITS & VEG";
+      catBg = AppTheme.green;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+        color: AppTheme.surface,
+        border: Border(bottom: BorderSide(color: AppTheme.black, width: 1.5)),
       ),
       child: Row(
         children: [
@@ -2335,7 +2370,10 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
             width: 32,
             child: Checkbox(
               value: isSelected,
-              activeColor: const Color(0xFF4F46E5),
+              activeColor: AppTheme.black,
+              checkColor: AppTheme.yellow,
+              side: const BorderSide(color: AppTheme.black, width: 2),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
               onChanged: (v) {
                 setState(() {
                   if (v == true) {
@@ -2353,15 +2391,24 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
             flex: 3,
             child: Row(
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: ItemImageWidget(
-                    imageUrl: item.imageUrl,
-                    itemName: item.itemName,
-                    isGrocery: true,
-                    width: 42,
-                    height: 42,
-                    borderRadius: 8,
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                    boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(0),
+                    child: ItemImageWidget(
+                      imageUrl: item.imageUrl,
+                      itemName: item.itemName,
+                      isGrocery: true,
+                      width: 44,
+                      height: 44,
+                      borderRadius: 0,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -2369,8 +2416,15 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item.itemName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A)), overflow: TextOverflow.ellipsis),
-                      Text("#SKU-${item.itemName.hashCode.abs() % 1000}", style: const TextStyle(fontSize: 10, color: Color(0xFF94A3B8))),
+                      Text(
+                        item.itemName.toUpperCase(),
+                        style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.black),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        "#SKU-${item.itemName.hashCode.abs() % 1000}",
+                        style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.black54),
+                      ),
                     ],
                   ),
                 ),
@@ -2385,25 +2439,35 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               alignment: Alignment.centerLeft,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: catBg, borderRadius: BorderRadius.circular(6)),
-                child: Text(categoryName, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: catText)),
+                decoration: BoxDecoration(
+                  color: catBg,
+                  borderRadius: BorderRadius.circular(2),
+                  border: Border.all(color: AppTheme.black, width: 1.5),
+                ),
+                child: Text(
+                  categoryName,
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w900, color: AppTheme.black),
+                ),
               ),
             ),
           ),
 
           // Price
           Expanded(
-            child: Text("₹${item.price.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A))),
+            child: Text(
+              "₹${item.price.toStringAsFixed(2)}",
+              style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
+            ),
           ),
 
           // Stock with Low-Stock Indicator
           Expanded(
             child: Text(
-              "${item.availableCount} units",
-              style: TextStyle(
-                fontWeight: isLowStock ? FontWeight.w900 : FontWeight.w600,
-                fontSize: 12,
-                color: isLowStock ? const Color(0xFFEF4444) : const Color(0xFF334155),
+              "${item.availableCount} UNITS",
+              style: GoogleFonts.ibmPlexMono(
+                fontWeight: isLowStock ? FontWeight.w900 : FontWeight.w700,
+                fontSize: 11,
+                color: isLowStock ? AppTheme.red : AppTheme.black,
               ),
             ),
           ),
@@ -2416,7 +2480,10 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
                 scale: 0.8,
                 child: Switch(
                   value: isAvailable,
-                  activeThumbColor: const Color(0xFF10B981),
+                  activeThumbColor: AppTheme.green,
+                  activeTrackColor: AppTheme.black,
+                  inactiveThumbColor: Colors.black45,
+                  inactiveTrackColor: Colors.black12,
                   onChanged: (val) => setState(() => _itemStatusMap[item.itemName] = val),
                 ),
               ),
@@ -2430,12 +2497,12 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.edit_outlined, color: Color(0xFF2563EB), size: 18),
+                  icon: const Icon(Icons.edit_outlined, color: AppTheme.blue, size: 18),
                   tooltip: "Edit Item",
                   onPressed: () => _showAddEditGroceryDialog(existingItem: item),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 18),
+                  icon: const Icon(Icons.delete_outline_rounded, color: AppTheme.red, size: 18),
                   tooltip: "Delete Item",
                   onPressed: () => _deleteGroceryItem(item.itemName),
                 ),
@@ -2613,249 +2680,286 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
   }
 
   Widget _buildHubOrderCard(OrderModel ord) {
-    Color statusBg = const Color(0xFFFEF3C7);
-    Color statusText = const Color(0xFFD97706);
+    Color statusBg = AppTheme.yellow;
+    Color statusText = AppTheme.black;
 
     if (ord.orderStatus == "Packing") {
-      statusBg = const Color(0xFFEEF2FF);
-      statusText = const Color(0xFF4F46E5);
+      statusBg = const Color(0xFFE0E7FF);
+      statusText = AppTheme.blue;
     } else if (ord.orderStatus == "Ready") {
-      statusBg = const Color(0xFFE0F2FE);
-      statusText = const Color(0xFF0284C7);
+      statusBg = AppTheme.yellow;
+      statusText = AppTheme.black;
     } else if (ord.orderStatus == "Dispatched" || ord.orderStatus == "Out for Delivery") {
       statusBg = const Color(0xFFF3E8FF);
       statusText = const Color(0xFF7E22CE);
     } else if (ord.orderStatus == "Delivered") {
-      statusBg = const Color(0xFFECFDF5);
-      statusText = const Color(0xFF10B981);
+      statusBg = AppTheme.green;
+      statusText = AppTheme.black;
     }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Order ID, Status, Time, Total, Payment
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    "#${ord.orderId}",
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Color(0xFF0F172A)),
-                  ),
-                  const SizedBox(width: 10),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(6)),
-                    child: Text(
-                      ord.orderStatus.toUpperCase(),
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusText),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                children: [
-                  Text(
-                    ord.orderDate ?? "2 mins ago",
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
-                  ),
-                  const SizedBox(width: 16),
-                  Text(
-                    "₹${ord.totalAmount.toStringAsFixed(2)}",
-                    style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Color(0xFF0F172A)),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          // Customer and Payment
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              InkWell(
-                onTap: () => _showCallDialog(context, ord.userName ?? "Customer", ord.userPhone ?? "9810000100"),
-                borderRadius: BorderRadius.circular(6),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
-                      const SizedBox(width: 6),
-                      Text(
-                        "${ord.userName ?? 'Customer'} • ${ord.userPhone ?? '9810000100'}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF334155)),
-                      ),
-                      const SizedBox(width: 4),
-                      const Icon(Icons.phone_in_talk_outlined, size: 13, color: Color(0xFF4F46E5)),
-                    ],
-                  ),
-                ),
-              ),
-              Text(
-                "Payment: ${ord.paymentMethod ?? 'UPI'}",
-                style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFFEF4444)),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  ord.deliveryAddress.isNotEmpty ? ord.deliveryAddress : "Indiranagar, Bengaluru - 560038",
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Items preview container
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Row(
+      child: BrutalistCard(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Order ID, Status, Time, Total, Payment
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.network(
-                        ord.orderId == 100
-                            ? "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=100&auto=format&fit=crop&q=60"
-                            : "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=100&auto=format&fit=crop&q=60",
-                        width: 44,
-                        height: 44,
-                        fit: BoxFit.cover,
-                      ),
+                    Text(
+                      "#${ord.orderId}",
+                      style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 18, color: AppTheme.black),
                     ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          ord.orderId == 100 ? "Aashirvaad Atta 5kg" : "Amul Butter 500g",
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF0F172A)),
-                        ),
-                        Text(
-                          ord.orderId == 100 ? "2 x ₹110.00" : "1 x ₹275.00",
-                          style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                        ),
-                      ],
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusBg,
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(color: AppTheme.black, width: 1.5),
+                      ),
+                      child: Text(
+                        ord.orderStatus.toUpperCase(),
+                        style: GoogleFonts.ibmPlexMono(fontSize: 10, fontWeight: FontWeight.w900, color: statusText),
+                      ),
                     ),
                   ],
                 ),
-                TextButton(
-                  onPressed: () => _showOrderItemsDialog(context, ord),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text("View Items (1)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF4F46E5))),
-                      Icon(Icons.chevron_right, size: 16, color: Color(0xFF4F46E5)),
-                    ],
+                Row(
+                  children: [
+                    Text(
+                      (ord.orderDate ?? "2 MINS AGO").toUpperCase(),
+                      style: GoogleFonts.ibmPlexMono(fontSize: 11, color: Colors.black54),
+                    ),
+                    const SizedBox(width: 14),
+                    Text(
+                      "₹${ord.totalAmount.toStringAsFixed(2)}",
+                      style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 17, color: AppTheme.black),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // Customer and Payment
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () => _showCallDialog(context, ord.userName ?? "Customer", ord.userPhone ?? "9810000100"),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.person_outline_rounded, size: 16, color: AppTheme.black),
+                        const SizedBox(width: 6),
+                        Text(
+                          "${ord.userName ?? 'Customer'} • ${ord.userPhone ?? '9810000100'}".toUpperCase(),
+                          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: 12, color: AppTheme.black),
+                        ),
+                        const SizedBox(width: 6),
+                        const Icon(Icons.phone_in_talk_outlined, size: 14, color: AppTheme.blue),
+                      ],
+                    ),
+                  ),
+                ),
+                Text(
+                  "PAY: ${(ord.paymentMethod ?? 'UPI').toUpperCase()}",
+                  style: GoogleFonts.ibmPlexMono(fontSize: 11, fontWeight: FontWeight.w700, color: Colors.black87),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 16, color: AppTheme.red),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    ord.deliveryAddress.isNotEmpty ? ord.deliveryAddress.toUpperCase() : "INDIRANAGAR, BENGALURU - 560038",
+                    style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black54),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-          ),
 
-          const SizedBox(height: 14),
+            const SizedBox(height: 14),
 
-          // Bottom Action Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Courier info
-              Row(
+            // Items preview container
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppTheme.bg,
+                borderRadius: BorderRadius.circular(2),
+                border: Border.all(color: AppTheme.black, width: 2),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("🛵", style: TextStyle(fontSize: 16)),
-                  const SizedBox(width: 6),
-                  Text(
-                    ord.agentName != null
-                        ? "Courier: ${ord.agentName} ★ ${ord.agentRating ?? 4.0}"
-                        : "Assign Courier ⌄",
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: AppTheme.black, width: 1.5),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(0),
+                          child: Image.network(
+                            ord.orderId == 100
+                                ? "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=100&auto=format&fit=crop&q=60"
+                                : "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=100&auto=format&fit=crop&q=60",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            (ord.orderId == 100 ? "Aashirvaad Atta 5kg" : "Amul Butter 500g").toUpperCase(),
+                            style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w800, fontSize: 13, color: AppTheme.black),
+                          ),
+                          Text(
+                            ord.orderId == 100 ? "2 x ₹110.00" : "1 x ₹275.00",
+                            style: GoogleFonts.ibmPlexMono(fontSize: 11, color: Colors.black87),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => _showCallDialog(context, ord.agentName ?? "Courier", ord.agentPhone ?? "9810000100"),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(color: Color(0xFFECFDF5), shape: BoxShape.circle),
-                      child: const Icon(Icons.call, size: 14, color: Color(0xFF10B981)),
+                  TextButton(
+                    onPressed: () => _showOrderItemsDialog(context, ord),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "VIEW ITEMS (1)",
+                          style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.blue),
+                        ),
+                        const Icon(Icons.chevron_right, size: 16, color: AppTheme.blue),
+                      ],
                     ),
                   ),
                 ],
               ),
+            ),
 
-              // Status Transition Buttons
-              if (ord.orderStatus == "Placed")
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => _updateOrderStatus(ord.orderId, "Packing"),
-                  child: const Text("Pack & Prepare", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                )
-              else if (ord.orderStatus == "Packing")
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => _updateOrderStatus(ord.orderId, "Ready"),
-                  child: const Text("Ready for Dispatch", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                )
-              else if (ord.orderStatus == "Ready")
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => _updateOrderStatus(ord.orderId, "Dispatched"),
-                  child: const Text("Mark as Dispatched", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(8)),
-                  child: const Text("Completed", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF10B981))),
+            const SizedBox(height: 14),
+
+            // Bottom Action Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Courier info
+                Row(
+                  children: [
+                    const Text("🛵", style: TextStyle(fontSize: 16)),
+                    const SizedBox(width: 6),
+                    Text(
+                      ord.agentName != null
+                          ? "COURIER: ${ord.agentName!.toUpperCase()} ★ ${ord.agentRating ?? 4.0}"
+                          : "ASSIGN COURIER ⌄",
+                      style: GoogleFonts.spaceGrotesk(fontSize: 11, fontWeight: FontWeight.w800, color: AppTheme.black),
+                    ),
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: () => _showCallDialog(context, ord.agentName ?? "Courier", ord.agentPhone ?? "9810000100"),
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: AppTheme.green,
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: AppTheme.black, width: 1.5),
+                        ),
+                        child: const Icon(Icons.call, size: 13, color: AppTheme.black),
+                      ),
+                    ),
+                  ],
                 ),
-            ],
-          ),
-        ],
+
+                // Status Transition Buttons
+                if (ord.orderStatus == "Placed")
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.yellow,
+                      foregroundColor: AppTheme.black,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2),
+                        side: const BorderSide(color: AppTheme.black, width: 2),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    ),
+                    onPressed: () => _updateOrderStatus(ord.orderId, "Packing"),
+                    child: Text(
+                      "PACK & PREPARE",
+                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black),
+                    ),
+                  )
+                else if (ord.orderStatus == "Packing")
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.yellow,
+                      foregroundColor: AppTheme.black,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2),
+                        side: const BorderSide(color: AppTheme.black, width: 2),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    ),
+                    onPressed: () => _updateOrderStatus(ord.orderId, "Ready"),
+                    child: Text(
+                      "READY FOR DISPATCH",
+                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black),
+                    ),
+                  )
+                else if (ord.orderStatus == "Ready")
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.black,
+                      foregroundColor: AppTheme.yellow,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(2),
+                        side: const BorderSide(color: AppTheme.black, width: 2),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    ),
+                    onPressed: () => _updateOrderStatus(ord.orderId, "Dispatched"),
+                    child: Text(
+                      "MARK AS DISPATCHED",
+                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.yellow),
+                    ),
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.green,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                    ),
+                    child: Text(
+                      "COMPLETED",
+                      style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -3600,45 +3704,59 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
         const SizedBox(height: 20),
 
         // Dark Store Details Card
-        Container(
+        BrutalistCard(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: const Color(0xFF4F46E5),
-                    child: const Icon(Icons.warehouse_rounded, color: Colors.white, size: 28),
+                  Container(
+                    width: 54,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      color: AppTheme.yellow,
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(color: AppTheme.black, width: 2),
+                      boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2))],
+                    ),
+                    child: const Icon(Icons.warehouse_rounded, color: AppTheme.black, size: 28),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Dark Store Hub #$_storeId", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                        Text(
+                          "DARK STORE HUB #$_storeId".toUpperCase(),
+                          style: GoogleFonts.spaceGrotesk(fontSize: 17, fontWeight: FontWeight.w900, color: AppTheme.black),
+                        ),
                         const SizedBox(height: 2),
-                        Text("📍 $_storeStreet, $_storeArea, $_storeState - $_storePincode", style: const TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+                        Text(
+                          "📍 $_storeStreet, $_storeArea, $_storeState - $_storePincode".toUpperCase(),
+                          style: GoogleFonts.ibmPlexMono(fontSize: 11, color: Colors.black87),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 14),
-              const Divider(),
+              Container(height: 1.5, color: AppTheme.black),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("4.29 ★ Dispatch Rating", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF334155))),
+                  Text(
+                    "4.29 ★ DISPATCH RATING",
+                    style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 12, color: AppTheme.black),
+                  ),
                   TextButton.icon(
-                    icon: const Icon(Icons.edit_outlined, size: 16),
-                    label: const Text("Edit Hub Address", style: TextStyle(fontWeight: FontWeight.bold)),
+                    icon: const Icon(Icons.edit_outlined, size: 16, color: AppTheme.blue),
+                    label: Text(
+                      "EDIT HUB ADDRESS",
+                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 12, color: AppTheme.blue),
+                    ),
                     onPressed: _showEditDarkStoreDialog,
                   ),
                 ],
@@ -3650,12 +3768,8 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
         const SizedBox(height: 18),
 
         // Operational switches
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-          ),
+        BrutalistCard(
+          padding: EdgeInsets.zero,
           child: Column(
             children: [
               SwitchListTile(
@@ -3706,13 +3820,22 @@ class _DarkStoreDashboardScreenState extends State<DarkStoreDashboardScreen> {
         // Logout
         SizedBox(
           width: double.infinity,
-          height: 48,
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.logout_rounded, color: Color(0xFFEF4444)),
-            label: const Text("Log Out of Dark Store Portal", style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold, fontSize: 14)),
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFFEF4444), width: 1.2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          height: 52,
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 20),
+            label: Text(
+              "LOG OUT OF DARK STORE PORTAL",
+              style: GoogleFonts.spaceGrotesk(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.red,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(2),
+                side: const BorderSide(color: AppTheme.black, width: 2.5),
+              ),
+              shadowColor: Colors.transparent,
             ),
             onPressed: _logout,
           ),

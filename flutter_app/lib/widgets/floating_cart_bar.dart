@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/cart_manager.dart';
 import '../screens/user/cart_checkout_screen.dart';
+import '../theme/app_theme.dart';
 
 class FloatingCartBar extends StatelessWidget {
   final Map<String, dynamic> userData;
@@ -21,88 +23,113 @@ class FloatingCartBar extends StatelessWidget {
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Material(
-              elevation: 8,
-              shadowColor: const Color(0xFF4F46E5).withOpacity(0.35),
-              borderRadius: BorderRadius.circular(16),
-              color: const Color(0xFF1E1B4B), // Deep Indigo brand surface
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CartCheckoutScreen(userData: userData),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                  child: Row(
-                    children: [
-                      // Cart quantity badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6366F1),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Text(
-                          "${cartManager.totalCount}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
-                      // Vendor & Total
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              vendorName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFFCBD5E1),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              "₹${cartManager.grandTotal.toStringAsFixed(2)}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: -0.3,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // View Cart action (text only inside button, adhering to constraints)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF10B981), // Emerald green CTA
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Text(
-                          "View Cart",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ),
-                    ],
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CartCheckoutScreen(userData: userData),
                   ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: AppTheme.black,
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  border: Border.all(
+                    color: AppTheme.black,
+                    width: AppTheme.borderWidth,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppTheme.yellow,
+                      offset: Offset(4, 4),
+                      blurRadius: 0,
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Cart quantity badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.yellow,
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.borderRadius),
+                        border: Border.all(color: AppTheme.black, width: 2),
+                      ),
+                      child: Text(
+                        "${cartManager.totalCount}",
+                        style: GoogleFonts.ibmPlexMono(
+                          color: AppTheme.black,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    // Vendor & Total
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            vendorName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.ibmPlexMono(
+                              color: AppTheme.yellow,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          Text(
+                            "₹${cartManager.grandTotal.toStringAsFixed(2)}",
+                            style: GoogleFonts.ibmPlexMono(
+                              color: AppTheme.surface,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // View Cart action CTA
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.yellow,
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.borderRadius),
+                        border: Border.all(color: AppTheme.black, width: 2),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "VIEW CART",
+                            style: GoogleFonts.spaceGrotesk(
+                              color: AppTheme.black,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12.5,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.arrow_forward_rounded,
+                              size: 14, color: AppTheme.black),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

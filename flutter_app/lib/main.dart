@@ -1,8 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'screens/splash_screen.dart';
-import 'screens/landing/web_landing_screen.dart';
+import 'screens/intro/project_intro_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,11 +15,12 @@ class BiteHubApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BiteHub - Food & Grocery Delivery Platform',
+      title: 'BiteHub - DBMS Project',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: kIsWeb ? const WebLandingScreen() : const SplashScreen(),
+      home: const ProjectIntroScreen(),
     );
   }
 }
+
 

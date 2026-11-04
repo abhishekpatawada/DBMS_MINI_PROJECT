@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
 import '../../models/models.dart';
 import '../../services/api_service.dart';
 import '../../utils/item_image_helper.dart';
@@ -214,6 +216,8 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
   // ===========================================================================
   // 1. DASHBOARD HEADER (Consistent BiteHub Aesthetic)
   // ===========================================================================
+  // 1. DASHBOARD HEADER (Brutalism 2.0 Command Center)
+  // ===========================================================================
   Widget _buildHeader(bool isBigScreen) {
     final timeStr = DateFormat('hh:mm:ss a').format(_currentTime);
     final dateStr = DateFormat('EEEE, MMM d, yyyy').format(_currentTime);
@@ -221,14 +225,14 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: Border.all(color: AppTheme.black, width: AppTheme.borderWidth),
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: AppTheme.black,
+            offset: Offset(4, 4),
+            blurRadius: 0,
           ),
         ],
       ),
@@ -238,23 +242,14 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
             children: [
               // Icon Badge
               Container(
-                width: 50,
-                height: 50,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: widget.isRestaurant
-                        ? [const Color(0xFFEA580C), const Color(0xFFF97316)]
-                        : [const Color(0xFF059669), const Color(0xFF10B981)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (widget.isRestaurant ? const Color(0xFFEA580C) : const Color(0xFF10B981)).withOpacity(0.25),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
+                  color: widget.isRestaurant ? AppTheme.yellow : AppTheme.green,
+                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                  boxShadow: const [
+                    BoxShadow(color: AppTheme.black, offset: Offset(2.5, 2.5), blurRadius: 0),
                   ],
                 ),
                 child: Center(
@@ -274,11 +269,11 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
                       children: [
                         Flexible(
                           child: Text(
-                            widget.entityName,
-                            style: const TextStyle(
-                              color: Color(0xFF0F172A),
+                            widget.entityName.toUpperCase(),
+                            style: GoogleFonts.spaceGrotesk(
+                              color: AppTheme.black,
                               fontSize: 20,
-                              fontWeight: FontWeight.w800,
+                              fontWeight: FontWeight.w900,
                               letterSpacing: -0.4,
                             ),
                             overflow: TextOverflow.ellipsis,
@@ -288,16 +283,16 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFCBD5E1)),
+                            color: AppTheme.yellow,
+                            borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                            border: Border.all(color: AppTheme.black, width: 1.5),
                           ),
                           child: Text(
-                            widget.isRestaurant ? "RESTAURANT" : "DARK STORE",
-                            style: const TextStyle(
-                              color: Color(0xFF475569),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
+                            (widget.isRestaurant ? "RESTAURANT" : "DARK STORE"),
+                            style: GoogleFonts.ibmPlexMono(
+                              color: AppTheme.black,
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w900,
                               letterSpacing: 0.6,
                             ),
                           ),
@@ -307,11 +302,11 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF64748B)),
+                        const Icon(Icons.location_on_outlined, size: 14, color: AppTheme.black),
                         const SizedBox(width: 4),
                         Text(
                           widget.entityLocation.isNotEmpty ? widget.entityLocation : "Central Operations Hub",
-                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                          style: GoogleFonts.inter(color: AppTheme.black.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(width: 10),
                         ScaleTransition(
@@ -320,18 +315,18 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
                             width: 8,
                             height: 8,
                             decoration: const BoxDecoration(
-                              color: Color(0xFF10B981),
+                              color: AppTheme.green,
                               shape: BoxShape.circle,
                             ),
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Text(
+                        Text(
                           "LIVE ENGINE",
-                          style: TextStyle(
-                            color: Color(0xFF10B981),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
+                          style: GoogleFonts.ibmPlexMono(
+                            color: AppTheme.black,
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                       ],
@@ -345,23 +340,22 @@ class _BigScreenRevenueDashboardState extends State<BigScreenRevenueDashboard> w
                   children: [
                     Text(
                       timeStr,
-                      style: const TextStyle(
-                        color: Color(0xFF0F172A),
+                      style: GoogleFonts.ibmPlexMono(
+                        color: AppTheme.black,
                         fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        fontFeatures: [FontFeature.tabularFigures()],
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                     Text(
-                      dateStr,
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                      dateStr.toUpperCase(),
+                      style: GoogleFonts.spaceGrotesk(color: AppTheme.black.withValues(alpha: 0.6), fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 const SizedBox(width: 16),
               ],
               IconButton(
-                icon: const Icon(Icons.refresh, color: Color(0xFF64748B)),
+                icon: const Icon(Icons.refresh, color: AppTheme.black),
                 tooltip: "Reload Analytics",
                 onPressed: () => _loadAnalytics(),
               ),

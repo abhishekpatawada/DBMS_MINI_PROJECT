@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
 import '../../services/api_service.dart';
 
 class SqlVisualizerScreen extends StatefulWidget {
@@ -145,29 +147,38 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
+        backgroundColor: AppTheme.bg,
+        elevation: 0,
+        shape: const Border(
+          bottom: BorderSide(color: AppTheme.black, width: 2.5),
+        ),
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
+                color: AppTheme.yellow,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: AppTheme.black, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0),
+                ],
               ),
-              child: const Text("⚡", style: TextStyle(fontSize: 18)),
+              child: Text("SQL", style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black)),
             ),
             const SizedBox(width: 12),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "SQL Visualizer & DBMS Workbench",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+                  "SQL WORKBENCH // DBMS VISUALIZER",
+                  style: GoogleFonts.spaceGrotesk(fontSize: 16, fontWeight: FontWeight.w900, color: AppTheme.black),
                 ),
                 Text(
-                  "Interactive Schema Graph • Real-Time Query Runner • Table Animations",
-                  style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
+                  "Interactive Schema Graph • Real-Time Engine • Relational Integrity",
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, color: AppTheme.black.withValues(alpha: 0.6), fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -175,7 +186,7 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh_rounded),
+            icon: const Icon(Icons.refresh_rounded, color: AppTheme.black),
             tooltip: "Refresh Schema",
             onPressed: _loadInitialData,
           ),
@@ -183,7 +194,7 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
         ],
       ),
       body: _isLoadingSchema
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.black))
           : _schemaError != null
               ? _buildErrorView()
               : Row(
@@ -193,7 +204,7 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
                       flex: 4,
                       child: _buildEditorPanel(),
                     ),
-                    const VerticalDivider(width: 1, thickness: 1, color: Color(0xFFE2E8F0)),
+                    const VerticalDivider(width: 2.5, thickness: 2.5, color: AppTheme.black),
                     // Right: Tabs (Schema Visualizer, Results, Analysis, History)
                     Expanded(
                       flex: 6,
@@ -236,7 +247,7 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
 
   Widget _buildEditorPanel() {
     return Container(
-      color: Colors.white,
+      color: AppTheme.bg,
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -244,64 +255,78 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
           // Preset Query Selector
           Row(
             children: [
-              const Icon(Icons.bookmarks_outlined, size: 18, color: Color(0xFF6366F1)),
+              const Icon(Icons.bookmarks_outlined, size: 18, color: AppTheme.black),
               const SizedBox(width: 8),
-              const Text("Preset Query:", style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF334155))),
+              Text("PRESET QUERY:", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 12, color: AppTheme.black)),
               const Spacer(),
               if (_presets.isNotEmpty)
-                DropdownButton<String>(
-                  value: null,
-                  hint: const Text("Load Example...", style: TextStyle(fontSize: 12)),
-                  underline: const SizedBox(),
-                  icon: const Icon(Icons.arrow_drop_down, size: 20),
-                  items: _presets.map<DropdownMenuItem<String>>((p) {
-                    return DropdownMenuItem<String>(
-                      value: p['sql'],
-                      child: Text(p['title'] ?? 'Preset', style: const TextStyle(fontSize: 12)),
-                    );
-                  }).toList(),
-                  onChanged: (val) {
-                    if (val != null) {
-                      setState(() {
-                        _sqlController.text = val;
-                        _detectHighlightedTables(val);
-                      });
-                    }
-                  },
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                    border: Border.all(color: AppTheme.black, width: 1.5),
+                    boxShadow: const [
+                      BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0),
+                    ],
+                  ),
+                  child: DropdownButton<String>(
+                    value: null,
+                    hint: Text("Load Example...", style: GoogleFonts.ibmPlexMono(fontSize: 11, color: AppTheme.black, fontWeight: FontWeight.bold)),
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.arrow_drop_down, size: 20, color: AppTheme.black),
+                    items: _presets.map<DropdownMenuItem<String>>((p) {
+                      return DropdownMenuItem<String>(
+                        value: p['sql'],
+                        child: Text(p['title'] ?? 'Preset', style: GoogleFonts.spaceGrotesk(fontSize: 12, fontWeight: FontWeight.bold)),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          _sqlController.text = val;
+                          _detectHighlightedTables(val);
+                        });
+                      }
+                    },
+                  ),
                 ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           // Code Editor Area
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF334155)),
+                color: AppTheme.black,
+                borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                border: Border.all(color: AppTheme.black, width: 2.5),
+                boxShadow: const [
+                  BoxShadow(color: AppTheme.black, offset: Offset(3.5, 3.5), blurRadius: 0),
+                ],
               ),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               child: TextField(
                 controller: _sqlController,
                 maxLines: null,
                 expands: true,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
+                style: GoogleFonts.ibmPlexMono(
                   fontSize: 13,
-                  color: Color(0xFF38BDF8),
-                  height: 1.4,
+                  color: AppTheme.yellow,
+                  height: 1.45,
+                  fontWeight: FontWeight.w600,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Enter your SQL query here (e.g. SELECT * FROM orders;)",
-                  hintStyle: TextStyle(color: Color(0xFF64748B), fontFamily: 'monospace', fontSize: 13),
+                  hintStyle: GoogleFonts.ibmPlexMono(color: Colors.white.withValues(alpha: 0.3), fontSize: 13),
                 ),
                 onChanged: _detectHighlightedTables,
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Action Toolbar
           Row(
@@ -311,8 +336,13 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
                   _sqlController.clear();
                   setState(() => _highlightedTables.clear());
                 },
-                icon: const Icon(Icons.clear_all_rounded, size: 16),
-                label: const Text("Clear"),
+                icon: const Icon(Icons.clear_all_rounded, size: 16, color: AppTheme.black),
+                label: Text("CLEAR", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black)),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppTheme.surface,
+                  side: const BorderSide(color: AppTheme.black, width: 2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
+                ),
               ),
               const SizedBox(width: 8),
               OutlinedButton.icon(
@@ -322,21 +352,28 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
                     const SnackBar(content: Text("Query copied to clipboard!")),
                   );
                 },
-                icon: const Icon(Icons.copy_rounded, size: 16),
-                label: const Text("Copy"),
+                icon: const Icon(Icons.copy_rounded, size: 16, color: AppTheme.black),
+                label: Text("COPY", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 11, color: AppTheme.black)),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: AppTheme.surface,
+                  side: const BorderSide(color: AppTheme.black, width: 2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
+                ),
               ),
               const Spacer(),
               ElevatedButton.icon(
                 onPressed: _isExecuting ? null : _executeQuery,
                 icon: _isExecuting
-                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Icon(Icons.play_arrow_rounded, size: 20),
-                label: Text(_isExecuting ? "Running..." : "Run Query"),
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.black))
+                    : const Icon(Icons.play_arrow_rounded, size: 20, color: AppTheme.black),
+                label: Text(_isExecuting ? "RUNNING..." : "RUN QUERY", style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, color: AppTheme.black, fontSize: 12)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF10B981),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppTheme.yellow,
+                  foregroundColor: AppTheme.black,
+                  elevation: 0,
+                  side: const BorderSide(color: AppTheme.black, width: 2.5),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppTheme.radiusSm)),
                 ),
               ),
             ],
@@ -351,24 +388,30 @@ class _SqlVisualizerScreenState extends State<SqlVisualizerScreen> with SingleTi
       children: [
         // Tab Bar
         Container(
-          color: Colors.white,
+          color: AppTheme.bg,
+          decoration: const BoxDecoration(
+            border: Border(bottom: BorderSide(color: AppTheme.black, width: 2)),
+          ),
           child: TabBar(
             controller: _tabController,
             isScrollable: true,
-            labelColor: const Color(0xFF6366F1),
-            unselectedLabelColor: const Color(0xFF64748B),
-            indicatorColor: const Color(0xFF6366F1),
+            labelColor: AppTheme.black,
+            unselectedLabelColor: AppTheme.black.withValues(alpha: 0.5),
+            indicatorColor: AppTheme.black,
+            indicatorWeight: 3,
+            labelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 12),
+            unselectedLabelStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, fontSize: 12),
             tabs: [
               Tab(
                 icon: const Icon(Icons.hub_outlined, size: 18),
                 text: "Schema Graph (${_schemaData?['tables']?.length ?? 10} Tables)",
               ),
-              Tab(
-                icon: const Icon(Icons.table_chart_outlined, size: 18),
+              const Tab(
+                icon: Icon(Icons.table_chart_outlined, size: 18),
                 text: "Query Results",
               ),
-              Tab(
-                icon: const Icon(Icons.analytics_outlined, size: 18),
+              const Tab(
+                icon: Icon(Icons.analytics_outlined, size: 18),
                 text: "Query Analysis",
               ),
               Tab(

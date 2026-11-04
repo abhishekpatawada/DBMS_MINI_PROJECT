@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import '../../services/api_service.dart';
 
 class DeliveryAgentRevenueView extends StatefulWidget {
@@ -56,11 +59,13 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
 
     showModalBottomSheet(
       context: context,
+      backgroundColor: AppTheme.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.zero,
+        side: BorderSide(color: AppTheme.black, width: AppTheme.borderWidth),
       ),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,62 +73,109 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.bolt_rounded, color: Color(0xFFF59E0B), size: 24),
-                    SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.yellow,
+                        border: Border.all(color: AppTheme.black, width: 2),
+                      ),
+                      child: const Icon(Icons.bolt_rounded, color: AppTheme.black, size: 20),
+                    ),
+                    const SizedBox(width: 10),
                     Text(
-                      "Cash out to Bank",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF0F172A)),
+                      "INSTANT BANK CASHOUT",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                        color: AppTheme.black,
+                      ),
                     ),
                   ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(ctx),
+                GestureDetector(
+                  onTap: () => Navigator.pop(ctx),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                    ),
+                    child: const Icon(Icons.close, size: 16, color: AppTheme.black),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                color: AppTheme.bg,
+                border: Border.all(color: AppTheme.black, width: 2),
+                boxShadow: const [
+                  BoxShadow(color: AppTheme.black, offset: Offset(3, 3), blurRadius: 0),
+                ],
               ),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text("Available for Instant Withdrawal:", style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),
+                      Text(
+                        "AVAILABLE WITHDRAWAL:",
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
                       Text(
                         "₹${todayEarnings.toStringAsFixed(2)}",
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF10B981)),
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.black,
+                        ),
                       ),
                     ],
                   ),
-                  const Divider(height: 24),
+                  const Divider(color: AppTheme.black, thickness: 1.5, height: 24),
                   Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
+                          color: AppTheme.surface,
+                          border: Border.all(color: AppTheme.black, width: 1.5),
                         ),
-                        child: const Icon(Icons.account_balance, color: Color(0xFF4F46E5)),
+                        child: const Icon(Icons.account_balance, color: AppTheme.black),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(payout['bank_name']?.toString() ?? "HDFC Bank", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A))),
-                            Text("A/C: ${payout['account_number'] ?? '•••• •••• 8912'}  •  IFSC: ${payout['ifsc'] ?? 'HDFC0001234'}", style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
-                            Text("UPI: ${payout['upi_id'] ?? '9876500001@okaxis'}", style: const TextStyle(color: Color(0xFF4F46E5), fontSize: 12, fontWeight: FontWeight.w600)),
+                            Text(
+                              (payout['bank_name']?.toString() ?? "HDFC Bank").toUpperCase(),
+                              style: GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                                color: AppTheme.black,
+                              ),
+                            ),
+                            Text(
+                              "A/C: ${payout['account_number'] ?? '•••• •••• 8912'}  •  IFSC: ${payout['ifsc'] ?? 'HDFC0001234'}",
+                              style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 11),
+                            ),
+                            Text(
+                              "UPI: ${payout['upi_id'] ?? '9876500001@okaxis'}",
+                              style: GoogleFonts.ibmPlexMono(
+                                color: AppTheme.black,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -134,46 +186,48 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
             ),
             const SizedBox(height: 14),
             Row(
-              children: const [
-                Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 16),
-                SizedBox(width: 6),
-                Text("Instant Transfer Fee: ₹0.00 (Zero Commission)", style: TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w500)),
+              children: [
+                const Icon(Icons.check_circle_rounded, color: AppTheme.black, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  "INSTANT DIRECT DEPOSIT // 0% PLATFORM FEE",
+                  style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B), fontWeight: FontWeight.bold),
+                ),
               ],
             ),
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
+            BrutalistButton(
+              text: "TRANSFER ₹${todayEarnings.toStringAsFixed(2)} NOW",
+              icon: Icons.bolt_rounded,
+              bgColor: AppTheme.yellow,
+              textColor: AppTheme.black,
+              fullWidth: true,
               height: 48,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.bolt_rounded, color: Colors.white),
-                label: Text(
-                  "Transfer ₹${todayEarnings.toStringAsFixed(2)} Now",
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.check_circle_rounded, color: Colors.white),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text("₹${todayEarnings.toStringAsFixed(2)} credited to your ${payout['bank_name'] ?? 'HDFC Bank'} account!"),
+              onPressed: () {
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle_rounded, color: AppTheme.black),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            "₹${todayEarnings.toStringAsFixed(2)} credited to your ${payout['bank_name'] ?? 'HDFC Bank'} account!",
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black),
                           ),
-                        ],
-                      ),
-                      backgroundColor: const Color(0xFF10B981),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ],
                     ),
-                  );
-                },
-              ),
+                    backgroundColor: AppTheme.yellow,
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                      side: const BorderSide(color: AppTheme.black, width: 2),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -260,7 +314,7 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
 
     return RefreshIndicator(
       onRefresh: _loadRevenueData,
-      color: const Color(0xFF4F46E5),
+      color: AppTheme.black,
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -269,55 +323,92 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF0F172A)),
-                  onPressed: widget.onBack ?? () => Navigator.pop(context),
+                GestureDetector(
+                  onTap: widget.onBack ?? () => Navigator.pop(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      border: Border.all(color: AppTheme.black, width: 2),
+                      boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)],
+                    ),
+                    child: const Icon(Icons.arrow_back_rounded, color: AppTheme.black, size: 20),
+                  ),
                 ),
-                const Text(
-                  "Revenue & Earnings",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                Text(
+                  "REVENUE & EARNINGS",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: AppTheme.black,
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.calendar_today_outlined, color: Color(0xFF0F172A), size: 20),
-                  onPressed: () {
+                GestureDetector(
+                  onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Selected: Current Pay Cycle (Oct 14 - Oct 20)")),
+                      SnackBar(
+                        content: const Text(
+                          "Selected: Current Pay Cycle (Oct 14 - Oct 20)",
+                          style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.black),
+                        ),
+                        backgroundColor: AppTheme.yellow,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                          side: const BorderSide(color: AppTheme.black, width: 2),
+                        ),
+                      ),
                     );
                   },
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surface,
+                      border: Border.all(color: AppTheme.black, width: 2),
+                      boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)],
+                    ),
+                    child: const Icon(Icons.calendar_today_outlined, color: AppTheme.black, size: 18),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
           ] else ...[
             // Screen 1 Header Block
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFEF3C7),
-                    shape: BoxShape.circle,
+                  decoration: BoxDecoration(
+                    color: AppTheme.yellow,
+                    border: Border.all(color: AppTheme.black, width: 2),
+                    boxShadow: const [
+                      BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0),
+                    ],
                   ),
-                  child: const Icon(Icons.monetization_on_rounded, color: Color(0xFFD97706), size: 22),
+                  child: const Icon(Icons.monetization_on_rounded, color: AppTheme.black, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      "Revenue & Earnings",
-                      style: TextStyle(
-                        fontSize: 17,
+                      "REVENUE & EARNINGS",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 16,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF0F172A),
+                        color: AppTheme.black,
+                        letterSpacing: -0.3,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      "Track your earnings and growth",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF64748B),
+                      "PAYOUT ENGINE // ESCROW DIRECT SETTLEMENT",
+                      style: GoogleFonts.ibmPlexMono(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF64748B),
                       ),
                     ),
                   ],
@@ -330,19 +421,19 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           // Time Filter Pills: Today, This Week, This Month, All Time
           Row(
             children: [
-              _buildTimeFilterPill("Today"),
+              _buildTimeFilterPill("TODAY", "Today"),
               const SizedBox(width: 8),
-              _buildTimeFilterPill("This Week"),
+              _buildTimeFilterPill("THIS WEEK", "This Week"),
               const SizedBox(width: 8),
-              _buildTimeFilterPill("This Month"),
+              _buildTimeFilterPill("THIS MONTH", "This Month"),
               const SizedBox(width: 8),
-              _buildTimeFilterPill("All Time"),
+              _buildTimeFilterPill("ALL TIME", "All Time"),
             ],
           ),
 
           const SizedBox(height: 16),
 
-          // 1. HERO PAYOUT CARD (Dark Gradient)
+          // 1. HERO PAYOUT CARD
           _buildHeroPayoutCard(
             thisWeekEarnings: thisWeekEarnings,
             todayEarnings: todayEarnings,
@@ -367,12 +458,12 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
 
           const SizedBox(height: 16),
 
-          // 4. DIRECT DEPOSIT PAYOUT ACCOUNT CARD (SCREEN 2)
+          // 4. DIRECT DEPOSIT PAYOUT ACCOUNT CARD
           _buildPayoutAccountCard(),
 
           const SizedBox(height: 20),
 
-          // 5. TRIP EARNINGS HISTORY LIST (SCREEN 2)
+          // 5. TRIP EARNINGS HISTORY LIST
           _buildTripHistorySection(filteredTrips),
 
           const SizedBox(height: 32),
@@ -381,38 +472,31 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
     );
   }
 
-  Widget _buildTimeFilterPill(String label) {
-    final isSelected = _timeFilter == label;
+  Widget _buildTimeFilterPill(String displayLabel, String value) {
+    final isSelected = _timeFilter == value;
 
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _timeFilter = label),
+        onTap: () => setState(() => _timeFilter = value),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
+          duration: const Duration(milliseconds: 100),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? const Color(0xFF4F46E5) : Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
-            ),
+            color: isSelected ? AppTheme.yellow : AppTheme.surface,
+            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+            border: Border.all(color: AppTheme.black, width: 2),
             boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
+                ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)]
                 : null,
           ),
           child: Center(
             child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                color: isSelected ? Colors.white : const Color(0xFF475569),
+              displayLabel,
+              style: GoogleFonts.spaceGrotesk(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w900,
+                color: AppTheme.black,
+                letterSpacing: 0.3,
               ),
             ),
           ),
@@ -427,24 +511,9 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
     required dynamic totalDeliveries,
     required double totalEarnings,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF0F172A).withValues(alpha: 0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
+    return BrutalistCard(
+      bgColor: AppTheme.yellow,
+      padding: const EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -455,42 +524,43 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppTheme.black,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
                     ),
-                    child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF10B981), size: 18),
+                    child: const Icon(Icons.account_balance_wallet_rounded, color: AppTheme.yellow, size: 16),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     "TOTAL WEEKLY PAYOUT",
-                    style: TextStyle(
-                      color: Color(0xFF94A3B8),
+                    style: GoogleFonts.ibmPlexMono(
+                      color: AppTheme.black,
                       fontSize: 11,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w900,
                       letterSpacing: 0.8,
                     ),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
+                  color: AppTheme.surface,
+                  border: Border.all(color: AppTheme.black, width: 1.5),
+                  boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.trending_up_rounded, color: Color(0xFF10B981), size: 13),
-                    SizedBox(width: 4),
+                  children: [
+                    const Icon(Icons.trending_up_rounded, color: AppTheme.black, size: 13),
+                    const SizedBox(width: 4),
                     Text(
                       "+18.4%",
-                      style: TextStyle(
-                        color: Color(0xFF10B981),
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.ibmPlexMono(
+                        color: AppTheme.black,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ],
@@ -504,16 +574,16 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           // Large Amount
           Text(
             "₹${thisWeekEarnings.toStringAsFixed(2)}",
-            style: const TextStyle(
-              fontSize: 32,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 34,
               fontWeight: FontWeight.w900,
-              color: Colors.white,
-              letterSpacing: -0.5,
+              color: AppTheme.black,
+              letterSpacing: -1.0,
             ),
           ),
 
           const SizedBox(height: 14),
-          const Divider(color: Color(0xFF334155), height: 1),
+          const Divider(color: AppTheme.black, thickness: 2, height: 1),
           const SizedBox(height: 14),
 
           // Sub-stats Row (Today's Earnings, Completed Trips, Lifetime Revenue)
@@ -523,60 +593,60 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Today's\nEarnings",
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.2),
+                    Text(
+                      "TODAY EARNINGS",
+                      style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontSize: 9.5, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "₹${todayEarnings.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        color: Color(0xFF10B981),
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.ibmPlexMono(
+                        color: AppTheme.black,
+                        fontWeight: FontWeight.w900,
                         fontSize: 15,
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(width: 1, height: 36, color: const Color(0xFF334155)),
+              Container(width: 2, height: 36, color: AppTheme.black),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Completed\nTrips",
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.2),
+                    Text(
+                      "COMPLETED TRIPS",
+                      style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontSize: 9.5, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "$totalDeliveries",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.ibmPlexMono(
+                        color: AppTheme.black,
+                        fontWeight: FontWeight.w900,
                         fontSize: 15,
                       ),
                     ),
                   ],
                 ),
               ),
-              Container(width: 1, height: 36, color: const Color(0xFF334155)),
+              Container(width: 2, height: 36, color: AppTheme.black),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Lifetime\nRevenue",
-                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.2),
+                    Text(
+                      "LIFETIME REVENUE",
+                      style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontSize: 9.5, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       "₹${totalEarnings.toStringAsFixed(0)}",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.ibmPlexMono(
+                        color: AppTheme.black,
+                        fontWeight: FontWeight.w900,
                         fontSize: 15,
                       ),
                     ),
@@ -589,26 +659,14 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           const SizedBox(height: 18),
 
           // Cash out to Bank Button
-          SizedBox(
-            width: double.infinity,
+          BrutalistButton(
+            text: "CASH OUT TO BANK",
+            icon: Icons.bolt_rounded,
+            bgColor: AppTheme.black,
+            textColor: AppTheme.yellow,
+            fullWidth: true,
             height: 46,
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.bolt_rounded, color: Colors.white, size: 20),
-              label: const Text(
-                "Cash out to Bank",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4F46E5),
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: _showInstantCashoutDialog,
-            ),
+            onPressed: _showInstantCashoutDialog,
           ),
         ],
       ),
@@ -627,21 +685,19 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           children: [
             Expanded(
               child: _buildMetricTile(
-                title: "Avg / Trip",
+                title: "AVG / TRIP",
                 value: "₹${avgPerTrip.toStringAsFixed(2)}",
                 icon: Icons.receipt_long_outlined,
-                iconColor: const Color(0xFF4F46E5),
-                valueColor: const Color(0xFF1E1B4B),
+                iconBg: AppTheme.yellow,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMetricTile(
-                title: "Tips Received",
+                title: "TIPS RECEIVED",
                 value: "₹${totalTips.toStringAsFixed(2)}",
                 icon: Icons.favorite_border_rounded,
-                iconColor: const Color(0xFFEC4899),
-                valueColor: const Color(0xFF1E1B4B),
+                iconBg: AppTheme.green,
               ),
             ),
           ],
@@ -651,21 +707,19 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           children: [
             Expanded(
               child: _buildMetricTile(
-                title: "On-Time Delivery",
+                title: "ON-TIME RATE",
                 value: onTimeRate,
                 icon: Icons.access_time_rounded,
-                iconColor: const Color(0xFF10B981),
-                valueColor: const Color(0xFF059669),
+                iconBg: AppTheme.surface,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: _buildMetricTile(
-                title: "Distance Driven",
-                value: "$totalKm km",
+                title: "DISTANCE DRIVEN",
+                value: "$totalKm KM",
                 icon: Icons.navigation_outlined,
-                iconColor: const Color(0xFFF59E0B),
-                valueColor: const Color(0xFF0F172A),
+                iconBg: AppTheme.yellow,
               ),
             ),
           ],
@@ -678,44 +732,33 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
     required String title,
     required String value,
     required IconData icon,
-    required Color iconColor,
-    required Color valueColor,
+    required Color iconBg,
   }) {
-    return Container(
+    return BrutalistCard(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      shadowOffset: const Offset(2.5, 2.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  color: iconBg,
+                  border: Border.all(color: AppTheme.black, width: 1.5),
                 ),
-                child: Icon(icon, color: iconColor, size: 16),
+                child: Icon(icon, color: AppTheme.black, size: 15),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                  style: GoogleFonts.ibmPlexMono(
+                    color: const Color(0xFF64748B),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -725,10 +768,10 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           const SizedBox(height: 10),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 18,
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 17,
               fontWeight: FontWeight.w900,
-              color: valueColor,
+              color: AppTheme.black,
             ),
           ),
         ],
@@ -743,44 +786,45 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
       if (earn > maxVal) maxVal = earn;
     }
 
-    return Container(
-      width: double.infinity,
+    return BrutalistCard(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Row(
                 children: [
-                  Icon(Icons.bar_chart_rounded, color: Color(0xFF4F46E5), size: 20),
-                  SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: AppTheme.yellow,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
+                    ),
+                    child: const Icon(Icons.bar_chart_rounded, color: AppTheme.black, size: 16),
+                  ),
+                  const SizedBox(width: 8),
                   Text(
-                    "Weekly Revenue Trend",
-                    style: TextStyle(
+                    "WEEKLY REVENUE TREND",
+                    style: GoogleFonts.spaceGrotesk(
                       fontWeight: FontWeight.w900,
-                      fontSize: 15,
-                      color: Color(0xFF0F172A),
+                      fontSize: 14,
+                      color: AppTheme.black,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
               ),
-              Text(
-                "Last 7 Days",
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w500),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppTheme.black, width: 1.5),
+                ),
+                child: Text(
+                  "LAST 7 DAYS",
+                  style: GoogleFonts.ibmPlexMono(color: AppTheme.black, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
               ),
             ],
           ),
@@ -798,42 +842,46 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
 
                 return Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 3.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
                           "₹${earn.toStringAsFixed(0)}",
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: isPeak ? const Color(0xFF059669) : const Color(0xFF64748B),
+                          style: GoogleFonts.ibmPlexMono(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w900,
+                            color: isPeak ? AppTheme.black : const Color(0xFF64748B),
                           ),
                         ),
                         const SizedBox(height: 6),
                         AnimatedContainer(
-                          duration: const Duration(milliseconds: 400),
-                          height: 70 * ratio,
+                          duration: const Duration(milliseconds: 300),
+                          height: 68 * ratio,
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: isPeak ? const Color(0xFF10B981) : const Color(0xFF6366F1),
-                            borderRadius: BorderRadius.circular(6),
+                            color: isPeak ? AppTheme.yellow : AppTheme.surface,
+                            borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                            border: Border.all(color: AppTheme.black, width: 2),
+                            boxShadow: isPeak
+                                ? const [BoxShadow(color: AppTheme.black, offset: Offset(2, 2), blurRadius: 0)]
+                                : null,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          dayName,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: isPeak ? FontWeight.bold : FontWeight.w600,
-                            color: const Color(0xFF0F172A),
+                          dayName.toUpperCase(),
+                          style: GoogleFonts.ibmPlexMono(
+                            fontSize: 10,
+                            fontWeight: isPeak ? FontWeight.w900 : FontWeight.w700,
+                            color: AppTheme.black,
                           ),
                         ),
                         Text(
                           dateNumber,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Color(0xFF94A3B8),
+                          style: GoogleFonts.ibmPlexMono(
+                            fontSize: 9,
+                            color: const Color(0xFF64748B),
                           ),
                         ),
                       ],
@@ -851,20 +899,8 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
   Widget _buildPayoutAccountCard() {
     final payout = _data['payout_account'] as Map<String, dynamic>? ?? {};
 
-    return Container(
+    return BrutalistCard(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -875,20 +911,21 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFECFDF5),
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppTheme.green,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
                     ),
-                    child: const Icon(Icons.account_balance, color: Color(0xFF10B981), size: 18),
+                    child: const Icon(Icons.account_balance, color: AppTheme.black, size: 16),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    "Direct Deposit Payout Account",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 14,
-                      color: Color(0xFF0F172A),
+                  Text(
+                    "DIRECT DEPOSIT ACCOUNT",
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                      color: AppTheme.black,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
@@ -896,16 +933,16 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.3)),
+                  color: AppTheme.green,
+                  border: Border.all(color: AppTheme.black, width: 1.5),
+                  boxShadow: const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)],
                 ),
-                child: const Text(
-                  "Verified",
-                  style: TextStyle(
-                    color: Color(0xFF10B981),
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                child: Text(
+                  "VERIFIED",
+                  style: GoogleFonts.ibmPlexMono(
+                    color: AppTheme.black,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
@@ -919,17 +956,17 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      payout['bank_name']?.toString() ?? "HDFC Bank",
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F172A)),
+                      (payout['bank_name']?.toString() ?? "HDFC Bank").toUpperCase(),
+                      style: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w900, fontSize: 13, color: AppTheme.black),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       "A/C: ${payout['account_number'] ?? '•••• •••• 8912'}",
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                      style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 11),
                     ),
                     Text(
                       "IFSC: ${payout['ifsc'] ?? 'HDFC0001234'}",
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                      style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 11),
                     ),
                   ],
                 ),
@@ -938,19 +975,19 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Linked UPI ID",
-                      style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                    Text(
+                      "LINKED UPI ID",
+                      style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       payout['upi_id']?.toString() ?? "9876500001@okaxis",
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: Color(0xFF4F46E5)),
+                      style: GoogleFonts.ibmPlexMono(fontWeight: FontWeight.w900, fontSize: 11.5, color: AppTheme.black),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      "Auto-payout\nEvery Mon 9:00 AM",
-                      style: TextStyle(color: Color(0xFF10B981), fontSize: 11, fontWeight: FontWeight.bold, height: 1.2),
+                    Text(
+                      "AUTO-PAYOUT // EVERY MON 9 AM",
+                      style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 9.5, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -971,24 +1008,25 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
-              children: const [
-                Icon(Icons.receipt_long_rounded, color: Color(0xFF0F172A), size: 18),
-                SizedBox(width: 8),
+              children: [
+                const Icon(Icons.receipt_long_rounded, color: AppTheme.black, size: 18),
+                const SizedBox(width: 8),
                 Text(
-                  "Trip Earnings History",
-                  style: TextStyle(
+                  "TRIP EARNINGS HISTORY",
+                  style: GoogleFonts.spaceGrotesk(
                     fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                    color: Color(0xFF0F172A),
+                    fontSize: 14,
+                    color: AppTheme.black,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],
             ),
             Row(
               children: [
-                _buildTripFilterChip("✓ All", "All"),
+                _buildTripFilterChip("✓ ALL", "All"),
                 const SizedBox(width: 6),
-                _buildTripFilterChip("With Tips", "With Tips"),
+                _buildTripFilterChip("WITH TIPS", "With Tips"),
               ],
             ),
           ],
@@ -997,17 +1035,12 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
         const SizedBox(height: 12),
 
         if (trips.isEmpty)
-          Container(
+          BrutalistCard(
             padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: const Center(
+            child: Center(
               child: Text(
-                "No trips found for this filter",
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                "NO TRIPS FOUND FOR THIS FILTER",
+                style: GoogleFonts.ibmPlexMono(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ),
           )
@@ -1023,21 +1056,23 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
     return GestureDetector(
       onTap: () => setState(() => _tripFilter = value),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 100),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF0F172A) : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF0F172A) : const Color(0xFFE2E8F0),
-          ),
+          color: isSelected ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(color: AppTheme.black, width: 1.5),
+          boxShadow: isSelected
+              ? const [BoxShadow(color: AppTheme.black, offset: Offset(1.5, 1.5), blurRadius: 0)]
+              : null,
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.white : const Color(0xFF475569),
+          style: GoogleFonts.spaceGrotesk(
+            fontSize: 10,
+            fontWeight: FontWeight.w900,
+            color: AppTheme.black,
+            letterSpacing: 0.5,
           ),
         ),
       ),
@@ -1056,21 +1091,10 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
     final pickup = trip['pickup_location'] ?? 'Gachibowli';
     final dest = trip['delivery_address'] ?? '300 FC Road, Gachibowli, TS';
 
-    return Container(
+    return BrutalistCard(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(14),
+      shadowOffset: const Offset(2.5, 2.5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1083,40 +1107,40 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFF6FF),
-                      borderRadius: BorderRadius.circular(6),
+                      color: AppTheme.yellow,
+                      border: Border.all(color: AppTheme.black, width: 1.5),
                     ),
                     child: Text(
                       "#$orderId",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF2563EB),
-                        fontSize: 12,
+                      style: GoogleFonts.ibmPlexMono(
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
+                        fontSize: 11,
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    orderType,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      color: Color(0xFF0F172A),
+                    orderType.toUpperCase(),
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                      color: AppTheme.black,
                     ),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     "• $dateStr",
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                    style: GoogleFonts.ibmPlexMono(fontSize: 10, color: const Color(0xFF64748B)),
                   ),
                 ],
               ),
               Text(
                 "+₹${tripEarnings.toStringAsFixed(2)}",
-                style: const TextStyle(
-                  fontSize: 16,
+                style: GoogleFonts.ibmPlexMono(
+                  fontSize: 15,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF10B981),
+                  color: AppTheme.black,
                 ),
               ),
             ],
@@ -1127,12 +1151,12 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
           // Route
           Row(
             children: [
-              const Icon(Icons.arrow_right_alt_rounded, size: 16, color: Color(0xFF64748B)),
+              const Icon(Icons.arrow_right_alt_rounded, size: 16, color: AppTheme.black),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   "$pickup → $dest",
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF475569)),
+                  style: GoogleFonts.spaceGrotesk(fontSize: 11.5, fontWeight: FontWeight.w700, color: AppTheme.black),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1146,11 +1170,11 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
             spacing: 6,
             runSpacing: 4,
             children: [
-              _buildTag("Base ₹${basePay.toStringAsFixed(0)}", const Color(0xFFF1F5F9), const Color(0xFF475569)),
-              _buildTag("Distance ₹${distFee.toStringAsFixed(2)}", const Color(0xFFF1F5F9), const Color(0xFF475569)),
+              _buildTag("BASE ₹${basePay.toStringAsFixed(0)}", AppTheme.surface),
+              _buildTag("DIST ₹${distFee.toStringAsFixed(2)}", AppTheme.surface),
               if (tip > 0)
-                _buildTag("Tip +₹${tip.toStringAsFixed(0)}", const Color(0xFFFDF2F8), const Color(0xFFDB2777)),
-              _buildTag("★ $rating", const Color(0xFFFEF3C7), const Color(0xFFD97706)),
+                _buildTag("TIP +₹${tip.toStringAsFixed(0)}", AppTheme.yellow),
+              _buildTag("★ $rating", AppTheme.green),
             ],
           ),
         ],
@@ -1158,19 +1182,19 @@ class _DeliveryAgentRevenueViewState extends State<DeliveryAgentRevenueView> {
     );
   }
 
-  Widget _buildTag(String text, Color bg, Color textColor) {
+  Widget _buildTag(String text, Color bg) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppTheme.black, width: 1.5),
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          color: textColor,
+        style: GoogleFonts.ibmPlexMono(
+          fontSize: 10,
+          fontWeight: FontWeight.w900,
+          color: AppTheme.black,
         ),
       ),
     );

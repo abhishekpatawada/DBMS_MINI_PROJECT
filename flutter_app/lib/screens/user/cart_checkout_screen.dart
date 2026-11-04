@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../services/cart_manager.dart';
 import '../../services/api_service.dart';
 import '../../utils/item_image_helper.dart';
+import '../../theme/app_theme.dart';
+import '../../widgets/brutalist_widgets.dart';
 import 'order_tracking_screen.dart';
 
 class CartCheckoutScreen extends StatefulWidget {
@@ -14,7 +17,7 @@ class CartCheckoutScreen extends StatefulWidget {
 }
 
 class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
-  // 0: Your Cart (Screen 5), 1: Checkout (Screen 6)
+  // 0: Your Cart, 1: Checkout
   int _checkoutStep = 0;
 
   final _couponController = TextEditingController();
@@ -38,58 +41,111 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   void _showAddressPicker() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      builder: (ctx) => Padding(
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
         padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: AppTheme.bg,
+          border: Border(
+            top: BorderSide(color: AppTheme.black, width: 3.5),
+            left: BorderSide(color: AppTheme.black, width: 3.5),
+            right: BorderSide(color: AppTheme.black, width: 3.5),
+          ),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Choose Delivery Address",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "SELECT DELIVERY ADDRESS",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: AppTheme.black),
+                  onPressed: () => Navigator.pop(ctx),
+                ),
+              ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             ..._savedAddresses.map((addr) {
               final isSelected = cartManager.deliveryAddress == addr;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isSelected ? const Color(0xFF4F46E5) : const Color(0xFFE2E8F0),
-                    width: isSelected ? 2 : 1,
+              return GestureDetector(
+                onTap: () {
+                  cartManager.setDeliveryAddress(addr);
+                  Navigator.pop(ctx);
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppTheme.yellow : AppTheme.surface,
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(
+                      color: AppTheme.black,
+                      width: isSelected ? 2.5 : AppTheme.borderWidth,
+                    ),
+                    boxShadow: isSelected
+                        ? const [
+                            BoxShadow(
+                              color: AppTheme.black,
+                              offset: Offset(2.5, 2.5),
+                              blurRadius: 0,
+                            ),
+                          ]
+                        : null,
                   ),
-                  color: isSelected ? const Color(0xFFEEF2FF) : Colors.white,
-                ),
-                child: ListTile(
-                  title: Text(
-                    addr.split("•").first.trim(),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isSelected
+                            ? Icons.radio_button_checked_rounded
+                            : Icons.radio_button_off_rounded,
+                        color: AppTheme.black,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              addr.split("•").first.trim().toUpperCase(),
+                              style: GoogleFonts.spaceGrotesk(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                                color: AppTheme.black,
+                              ),
+                            ),
+                            Text(
+                              addr.split("•").last.trim(),
+                              style: GoogleFonts.ibmPlexMono(
+                                fontSize: 11,
+                                color: const Color(0xFF555555),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  subtitle: Text(
-                    addr.split("•").last.trim(),
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                  ),
-                  trailing: isSelected
-                      ? const Text("Selected", style: TextStyle(color: Color(0xFF4F46E5), fontWeight: FontWeight.bold))
-                      : null,
-                  onTap: () {
-                    cartManager.setDeliveryAddress(addr);
-                    Navigator.pop(ctx);
-                  },
                 ),
               );
             }),
-            const SizedBox(height: 8),
-            TextButton(
+            const SizedBox(height: 6),
+            BrutalistButton.white(
+              text: "+ ADD NEW ADDRESS",
+              fullWidth: true,
               onPressed: () {
                 Navigator.pop(ctx);
                 _showAddCustomAddressDialog();
               },
-              child: const Text("+ Add New Address", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF4F46E5))),
             ),
           ],
         ),
@@ -102,27 +158,49 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Add New Address"),
+        backgroundColor: AppTheme.bg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          side: const BorderSide(color: AppTheme.black, width: 3),
+        ),
+        title: Text(
+          "ADD DELIVERY ADDRESS",
+          style: GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.w900,
+            color: AppTheme.black,
+          ),
+        ),
         content: TextField(
           controller: customAddrController,
           maxLines: 2,
+          style: GoogleFonts.ibmPlexMono(fontSize: 13),
           decoration: const InputDecoration(
             hintText: "Flat / House No, Street, Area, Pincode",
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
-          ElevatedButton(
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              "CANCEL",
+              style: GoogleFonts.spaceGrotesk(
+                fontWeight: FontWeight.w800,
+                color: AppTheme.black,
+              ),
+            ),
+          ),
+          BrutalistButton.yellow(
+            text: "SAVE ADDRESS",
+            height: 40,
             onPressed: () {
               final text = customAddrController.text.trim();
               if (text.isNotEmpty) {
                 final full = "Home • $text";
                 setState(() => _savedAddresses.add(full));
                 cartManager.setDeliveryAddress(full);
-                Navigator.pop(ctx);
               }
+              Navigator.pop(ctx);
             },
-            child: const Text("Save & Deliver Here"),
           ),
         ],
       ),
@@ -132,73 +210,43 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   void _showCouponDialog() {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(ctx).viewInsets.bottom,
-          left: 20,
-          right: 20,
-          top: 20,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: AppTheme.bg,
+          border: Border(
+            top: BorderSide(color: AppTheme.black, width: 3.5),
+            left: BorderSide(color: AppTheme.black, width: 3.5),
+            right: BorderSide(color: AppTheme.black, width: 3.5),
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Apply Coupon",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-            ),
-            const SizedBox(height: 14),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _couponController,
-                    textCapitalization: TextCapitalization.characters,
-                    decoration: InputDecoration(
-                      hintText: "Enter coupon code",
-                      filled: true,
-                      fillColor: const Color(0xFFF1F5F9),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
-                    ),
+                Text(
+                  "APPLY DISCOUNT COUPON",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
                   ),
                 ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4F46E5),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () {
-                    final success = cartManager.applyCoupon(_couponController.text);
-                    Navigator.pop(ctx);
-                    if (!success) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Invalid coupon. Try BITEHUB50 or FEAST20"), backgroundColor: Colors.red),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Applied '${cartManager.appliedCoupon}'!"), backgroundColor: const Color(0xFF10B981)),
-                      );
-                    }
-                  },
-                  child: const Text("Apply", style: TextStyle(fontWeight: FontWeight.bold)),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: AppTheme.black),
+                  onPressed: () => Navigator.pop(ctx),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            const Text("AVAILABLE COUPONS", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1, color: Color(0xFF64748B))),
-            const SizedBox(height: 8),
-            _couponOption("FEAST20", "Flat 20% OFF on all items", "Min order ₹200"),
-            _couponOption("BITEHUB50", "50% OFF up to ₹100", "Min order ₹150"),
-            _couponOption("INSTA50", "₹50 OFF on Instamart orders", "Valid on groceries"),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+            _couponOption("FEAST20", "FLAT 20% OFF ON ORDERS OVER ₹249", "Valid across all restaurants"),
+            _couponOption("BITE100", "₹100 OFF FOR FIRST-TIME USERS", "Minimum cart ₹399"),
+            _couponOption("INSTA50", "₹50 OFF ON INSTAMART GROCERIES", "Valid on 10-min groceries"),
+            const SizedBox(height: 14),
           ],
         ),
       ),
@@ -206,40 +254,64 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   }
 
   Widget _couponOption(String code, String desc, String sub) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+    return BrutalistCard(
+      bgColor: AppTheme.surface,
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+      margin: const EdgeInsets.only(bottom: 10),
+      shadowOffset: const Offset(2.5, 2.5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(code, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF4F46E5), fontSize: 14)),
-              const SizedBox(height: 2),
-              Text(desc, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0F172A))),
-              Text(sub, style: const TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8))),
-            ],
-          ),
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF4F46E5),
-              side: const BorderSide(color: Color(0xFF4F46E5)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  code,
+                  style: GoogleFonts.ibmPlexMono(
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  desc,
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    color: AppTheme.black,
+                  ),
+                ),
+                Text(
+                  sub,
+                  style: GoogleFonts.inter(
+                    fontSize: 10.5,
+                    color: const Color(0xFF666666),
+                  ),
+                ),
+              ],
             ),
+          ),
+          BrutalistButton.yellow(
+            text: "APPLY",
+            height: 36,
             onPressed: () {
               cartManager.applyCoupon(code);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Applied '$code'!"), backgroundColor: const Color(0xFF10B981)),
+                SnackBar(
+                  content: Text(
+                    "COUPON '$code' APPLIED // SAVED ₹${cartManager.discountAmount.toStringAsFixed(0)}",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.black,
+                    ),
+                  ),
+                  backgroundColor: AppTheme.green,
+                ),
               );
             },
-            child: const Text("Apply", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),
@@ -274,10 +346,16 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Order confirmed! Your meal is being prepared."),
-            backgroundColor: Color(0xFF10B981),
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: Text(
+              "ORDER CONFIRMED #$orderId // DISPATCHING",
+              style: GoogleFonts.ibmPlexMono(
+                fontWeight: FontWeight.w900,
+                color: AppTheme.black,
+              ),
+            ),
+            backgroundColor: AppTheme.green,
+            duration: const Duration(seconds: 2),
           ),
         );
 
@@ -297,7 +375,7 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Order failed: $e"),
-            backgroundColor: Colors.red,
+            backgroundColor: AppTheme.red,
           ),
         );
       }
@@ -311,145 +389,201 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
       builder: (context, _) {
         if (cartManager.isEmpty) {
           return Scaffold(
-            backgroundColor: const Color(0xFFF8FAFC),
+            backgroundColor: AppTheme.bg,
             appBar: AppBar(
-              elevation: 0,
-              backgroundColor: Colors.white,
               leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+                icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.black),
                 onPressed: () => Navigator.pop(context),
               ),
-              title: const Text("Your Cart", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A))),
+              title: Text(
+                "YOUR CART",
+                style: GoogleFonts.spaceGrotesk(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                  color: AppTheme.black,
+                ),
+              ),
             ),
             body: Center(
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEEF2FF),
-                        borderRadius: BorderRadius.circular(24),
+                child: BrutalistCard(
+                  bgColor: AppTheme.surface,
+                  padding: const EdgeInsets.all(32),
+                  shadowOffset: const Offset(6, 6),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: AppTheme.yellow,
+                          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                          border: Border.all(
+                            color: AppTheme.black,
+                            width: AppTheme.borderWidth,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: AppTheme.black,
+                              offset: Offset(3, 3),
+                              blurRadius: 0,
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.remove_shopping_cart_rounded,
+                              size: 40, color: AppTheme.black),
+                        ),
                       ),
-                      child: const Center(child: Text("🛒", style: TextStyle(fontSize: 40))),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "Your cart is empty",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      "Explore top-rated restaurants and dishes to satisfy your cravings.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      const SizedBox(height: 20),
+                      Text(
+                        "CART IS EMPTY",
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.black,
+                        ),
                       ),
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text("Browse Dishes & Groceries", style: TextStyle(fontWeight: FontWeight.bold)),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        "Explore top restaurants or 10-minute groceries to begin.",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          color: const Color(0xFF666666),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      BrutalistButton.yellow(
+                        text: "BROWSE CATALOG →",
+                        fullWidth: true,
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           );
         }
 
-        // Render Step 0 (Screen 5: Your Cart) OR Step 1 (Screen 6: Checkout)
         return _checkoutStep == 0 ? _buildCartScreen() : _buildCheckoutScreen();
       },
     );
   }
 
   // ===========================================================================
-  // SCREEN 5: YOUR CART
+  // SCREEN 5: YOUR CART (BRUTALIST REDESIGN)
   // ===========================================================================
   Widget _buildCartScreen() {
     final isBite = cartManager.orderType == "Restaurant";
     final vendorTitle = isBite
-        ? (cartManager.activeRestName ?? "BBQ Bawarchi 1")
-        : (cartManager.activeStoreArea != null ? "Instamart • ${cartManager.activeStoreArea}" : "Instamart Hub");
-    final vendorSub = isBite ? "Saket, Delhi • 25-35 mins" : "Fast delivery • 10-15 mins";
-
+        ? (cartManager.activeRestName ?? "Restaurant Partner")
+        : (cartManager.activeStoreArea != null
+            ? "Instamart • ${cartManager.activeStoreArea}"
+            : "Instamart Dark Store Hub");
+    final vendorSub =
+        isBite ? "Gourmet dining • 25-35 mins" : "Direct hub dispatch • 10-15 mins";
     final grandTotal = cartManager.grandTotal;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text("Your Cart", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A))),
-        actions: [
-          TextButton(
-            onPressed: () {
-              cartManager.clear();
-              Navigator.pop(context);
-            },
-            child: const Text("Clear", style: TextStyle(color: Color(0xFF4F46E5), fontWeight: FontWeight.bold, fontSize: 13)),
+        title: Text(
+          "YOUR CART",
+          style: GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            color: AppTheme.black,
           ),
-          const SizedBox(width: 8),
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: GestureDetector(
+              onTap: () {
+                cartManager.clear();
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppTheme.surface,
+                  borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                  border: Border.all(color: AppTheme.black, width: 2),
+                ),
+                child: Text(
+                  "CLEAR",
+                  style: GoogleFonts.ibmPlexMono(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 11,
+                    color: AppTheme.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Segmented Tabs: Bite (1) / Instamart (0) (Screen 5)
+          // Order Type Segment Tabs
           Container(
-            padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: const Color(0xFFE2E8F0),
-              borderRadius: BorderRadius.circular(12),
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+              border: Border.all(
+                color: AppTheme.black,
+                width: AppTheme.borderWidth,
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppTheme.black,
+                  offset: Offset(3, 3),
+                  blurRadius: 0,
+                ),
+              ],
             ),
             child: Row(
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: isBite ? const Color(0xFF4F46E5) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
+                      color: isBite ? AppTheme.yellow : Colors.transparent,
                     ),
-                    child: Center(
-                      child: Text(
-                        "Bite (${isBite ? cartManager.totalCount : 0})",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: isBite ? Colors.white : const Color(0xFF64748B),
-                        ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "FOOD (${isBite ? cartManager.totalCount : 0})",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12.5,
+                        color: AppTheme.black,
                       ),
                     ),
                   ),
                 ),
+                Container(width: AppTheme.borderWidth, height: 38, color: AppTheme.black),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: !isBite ? const Color(0xFF10B981) : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
+                      color: !isBite ? AppTheme.yellow : Colors.transparent,
                     ),
-                    child: Center(
-                      child: Text(
-                        "Instamart (${!isBite ? cartManager.totalCount : 0})",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: !isBite ? Colors.white : const Color(0xFF64748B),
-                        ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "INSTAMART (${!isBite ? cartManager.totalCount : 0})",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12.5,
+                        color: AppTheme.black,
                       ),
                     ),
                   ),
@@ -459,36 +593,27 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Store Header + Items List (Screen 5)
-          Container(
+          // Vendor & Items Card
+          BrutalistCard(
+            bgColor: AppTheme.surface,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2)),
-              ],
-            ),
+            shadowOffset: const Offset(4, 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Store Info Row
                 Row(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        ItemImageHelper.getBannerForRestaurant(vendorTitle),
-                        width: 40,
-                        height: 40,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 40,
-                          height: 40,
-                          color: const Color(0xFFEEF2FF),
-                          child: const Icon(Icons.restaurant, color: Color(0xFF4F46E5), size: 20),
-                        ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isBite ? AppTheme.yellow : AppTheme.green,
+                        borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                        border: Border.all(color: AppTheme.black, width: 2),
+                      ),
+                      child: Icon(
+                        isBite ? Icons.restaurant_rounded : Icons.bolt_rounded,
+                        color: AppTheme.black,
+                        size: 20,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -496,14 +621,29 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(vendorTitle, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Color(0xFF0F172A))),
-                          Text(vendorSub, style: const TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                          Text(
+                            vendorTitle.toUpperCase(),
+                            style: GoogleFonts.spaceGrotesk(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 14.5,
+                              color: AppTheme.black,
+                            ),
+                          ),
+                          Text(
+                            vendorSub,
+                            style: GoogleFonts.ibmPlexMono(
+                              fontSize: 10.5,
+                              color: const Color(0xFF666666),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const Divider(height: 24),
+                const SizedBox(height: 12),
+                Container(height: 2.0, color: AppTheme.black),
+                const SizedBox(height: 14),
 
                 // Cart Items
                 ...cartManager.items.values.map((item) {
@@ -515,41 +655,76 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                           imageUrl: item.imageUrl,
                           itemName: item.itemName,
                           isGrocery: cartManager.orderType == "Grocery",
-                          width: 55,
-                          height: 55,
-                          borderRadius: 10,
+                          width: 52,
+                          height: 52,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(item.itemName, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A))),
-                              const SizedBox(height: 3),
-                              Text("₹${(item.price * item.quantity).toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A))),
+                              Text(
+                                item.itemName,
+                                style: GoogleFonts.spaceGrotesk(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 13.5,
+                                  color: AppTheme.black,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                "₹${(item.price * item.quantity).toStringAsFixed(2)}",
+                                style: GoogleFonts.ibmPlexMono(
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 13,
+                                  color: AppTheme.black,
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                        // Stepper: [ - 1 + ] (Screen 5)
+                        // Stepper: [ - QTY + ]
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                            color: AppTheme.surface,
+                            borderRadius:
+                                BorderRadius.circular(AppTheme.borderRadius),
+                            border: Border.all(color: AppTheme.black, width: 2),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppTheme.black,
+                                offset: Offset(2, 2),
+                                blurRadius: 0,
+                              ),
+                            ],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               InkWell(
-                                onTap: () => cartManager.decrementItem(item.itemName),
+                                onTap: () =>
+                                    cartManager.decrementItem(item.itemName),
                                 child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  child: Text("—", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF64748B))),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  child: Text("—",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 12,
+                                          color: AppTheme.black)),
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6),
-                                child: Text("${item.quantity}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A))),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 6),
+                                child: Text(
+                                  "${item.quantity}",
+                                  style: GoogleFonts.ibmPlexMono(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13,
+                                    color: AppTheme.black,
+                                  ),
+                                ),
                               ),
                               InkWell(
                                 onTap: () => cartManager.addItem(
@@ -563,9 +738,15 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                                   storeArea: cartManager.activeStoreArea,
                                   type: cartManager.orderType,
                                 ),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  child: Text("+", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF4F46E5))),
+                                child: Container(
+                                  color: AppTheme.yellow,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  child: const Text("+",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 13,
+                                          color: AppTheme.black)),
                                 ),
                               ),
                             ],
@@ -576,101 +757,131 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                   );
                 }),
 
-                // Add more items link
+                // Add more items button
                 Center(
                   child: TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text("+ Add more items", style: TextStyle(color: Color(0xFF4F46E5), fontWeight: FontWeight.bold, fontSize: 13)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Apply Coupon Tile (Screen 5)
-          GestureDetector(
-            onTap: _showCouponDialog,
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
-              ),
-              child: Row(
-                children: [
-                  const Text("🎟️", style: TextStyle(fontSize: 16)),
-                  const SizedBox(width: 10),
-                  Expanded(
                     child: Text(
-                      cartManager.appliedCoupon != null
-                          ? "Coupon '${cartManager.appliedCoupon}' Applied (Saved ₹${cartManager.discountAmount.toStringAsFixed(0)})"
-                          : "Apply Coupon",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: cartManager.appliedCoupon != null ? const Color(0xFF10B981) : const Color(0xFF0F172A),
+                      "+ ADD MORE ITEMS",
+                      style: GoogleFonts.spaceGrotesk(
+                        color: AppTheme.black,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 12,
                       ),
                     ),
                   ),
-                  const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF94A3B8)),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Bill Details (Screen 5)
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Bill Details", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-                const SizedBox(height: 12),
-                _billRow("Item Total", "₹${cartManager.subtotal.toStringAsFixed(2)}"),
-                _billRow("Delivery Fee", cartManager.deliveryFee == 0 ? "FREE" : "₹${cartManager.deliveryFee.toStringAsFixed(2)}"),
-                _billRow("Platform Fee", "₹5.00"),
-                _billRow("Taxes & Charges", "₹${cartManager.taxes.toStringAsFixed(2)}"),
-                if (cartManager.discountAmount > 0)
-                  _billRow("Discount", "- ₹${cartManager.discountAmount.toStringAsFixed(2)}", isDiscount: true),
-                const Divider(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text("Grand Total", style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-                    Text("₹${(grandTotal + 5.0).toStringAsFixed(2)}", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
-                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 14),
 
-          // Sticky Bottom Proceed CTA (Screen 5)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4F46E5),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              elevation: 0,
-            ),
-            onPressed: () => setState(() => _checkoutStep = 1),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          // Coupon Tile
+          BrutalistCard(
+            bgColor: cartManager.appliedCoupon != null
+                ? AppTheme.yellow
+                : AppTheme.surface,
+            padding: const EdgeInsets.all(14),
+            shadowOffset: const Offset(3, 3),
+            onTap: _showCouponDialog,
+            child: Row(
               children: [
-                Text("Proceed to Checkout", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-                SizedBox(width: 6),
-                Icon(Icons.arrow_forward_rounded, size: 18),
+                const Icon(Icons.confirmation_number_outlined,
+                    color: AppTheme.black, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    cartManager.appliedCoupon != null
+                        ? "COUPON '${cartManager.appliedCoupon}' ACTIVE // SAVED ₹${cartManager.discountAmount.toStringAsFixed(0)}"
+                        : "APPLY DISCOUNT COUPON",
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12.5,
+                      color: AppTheme.black,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.arrow_forward_rounded,
+                    size: 16, color: AppTheme.black),
               ],
             ),
+          ),
+          const SizedBox(height: 14),
+
+          // Bill Details
+          BrutalistCard(
+            bgColor: AppTheme.surface,
+            padding: const EdgeInsets.all(16),
+            shadowOffset: const Offset(4, 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "BILL DETAILS",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(height: 2.0, color: AppTheme.black),
+                const SizedBox(height: 10),
+                _billRow("ITEM TOTAL",
+                    "₹${cartManager.subtotal.toStringAsFixed(2)}"),
+                _billRow("DELIVERY FEE",
+                    cartManager.deliveryFee == 0
+                        ? "FREE"
+                        : "₹${cartManager.deliveryFee.toStringAsFixed(2)}"),
+                _billRow("PLATFORM FEE", "₹5.00"),
+                _billRow("TAXES & CHARGES",
+                    "₹${cartManager.taxes.toStringAsFixed(2)}"),
+                if (cartManager.discountAmount > 0)
+                  _billRow("DISCOUNT SAVED",
+                      "- ₹${cartManager.discountAmount.toStringAsFixed(2)}",
+                      isDiscount: true),
+                const SizedBox(height: 10),
+                Container(height: 2.0, color: AppTheme.black),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.yellow,
+                    borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+                    border: Border.all(color: AppTheme.black, width: 2),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "GRAND TOTAL",
+                        style: GoogleFonts.spaceGrotesk(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.black,
+                        ),
+                      ),
+                      Text(
+                        "₹${(grandTotal + 5.0).toStringAsFixed(2)}",
+                        style: GoogleFonts.ibmPlexMono(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: AppTheme.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Proceed to Checkout CTA
+          BrutalistButton(
+            text: "PROCEED TO CHECKOUT →",
+            fullWidth: true,
+            onPressed: () => setState(() => _checkoutStep = 1),
           ),
           const SizedBox(height: 24),
         ],
@@ -679,47 +890,69 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
   }
 
   // ===========================================================================
-  // SCREEN 6: CHECKOUT
+  // SCREEN 6: CHECKOUT (BRUTALIST REDESIGN)
   // ===========================================================================
   Widget _buildCheckoutScreen() {
-    final isBite = cartManager.orderType == "Restaurant";
-    final vendorTitle = isBite
-        ? (cartManager.activeRestName ?? "BBQ Bawarchi 1")
-        : (cartManager.activeStoreArea != null ? "Instamart • ${cartManager.activeStoreArea}" : "Instamart Hub");
-    final grandTotal = cartManager.grandTotal + 5.0; // including platform fee
+    final grandTotal = cartManager.grandTotal + 5.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF0F172A)),
+          icon: const Icon(Icons.arrow_back_rounded, color: AppTheme.black),
           onPressed: () => setState(() => _checkoutStep = 0),
         ),
-        title: const Text("Checkout", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Color(0xFF0F172A))),
+        title: Text(
+          "CHECKOUT & PAYMENT",
+          style: GoogleFonts.spaceGrotesk(
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            color: AppTheme.black,
+          ),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // 1. Delivery Address Card (Screen 6)
-          Container(
+          // 1. Delivery Address Card
+          BrutalistCard(
+            bgColor: AppTheme.surface,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
-            ),
+            shadowOffset: const Offset(3.5, 3.5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Delivery Address", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
-                    InkWell(
+                    Text(
+                      "DELIVERY ADDRESS",
+                      style: GoogleFonts.spaceGrotesk(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                        color: AppTheme.black,
+                      ),
+                    ),
+                    GestureDetector(
                       onTap: _showAddressPicker,
-                      child: const Text("Change", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF4F46E5))),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppTheme.yellow,
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.borderRadius),
+                          border: Border.all(color: AppTheme.black, width: 1.5),
+                        ),
+                        child: Text(
+                          "CHANGE",
+                          style: GoogleFonts.ibmPlexMono(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 10.5,
+                            color: AppTheme.black,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -727,24 +960,38 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.home_outlined, size: 20, color: Color(0xFF4F46E5)),
-                    const SizedBox(width: 10),
+                    const Icon(Icons.location_on_rounded,
+                        size: 20, color: AppTheme.black),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             cartManager.deliveryAddress.contains("•")
-                                ? cartManager.deliveryAddress.split("•").first.trim()
-                                : "Home",
-                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A)),
+                                ? cartManager.deliveryAddress
+                                    .split("•")
+                                    .first
+                                    .trim()
+                                    .toUpperCase()
+                                : "HOME",
+                            style: GoogleFonts.spaceGrotesk(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 13,
+                              color: AppTheme.black,
+                            ),
                           ),
-                          const SizedBox(height: 2),
                           Text(
                             cartManager.deliveryAddress.contains("•")
-                                ? cartManager.deliveryAddress.split("•").last.trim()
+                                ? cartManager.deliveryAddress
+                                    .split("•")
+                                    .last
+                                    .trim()
                                 : cartManager.deliveryAddress,
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                            style: GoogleFonts.inter(
+                              fontSize: 11.5,
+                              color: const Color(0xFF555555),
+                            ),
                           ),
                         ],
                       ),
@@ -756,27 +1003,31 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
           const SizedBox(height: 14),
 
-          // 2. Delivery Instructions (Screen 6)
-          Container(
+          // 2. Delivery Instructions
+          BrutalistCard(
+            bgColor: AppTheme.surface,
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
-            ),
+            shadowOffset: const Offset(3.5, 3.5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Delivery Instructions", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
+                Text(
+                  "DELIVERY INSTRUCTIONS",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
+                  ),
+                ),
                 const SizedBox(height: 6),
                 TextField(
                   controller: _instructionsController,
+                  style: GoogleFonts.inter(fontSize: 13),
                   decoration: const InputDecoration(
-                    hintText: "e.g. Gate code, floor, landmark",
-                    hintStyle: TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                    border: InputBorder.none,
+                    hintText: "e.g. Leave with security, gate code, ring bell",
                     isDense: true,
-                    contentPadding: EdgeInsets.zero,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   ),
                 ),
               ],
@@ -784,164 +1035,35 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
           ),
           const SizedBox(height: 14),
 
-          // 3. Order Summary Card (Screen 6)
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Order Summary", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF64748B))),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        ItemImageHelper.getBannerForRestaurant(vendorTitle),
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          width: 50,
-                          height: 50,
-                          color: const Color(0xFFEEF2FF),
-                          child: const Icon(Icons.fastfood, color: Color(0xFF4F46E5), size: 22),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(vendorTitle, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF0F172A))),
-                          Text("${cartManager.totalCount} items", style: const TextStyle(fontSize: 12, color: Color(0xFF64748B))),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text("₹${cartManager.subtotal.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 14, color: Color(0xFF0F172A))),
-                        const SizedBox(height: 2),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDCFCE7),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text("20% OFF", style: TextStyle(color: Color(0xFF16A34A), fontSize: 9.5, fontWeight: FontWeight.bold)),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // 4. Apply Coupon (Screen 6)
-          GestureDetector(
-            onTap: _showCouponDialog,
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
-              ),
-              child: Row(
-                children: [
-                  const Text("🎟️", style: TextStyle(fontSize: 16)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      cartManager.appliedCoupon != null ? "Coupon '${cartManager.appliedCoupon}' Applied" : "Apply Coupon",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
-                        color: cartManager.appliedCoupon != null ? const Color(0xFF10B981) : const Color(0xFF0F172A),
-                      ),
-                    ),
-                  ),
-                  const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF94A3B8)),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // 5. Payment Method (Screen 6)
-          Container(
+          // 3. Payment Method Card
+          BrutalistCard(
+            bgColor: AppTheme.surface,
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFFF1F5F9)),
-            ),
+            shadowOffset: const Offset(4, 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Payment Method", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
-                const SizedBox(height: 8),
-
-                // BiteHub Pay (Screen 6)
-                RadioListTile<String>(
-                  contentPadding: EdgeInsets.zero,
-                  value: "BiteHub Pay",
-                  groupValue: _selectedPayment,
-                  activeColor: const Color(0xFF4F46E5),
-                  title: Row(
-                    children: [
-                      const Text("BiteHub Pay", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF0F172A))),
-                      const SizedBox(width: 8),
-                      Text("Balance: ₹450.00", style: TextStyle(fontSize: 11, color: Colors.grey[600])),
-                    ],
+                Text(
+                  "SELECT PAYMENT METHOD",
+                  style: GoogleFonts.spaceGrotesk(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                    color: AppTheme.black,
                   ),
-                  onChanged: (v) => setState(() => _selectedPayment = v!),
                 ),
+                const SizedBox(height: 10),
+                Container(height: 2.0, color: AppTheme.black),
+                const SizedBox(height: 10),
 
-                // UPI (Screen 6)
-                RadioListTile<String>(
-                  contentPadding: EdgeInsets.zero,
-                  value: "UPI",
-                  groupValue: _selectedPayment,
-                  activeColor: const Color(0xFF4F46E5),
-                  title: const Row(
-                    children: [
-                      Text("UPI", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF0F172A))),
-                      SizedBox(width: 10),
-                      Text("GPay • PhonePe • Paytm", style: TextStyle(fontSize: 11, color: Color(0xFF4F46E5), fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                  onChanged: (v) => setState(() => _selectedPayment = v!),
-                ),
-
-                // Credit / Debit Card (Screen 6)
-                RadioListTile<String>(
-                  contentPadding: EdgeInsets.zero,
-                  value: "Credit / Debit Card",
-                  groupValue: _selectedPayment,
-                  activeColor: const Color(0xFF4F46E5),
-                  title: const Text("Credit / Debit Card", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF0F172A))),
-                  onChanged: (v) => setState(() => _selectedPayment = v!),
-                ),
-
-                // Cash on Delivery (Screen 6)
-                RadioListTile<String>(
-                  contentPadding: EdgeInsets.zero,
-                  value: "Cash on Delivery",
-                  groupValue: _selectedPayment,
-                  activeColor: const Color(0xFF4F46E5),
-                  title: const Text("Cash on Delivery", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Color(0xFF0F172A))),
-                  onChanged: (v) => setState(() => _selectedPayment = v!),
-                ),
+                // Payment Options
+                _paymentTile("BiteHub Pay", "WALLET BALANCE: ₹450.00",
+                    Icons.account_balance_wallet_rounded),
+                _paymentTile("UPI", "GPAY • PHONEPE • PAYTM",
+                    Icons.qr_code_scanner_rounded),
+                _paymentTile("Credit / Debit Card", "VISA • MASTERCARD • RUPAY",
+                    Icons.credit_card_rounded),
+                _paymentTile("Cash on Delivery", "PAY CASH / UPI ON ARRIVAL",
+                    Icons.payments_rounded),
               ],
             ),
           ),
@@ -949,14 +1071,17 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
         ],
       ),
 
-      // Sticky Bottom Bar: Grand Total on left + Place Order button on right (Screen 6)
+      // Sticky Bottom Bar
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4)),
-          ],
+        decoration: const BoxDecoration(
+          color: AppTheme.black,
+          border: Border(
+            top: BorderSide(
+              color: AppTheme.black,
+              width: AppTheme.borderWidth,
+            ),
+          ),
         ),
         child: SafeArea(
           child: Row(
@@ -966,23 +1091,37 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("₹${grandTotal.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Color(0xFF0F172A))),
-                  const Text("Grand Total", style: TextStyle(fontSize: 11, color: Color(0xFF64748B))),
+                  Text(
+                    "TOTAL PAYABLE",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.yellow,
+                    ),
+                  ),
+                  Text(
+                    "₹${grandTotal.toStringAsFixed(2)}",
+                    style: GoogleFonts.ibmPlexMono(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 20,
+                      color: AppTheme.surface,
+                    ),
+                  ),
                 ],
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4F46E5),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                onPressed: _isSubmitting ? null : _handlePlaceOrder,
-                child: _isSubmitting
-                    ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text("Place Order", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15)),
-              ),
+              _isSubmitting
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: AppTheme.yellow,
+                        strokeWidth: 2.5,
+                      ),
+                    )
+                  : BrutalistButton.yellow(
+                      text: "PLACE ORDER ★",
+                      onPressed: _handlePlaceOrder,
+                    ),
             ],
           ),
         ),
@@ -990,19 +1129,83 @@ class _CartCheckoutScreenState extends State<CartCheckoutScreen> {
     );
   }
 
+  Widget _paymentTile(String title, String subtitle, IconData icon) {
+    final isSelected = _selectedPayment == title;
+
+    return GestureDetector(
+      onTap: () => setState(() => _selectedPayment = title),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.yellow : AppTheme.surface,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadius),
+          border: Border.all(
+            color: AppTheme.black,
+            width: isSelected ? 2.5 : 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              isSelected
+                  ? Icons.radio_button_checked_rounded
+                  : Icons.radio_button_off_rounded,
+              color: AppTheme.black,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Icon(icon, size: 20, color: AppTheme.black),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.spaceGrotesk(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 13,
+                      color: AppTheme.black,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.ibmPlexMono(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF555555),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _billRow(String label, String value, {bool isDiscount = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+          Text(
+            label,
+            style: GoogleFonts.spaceGrotesk(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF555555),
+            ),
+          ),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: isDiscount ? const Color(0xFF10B981) : const Color(0xFF0F172A),
+            style: GoogleFonts.ibmPlexMono(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w800,
+              color: isDiscount ? AppTheme.green : AppTheme.black,
             ),
           ),
         ],

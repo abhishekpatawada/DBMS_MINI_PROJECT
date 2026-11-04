@@ -179,6 +179,8 @@ class ApiService {
     return response.statusCode == 200;
   }
 
+  static Future<bool> updateUserProfile(int userId, Map<String, dynamic> data) => updateUser(userId, data);
+
   static Future<bool> deleteUser(int userId) async {
     final response = await http.delete(Uri.parse('$baseUrl/users/$userId'));
     return response.statusCode == 200;
